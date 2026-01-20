@@ -1,19 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.0.31903.59
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11408.102 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{2C854FF8-EFCF-4411-AD4B-2803A3DA97CD}"
 	ProjectSection(SolutionItems) = preProject
-		docs\PROJECT_CHARTER.md = docs\PROJECT_CHARTER.md
-		docs\REQUIREMENTS.md = docs\REQUIREMENTS.md
-		docs\TECHNICAL_ARCHITECTURE.md = docs\TECHNICAL_ARCHITECTURE.md
 		docs\API_SPECIFICATION.md = docs\API_SPECIFICATION.md
+		docs\CODING_STANDARDS.md = docs\CODING_STANDARDS.md
 		docs\DATABASE_SCHEMA.md = docs\DATABASE_SCHEMA.md
 		docs\DEPLOYMENT_GUIDE.md = docs\DEPLOYMENT_GUIDE.md
-		docs\CODING_STANDARDS.md = docs\CODING_STANDARDS.md
+		docs\PROJECT_CHARTER.md = docs\PROJECT_CHARTER.md
+		docs\REQUIREMENTS.md = docs\REQUIREMENTS.md
 		docs\SECURITY_GUIDELINES.md = docs\SECURITY_GUIDELINES.md
+		docs\TECHNICAL_ARCHITECTURE.md = docs\TECHNICAL_ARCHITECTURE.md
 		docs\TESTING_STRATEGY.md = docs\TESTING_STRATEGY.md
+		TextFile1.txt = TextFile1.txt
 		docs\UI_UX_GUIDELINES.md = docs\UI_UX_GUIDELINES.md
 	EndProjectSection
 EndProject
