@@ -6,11 +6,16 @@
 
 | **Document Title** | FestGuide - Technical Architecture Document |
 |---|---|
-| **Version** | 1.0 |
+| **Version** | 1.1 |
 | **Date** | 2026-01-20 |
 | **Status** | Draft |
 | **Author** | Project Team |
 | **Document Owner** | sqlservernerd |
+
+| **Version** | **Date** | **Author** | **Changes** |
+|---|---|---|---|
+| 1.0 | 2026-01-20 | Project Team | Initial draft |
+| 1.1 | 2026-01-20 | Project Team | Fixed project naming consistency (removed errant spaces) |
 
 ---
 
@@ -224,8 +229,8 @@ FestGuide.sln
 ├─────────────┬───────────────────────────────────────────────────┤
 │  Organizer  │◄──── User account with organizer role             │
 └─────────────┘                                                    
-       │                                                            
-       ▼                                                            
+       │                                                             
+       ▼                                                             
 ┌─────────────────────────────────────────────────────────────────┐
 │ Festival Permission                                              │
 │ ─────────────────                                                │
@@ -241,8 +246,8 @@ FestGuide.sln
 │  Attendee   │◄──── User account with attendee role (PRIMARY)    │
 │             │      (optional: PreferredTimezoneId)              │
 └─────────────┘                                                    
-       │                                                            
-       ▼                                                            
+       │                                                             
+       ▼                                                             
 ┌───────────────────┐       ┌──────────────────────────┐
 │ Personal Schedule │──────►│ Personal Schedule Entry  │
 │ (per edition)     │1─────*│ (references Engagement)  │
