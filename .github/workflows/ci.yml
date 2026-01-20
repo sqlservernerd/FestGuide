@@ -7,9 +7,9 @@ on:
     branches: [ main, develop ]
 
 env:
-DOTNET_VERSION: '10.0.x'
-DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
-DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_VERSION: '10.0.x'
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
 
 jobs:
   build:
@@ -26,13 +26,13 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore FestGuide.sln
 
     - name: Build
-      run: dotnet build --configuration Release --no-restore
+      run: dotnet build FestGuide.sln --configuration Release --no-restore
 
     - name: Run unit tests
-      run: dotnet test --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+      run: dotnet test FestGuide.sln --configuration Release --no-build --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
 
     - name: Upload coverage reports
       uses: codecov/codecov-action@v4
@@ -55,12 +55,12 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore FestGuide.sln
 
     - name: Run security scan
       run: |
         dotnet tool install --global security-scan --version 5.6.3 || true
-        dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
+        dotnet list FestGuide.sln package --vulnerable --include-transitive 2>&1 | tee vulnerability-report.txt
         
     - name: Upload vulnerability report
       uses: actions/upload-artifact@v4
@@ -83,7 +83,7 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSION }}
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore FestGuide.sln
 
     - name: Build with analyzers
-      run: dotnet build --configuration Release --no-restore /p:TreatWarningsAsErrors=false
+      run: dotnet build FestGuide.sln --configuration Release --no-restore /p:TreatWarningsAsErrors=false
