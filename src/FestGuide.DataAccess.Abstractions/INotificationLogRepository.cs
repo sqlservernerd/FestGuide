@@ -40,12 +40,12 @@ public interface INotificationLogRepository
     /// <summary>
     /// Marks a notification as read.
     /// </summary>
-    Task MarkAsReadAsync(Guid notificationLogId, CancellationToken ct = default);
+    Task MarkAsReadAsync(Guid notificationLogId, Guid modifiedBy, CancellationToken ct = default);
 
     /// <summary>
     /// Marks all notifications as read for a user.
     /// </summary>
-    Task MarkAllAsReadAsync(Guid userId, CancellationToken ct = default);
+    Task MarkAllAsReadAsync(Guid userId, Guid modifiedBy, CancellationToken ct = default);
 
     /// <summary>
     /// Updates delivery status.

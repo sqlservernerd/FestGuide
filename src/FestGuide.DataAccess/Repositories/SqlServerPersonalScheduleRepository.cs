@@ -313,7 +313,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<PersonalSchedule>> GetByEditionAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<PersonalSchedule>> GetByEditionAsync(Guid editionId, int limit = 1000, int offset = 0, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -322,10 +322,12 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
                 CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
             FROM attendee.PersonalSchedule
             WHERE EditionId = @EditionId AND IsDeleted = 0
+            ORDER BY CreatedAtUtc
+            OFFSET @Offset ROWS FETCH NEXT @Limit ROWS ONLY
             """;
 
         var result = await _connection.QueryAsync<PersonalSchedule>(
-            new CommandDefinition(sql, new { EditionId = editionId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { EditionId = editionId, Limit = limit, Offset = offset }, cancellationToken: ct));
 
         return result.ToList();
     }

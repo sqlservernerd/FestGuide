@@ -12,6 +12,8 @@ namespace FestGuide.Application.Services;
 /// </summary>
 public class NotificationService : INotificationService
 {
+    private const int MaxSchedulesPerEdition = 10000; // Maximum number of schedules to fetch per edition for notifications
+
     private readonly IDeviceTokenRepository _deviceTokenRepository;
     private readonly INotificationLogRepository _notificationLogRepository;
     private readonly INotificationPreferenceRepository _preferenceRepository;
@@ -82,7 +84,7 @@ public class NotificationService : INotificationService
             throw new ForbiddenException("Device not found or does not belong to user.");
         }
 
-        await _deviceTokenRepository.DeactivateAsync(deviceTokenId, ct);
+        await _deviceTokenRepository.DeactivateAsync(deviceTokenId, userId, ct);
 
         _logger.LogInformation("Device {DeviceTokenId} unregistered for user {UserId}", deviceTokenId, userId);
     }
@@ -90,7 +92,8 @@ public class NotificationService : INotificationService
     /// <inheritdoc />
     public async Task UnregisterDeviceByTokenAsync(string token, CancellationToken ct = default)
     {
-        await _deviceTokenRepository.DeactivateByTokenAsync(token, ct);
+        // For token-based unregistration, we use Guid.Empty since we don't have authenticated user context
+        await _deviceTokenRepository.DeactivateByTokenAsync(token, Guid.Empty, ct);
     }
 
     #endregion
@@ -168,13 +171,13 @@ public class NotificationService : INotificationService
             throw new ForbiddenException("Notification not found or does not belong to user.");
         }
 
-        await _notificationLogRepository.MarkAsReadAsync(notificationId, ct);
+        await _notificationLogRepository.MarkAsReadAsync(notificationId, userId, ct);
     }
 
     /// <inheritdoc />
     public async Task MarkAllAsReadAsync(Guid userId, CancellationToken ct = default)
     {
-        await _notificationLogRepository.MarkAllAsReadAsync(userId, ct);
+        await _notificationLogRepository.MarkAllAsReadAsync(userId, userId, ct);
     }
 
     #endregion
@@ -204,6 +207,13 @@ public class NotificationService : INotificationService
         if (!ShouldSendNotificationType(prefs, notificationType))
         {
             _logger.LogDebug("Notification type {Type} disabled for user {UserId}, skipping", notificationType, userId);
+            return;
+        }
+
+        // Check quiet hours
+        if (prefs != null && IsInQuietHours(prefs))
+        {
+            _logger.LogDebug("User {UserId} is in quiet hours, skipping notification", userId);
             return;
         }
 
@@ -253,9 +263,10 @@ public class NotificationService : INotificationService
                 _logger.LogWarning(ex, "Failed to send notification to device {DeviceId}", device.DeviceTokenId);
 
                 // Deactivate invalid tokens
-                if (ex.Message.Contains("invalid") || ex.Message.Contains("unregistered"))
+                if (ex.Message.Contains("invalid", StringComparison.OrdinalIgnoreCase) || 
+                    ex.Message.Contains("unregistered", StringComparison.OrdinalIgnoreCase))
                 {
-                    await _deviceTokenRepository.DeactivateAsync(device.DeviceTokenId, ct);
+                    await _deviceTokenRepository.DeactivateAsync(device.DeviceTokenId, Guid.Empty, ct);
                 }
             }
 
@@ -274,10 +285,18 @@ public class NotificationService : INotificationService
         Dictionary<string, string>? data = null,
         CancellationToken ct = default)
     {
-        foreach (var userId in userIds)
-        {
-            await SendToUserAsync(userId, notificationType, title, body, relatedEntityType, relatedEntityId, data, ct);
-        }
+        var sendTasks = userIds.Select(userId =>
+            SendToUserAsync(
+                userId,
+                notificationType,
+                title,
+                body,
+                relatedEntityType,
+                relatedEntityId,
+                data,
+                ct));
+
+        await Task.WhenAll(sendTasks);
     }
 
     /// <inheritdoc />
@@ -293,7 +312,7 @@ public class NotificationService : INotificationService
         else
         {
             // Otherwise, notify all users who have schedules for this edition
-            var schedules = await _personalScheduleRepository.GetByEditionAsync(change.EditionId, ct);
+            var schedules = await _personalScheduleRepository.GetByEditionAsync(change.EditionId, limit: MaxSchedulesPerEdition, offset: 0, ct);
             userIds = schedules.Select(s => s.UserId).Distinct();
         }
 
@@ -338,6 +357,26 @@ public class NotificationService : INotificationService
             "announcement" => prefs.AnnouncementsEnabled,
             _ => true
         };
+    }
+
+    private bool IsInQuietHours(NotificationPreference prefs)
+    {
+        if (!prefs.QuietHoursStart.HasValue || !prefs.QuietHoursEnd.HasValue)
+        {
+            return false;
+        }
+
+        var now = TimeOnly.FromTimeSpan(_dateTimeProvider.UtcNow.TimeOfDay);
+        var start = prefs.QuietHoursStart.Value;
+        var end = prefs.QuietHoursEnd.Value;
+
+        // Handle quiet hours that span midnight (e.g., 23:00 to 06:00)
+        if (start > end)
+        {
+            return now >= start || now <= end;
+        }
+
+        return now >= start && now <= end;
     }
 
     #endregion

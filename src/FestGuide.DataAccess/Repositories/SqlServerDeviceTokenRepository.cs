@@ -10,6 +10,8 @@ namespace FestGuide.DataAccess.Repositories;
 /// </summary>
 public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
 {
+    private const int MaxSqlParameterCount = 2000; // SQL Server has a limit of 2100 parameters, use 2000 for safety
+
     private readonly IDbConnection _connection;
 
     public SqlServerDeviceTokenRepository(IDbConnection connection)
@@ -71,19 +73,35 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
     /// <inheritdoc />
     public async Task<IReadOnlyList<DeviceToken>> GetByUsersAsync(IEnumerable<Guid> userIds, CancellationToken ct = default)
     {
-        const string sql = """
-            SELECT 
-                DeviceTokenId, UserId, Token, Platform, DeviceName,
-                IsActive, LastUsedAtUtc, ExpiresAtUtc,
-                CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
-            FROM notifications.DeviceToken
-            WHERE UserId IN @UserIds AND IsActive = 1
-            """;
+        var userIdArray = userIds.ToArray();
+        if (userIdArray.Length == 0)
+        {
+            return Array.Empty<DeviceToken>();
+        }
 
-        var result = await _connection.QueryAsync<DeviceToken>(
-            new CommandDefinition(sql, new { UserIds = userIds.ToArray() }, cancellationToken: ct));
+        // Handle large user sets by batching to avoid SQL Server parameter limits
+        var results = new List<DeviceToken>();
 
-        return result.ToList();
+        for (int i = 0; i < userIdArray.Length; i += MaxSqlParameterCount)
+        {
+            var batch = userIdArray.Skip(i).Take(MaxSqlParameterCount).ToArray();
+
+            const string sql = """
+                SELECT 
+                    DeviceTokenId, UserId, Token, Platform, DeviceName,
+                    IsActive, LastUsedAtUtc, ExpiresAtUtc,
+                    CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
+                FROM notifications.DeviceToken
+                WHERE UserId IN @UserIds AND IsActive = 1
+                """;
+
+            var batchResult = await _connection.QueryAsync<DeviceToken>(
+                new CommandDefinition(sql, new { UserIds = batch }, cancellationToken: ct));
+
+            results.AddRange(batchResult);
+        }
+
+        return results;
     }
 
     /// <inheritdoc />
@@ -122,45 +140,48 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
     }
 
     /// <inheritdoc />
-    public async Task DeactivateAsync(Guid deviceTokenId, CancellationToken ct = default)
+    public async Task DeactivateAsync(Guid deviceTokenId, Guid modifiedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE notifications.DeviceToken SET
                 IsActive = 0,
-                ModifiedAtUtc = GETUTCDATE()
+                ModifiedAtUtc = GETUTCDATE(),
+                ModifiedBy = @ModifiedBy
             WHERE DeviceTokenId = @DeviceTokenId
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { DeviceTokenId = deviceTokenId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { DeviceTokenId = deviceTokenId, ModifiedBy = modifiedBy }, cancellationToken: ct));
     }
 
     /// <inheritdoc />
-    public async Task DeactivateByTokenAsync(string token, CancellationToken ct = default)
+    public async Task DeactivateByTokenAsync(string token, Guid modifiedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE notifications.DeviceToken SET
                 IsActive = 0,
-                ModifiedAtUtc = GETUTCDATE()
+                ModifiedAtUtc = GETUTCDATE(),
+                ModifiedBy = @ModifiedBy
             WHERE Token = @Token
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { Token = token }, cancellationToken: ct));
+            new CommandDefinition(sql, new { Token = token, ModifiedBy = modifiedBy }, cancellationToken: ct));
     }
 
     /// <inheritdoc />
-    public async Task DeactivateAllForUserAsync(Guid userId, CancellationToken ct = default)
+    public async Task DeactivateAllForUserAsync(Guid userId, Guid modifiedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE notifications.DeviceToken SET
                 IsActive = 0,
-                ModifiedAtUtc = GETUTCDATE()
+                ModifiedAtUtc = GETUTCDATE(),
+                ModifiedBy = @ModifiedBy
             WHERE UserId = @UserId
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { UserId = userId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { UserId = userId, ModifiedBy = modifiedBy }, cancellationToken: ct));
     }
 
     /// <inheritdoc />

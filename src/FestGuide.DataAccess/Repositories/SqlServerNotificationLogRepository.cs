@@ -133,31 +133,33 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
     }
 
     /// <inheritdoc />
-    public async Task MarkAsReadAsync(Guid notificationLogId, CancellationToken ct = default)
+    public async Task MarkAsReadAsync(Guid notificationLogId, Guid modifiedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE notifications.NotificationLog SET
                 ReadAtUtc = GETUTCDATE(),
-                ModifiedAtUtc = GETUTCDATE()
+                ModifiedAtUtc = GETUTCDATE(),
+                ModifiedBy = @ModifiedBy
             WHERE NotificationLogId = @NotificationLogId
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { NotificationLogId = notificationLogId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { NotificationLogId = notificationLogId, ModifiedBy = modifiedBy }, cancellationToken: ct));
     }
 
     /// <inheritdoc />
-    public async Task MarkAllAsReadAsync(Guid userId, CancellationToken ct = default)
+    public async Task MarkAllAsReadAsync(Guid userId, Guid modifiedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE notifications.NotificationLog SET
                 ReadAtUtc = GETUTCDATE(),
-                ModifiedAtUtc = GETUTCDATE()
+                ModifiedAtUtc = GETUTCDATE(),
+                ModifiedBy = @ModifiedBy
             WHERE UserId = @UserId AND ReadAtUtc IS NULL
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { UserId = userId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { UserId = userId, ModifiedBy = modifiedBy }, cancellationToken: ct));
     }
 
     /// <inheritdoc />

@@ -19,7 +19,7 @@ public class RegisterDeviceRequestValidator : AbstractValidator<RegisterDeviceRe
         RuleFor(x => x.Platform)
             .NotEmpty().WithMessage("Platform is required.")
             .Must(p => ValidPlatforms.Contains(p.ToLowerInvariant()))
-            .WithMessage("Platform must be one of: ios, android, web.");
+            .WithMessage("Platform must be one of (case-insensitive): ios, android, web.");
 
         RuleFor(x => x.DeviceName)
             .MaximumLength(100).WithMessage("Device name must not exceed 100 characters.")
@@ -42,5 +42,12 @@ public class UpdateNotificationPreferenceRequestValidator : AbstractValidator<Up
         RuleFor(x => x)
             .Must(x => !(x.QuietHoursStart.HasValue ^ x.QuietHoursEnd.HasValue))
             .WithMessage("Both quiet hours start and end must be provided, or neither.");
+
+        RuleFor(x => x)
+            .Must(x =>
+                !x.QuietHoursStart.HasValue ||
+                !x.QuietHoursEnd.HasValue ||
+                x.QuietHoursStart < x.QuietHoursEnd)
+            .WithMessage("Quiet hours start must be earlier than quiet hours end.");
     }
 }

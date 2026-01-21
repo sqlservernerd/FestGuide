@@ -142,7 +142,7 @@ public class NotificationServiceTests
         await _sut.UnregisterDeviceAsync(userId, deviceId);
 
         // Assert
-        _mockDeviceTokenRepo.Verify(r => r.DeactivateAsync(deviceId, It.IsAny<CancellationToken>()), Times.Once);
+        _mockDeviceTokenRepo.Verify(r => r.DeactivateAsync(deviceId, It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -191,7 +191,7 @@ public class NotificationServiceTests
         await _sut.UnregisterDeviceByTokenAsync(token);
 
         // Assert
-        _mockDeviceTokenRepo.Verify(r => r.DeactivateByTokenAsync(token, It.IsAny<CancellationToken>()), Times.Once);
+        _mockDeviceTokenRepo.Verify(r => r.DeactivateByTokenAsync(token, It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     #endregion
@@ -358,7 +358,7 @@ public class NotificationServiceTests
         await _sut.MarkAsReadAsync(userId, notificationId);
 
         // Assert
-        _mockNotificationLogRepo.Verify(r => r.MarkAsReadAsync(notificationId, It.IsAny<CancellationToken>()), Times.Once);
+        _mockNotificationLogRepo.Verify(r => r.MarkAsReadAsync(notificationId, It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -407,7 +407,7 @@ public class NotificationServiceTests
         await _sut.MarkAllAsReadAsync(userId);
 
         // Assert
-        _mockNotificationLogRepo.Verify(r => r.MarkAllAsReadAsync(userId, It.IsAny<CancellationToken>()), Times.Once);
+        _mockNotificationLogRepo.Verify(r => r.MarkAllAsReadAsync(userId, It.IsAny<Guid>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     #endregion
@@ -629,7 +629,7 @@ public class NotificationServiceTests
             new() { PersonalScheduleId = Guid.NewGuid(), UserId = userId2, EditionId = editionId }
         };
 
-        _mockPersonalScheduleRepo.Setup(r => r.GetByEditionAsync(editionId, It.IsAny<CancellationToken>()))
+        _mockPersonalScheduleRepo.Setup(r => r.GetByEditionAsync(editionId, It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(schedules);
         _mockPreferenceRepo.Setup(r => r.GetByUserAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((NotificationPreference?)null);
@@ -642,7 +642,7 @@ public class NotificationServiceTests
         await _sut.SendScheduleChangeAsync(change);
 
         // Assert
-        _mockPersonalScheduleRepo.Verify(r => r.GetByEditionAsync(editionId, It.IsAny<CancellationToken>()), Times.Once);
+        _mockPersonalScheduleRepo.Verify(r => r.GetByEditionAsync(editionId, It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()), Times.Once);
         _mockPushProvider.Verify(p => p.SendAsync(
             It.IsAny<string>(),
             It.IsAny<string>(),
@@ -666,7 +666,7 @@ public class NotificationServiceTests
             NewStartTime: null,
             Message: "Schedule has been published");
 
-        _mockPersonalScheduleRepo.Setup(r => r.GetByEditionAsync(editionId, It.IsAny<CancellationToken>()))
+        _mockPersonalScheduleRepo.Setup(r => r.GetByEditionAsync(editionId, It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<PersonalSchedule>());
 
         // Act
@@ -704,7 +704,7 @@ public class NotificationServiceTests
             new() { PersonalScheduleId = Guid.NewGuid(), UserId = userId, EditionId = editionId }
         };
 
-        _mockPersonalScheduleRepo.Setup(r => r.GetByEditionAsync(editionId, It.IsAny<CancellationToken>()))
+        _mockPersonalScheduleRepo.Setup(r => r.GetByEditionAsync(editionId, It.IsAny<int>(), It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(schedules);
         _mockPreferenceRepo.Setup(r => r.GetByUserAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((NotificationPreference?)null);
