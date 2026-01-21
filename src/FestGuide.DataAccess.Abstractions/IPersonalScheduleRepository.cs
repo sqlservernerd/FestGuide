@@ -99,7 +99,7 @@ public interface IPersonalScheduleRepository
     /// Gets all personal schedules for an edition (across all users).
     /// Used for sending notifications to all attendees of an edition.
     /// </summary>
-    Task<IReadOnlyList<PersonalSchedule>> GetByEditionAsync(Guid editionId, CancellationToken ct = default);
+    Task<IReadOnlyList<PersonalSchedule>> GetByEditionAsync(Guid editionId, int limit = 1000, int offset = 0, CancellationToken ct = default);
 
     /// <summary>
     /// Gets user IDs who have a specific engagement saved in their personal schedules.

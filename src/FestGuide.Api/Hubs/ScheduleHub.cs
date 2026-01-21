@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using FestGuide.DataAccess.Abstractions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
@@ -9,10 +11,12 @@ namespace FestGuide.Api.Hubs;
 [Authorize]
 public class ScheduleHub : Hub
 {
+    private readonly IPersonalScheduleRepository _personalScheduleRepository;
     private readonly ILogger<ScheduleHub> _logger;
 
-    public ScheduleHub(ILogger<ScheduleHub> logger)
+    public ScheduleHub(IPersonalScheduleRepository personalScheduleRepository, ILogger<ScheduleHub> logger)
     {
+        _personalScheduleRepository = personalScheduleRepository;
         _logger = logger;
     }
 
@@ -45,6 +49,21 @@ public class ScheduleHub : Hub
     /// </summary>
     public async Task JoinPersonalSchedule(Guid scheduleId)
     {
+        var userId = GetCurrentUserId();
+        if (userId == null)
+        {
+            _logger.LogWarning("Unauthenticated user attempted to join personal schedule {ScheduleId}", scheduleId);
+            throw new HubException("User is not authenticated.");
+        }
+
+        // Verify ownership
+        var schedule = await _personalScheduleRepository.GetByIdAsync(scheduleId);
+        if (schedule == null || schedule.UserId != userId.Value)
+        {
+            _logger.LogWarning("User {UserId} attempted to join personal schedule {ScheduleId} they don't own", userId, scheduleId);
+            throw new HubException("Personal schedule not found or access denied.");
+        }
+
         var groupName = GetPersonalScheduleGroupName(scheduleId);
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
 
@@ -71,6 +90,12 @@ public class ScheduleHub : Hub
     {
         _logger.LogInformation("Client disconnected: {ConnectionId}", Context.ConnectionId);
         await base.OnDisconnectedAsync(exception);
+    }
+
+    private Guid? GetCurrentUserId()
+    {
+        var userIdClaim = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
     }
 
     public static string GetEditionGroupName(Guid editionId) => $"edition-{editionId}";

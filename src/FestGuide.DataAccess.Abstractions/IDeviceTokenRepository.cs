@@ -35,17 +35,17 @@ public interface IDeviceTokenRepository
     /// <summary>
     /// Deactivates a device token.
     /// </summary>
-    Task DeactivateAsync(Guid deviceTokenId, CancellationToken ct = default);
+    Task DeactivateAsync(Guid deviceTokenId, Guid modifiedBy, CancellationToken ct = default);
 
     /// <summary>
     /// Deactivates a device token by its token string.
     /// </summary>
-    Task DeactivateByTokenAsync(string token, CancellationToken ct = default);
+    Task DeactivateByTokenAsync(string token, Guid modifiedBy, CancellationToken ct = default);
 
     /// <summary>
     /// Deactivates all device tokens for a user.
     /// </summary>
-    Task DeactivateAllForUserAsync(Guid userId, CancellationToken ct = default);
+    Task DeactivateAllForUserAsync(Guid userId, Guid modifiedBy, CancellationToken ct = default);
 
     /// <summary>
     /// Updates the last used timestamp for a device token.

@@ -33,9 +33,7 @@ public class StubPushNotificationProvider : IPushNotificationProvider
     /// <inheritdoc />
     public async Task SendBatchAsync(IEnumerable<(string Token, string Platform)> deviceTokens, PushNotificationMessage message, CancellationToken ct = default)
     {
-        foreach (var (token, platform) in deviceTokens)
-        {
-            await SendAsync(token, platform, message, ct);
-        }
+        var sendTasks = deviceTokens.Select(dt => SendAsync(dt.Token, dt.Platform, message, ct));
+        await Task.WhenAll(sendTasks);
     }
 }
