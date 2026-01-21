@@ -133,10 +133,10 @@ public class PersonalScheduleServiceTests
             .ReturnsAsync(schedules);
         _mockScheduleRepo.Setup(r => r.GetEntriesAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<PersonalScheduleEntry>());
-        _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(edition);
-        _mockFestivalRepo.Setup(r => r.GetByIdAsync(festivalId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(festival);
+        _mockEditionRepo.Setup(r => r.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<FestivalEdition> { edition });
+        _mockFestivalRepo.Setup(r => r.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Festival> { festival });
 
         // Act
         var result = await _sut.GetMySchedulesAsync(userId);
@@ -159,6 +159,126 @@ public class PersonalScheduleServiceTests
 
         // Assert
         result.Should().BeEmpty();
+    }
+
+    #endregion
+
+    #region GetByEditionAsync Tests
+
+    [Fact]
+    public async Task GetByEditionAsync_WithValidEdition_ReturnsSchedules()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var editionId = Guid.NewGuid();
+        var schedules = new List<PersonalSchedule>
+        {
+            CreateTestSchedule(userId: userId, editionId: editionId),
+            CreateTestSchedule(userId: userId, editionId: editionId)
+        };
+
+        _mockScheduleRepo.Setup(r => r.GetByUserAndEditionAsync(userId, editionId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(schedules);
+        _mockScheduleRepo.Setup(r => r.GetEntriesAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<PersonalScheduleEntry>());
+
+        // Act
+        var result = await _sut.GetByEditionAsync(userId, editionId);
+
+        // Assert
+        result.Should().HaveCount(2);
+        result.All(s => s.EditionId == editionId).Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task GetByEditionAsync_WithNoSchedules_ReturnsEmptyList()
+    {
+        // Arrange
+        var userId = Guid.NewGuid();
+        var editionId = Guid.NewGuid();
+
+        _mockScheduleRepo.Setup(r => r.GetByUserAndEditionAsync(userId, editionId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<PersonalSchedule>());
+
+        // Act
+        var result = await _sut.GetByEditionAsync(userId, editionId);
+
+        // Assert
+        result.Should().BeEmpty();
+    }
+
+    #endregion
+
+    #region GetDetailAsync Tests
+
+    [Fact]
+    public async Task GetDetailAsync_WithValidSchedule_ReturnsDetailWithEntries()
+    {
+        // Arrange
+        var scheduleId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var editionId = Guid.NewGuid();
+        var festivalId = Guid.NewGuid();
+        var schedule = CreateTestSchedule(scheduleId, userId, editionId);
+        var edition = new FestivalEdition { EditionId = editionId, FestivalId = festivalId, Name = "2026 Edition" };
+        var festival = new Festival { FestivalId = festivalId, Name = "Test Festival" };
+
+        _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(schedule);
+        _mockScheduleRepo.Setup(r => r.GetEntriesAsync(scheduleId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<PersonalScheduleEntry>());
+        _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(edition);
+        _mockFestivalRepo.Setup(r => r.GetByIdAsync(festivalId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(festival);
+        _mockEngagementRepo.Setup(r => r.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Engagement>());
+
+        // Act
+        var result = await _sut.GetDetailAsync(scheduleId, userId);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.PersonalScheduleId.Should().Be(scheduleId);
+        result.EditionName.Should().Be("2026 Edition");
+        result.FestivalName.Should().Be("Test Festival");
+        result.Entries.Should().BeEmpty();
+    }
+
+    [Fact]
+    public async Task GetDetailAsync_WithNonExistentSchedule_ThrowsPersonalScheduleNotFoundException()
+    {
+        // Arrange
+        var scheduleId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+
+        _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((PersonalSchedule?)null);
+
+        // Act
+        var act = () => _sut.GetDetailAsync(scheduleId, userId);
+
+        // Assert
+        await act.Should().ThrowAsync<PersonalScheduleNotFoundException>();
+    }
+
+    [Fact]
+    public async Task GetDetailAsync_WithWrongUser_ThrowsForbiddenException()
+    {
+        // Arrange
+        var scheduleId = Guid.NewGuid();
+        var ownerId = Guid.NewGuid();
+        var differentUserId = Guid.NewGuid();
+        var schedule = CreateTestSchedule(scheduleId, ownerId);
+
+        _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(schedule);
+
+        // Act
+        var act = () => _sut.GetDetailAsync(scheduleId, differentUserId);
+
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenException>();
     }
 
     #endregion
@@ -576,6 +696,115 @@ public class PersonalScheduleServiceTests
 
         // Act
         var act = () => _sut.AddEntryAsync(scheduleId, differentUserId, request);
+
+        // Assert
+        await act.Should().ThrowAsync<ForbiddenException>();
+    }
+
+    #endregion
+
+    #region UpdateEntryAsync Tests
+
+    [Fact]
+    public async Task UpdateEntryAsync_WithValidRequest_UpdatesEntry()
+    {
+        // Arrange
+        var entryId = Guid.NewGuid();
+        var scheduleId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var engagementId = Guid.NewGuid();
+        var timeSlotId = Guid.NewGuid();
+        var artistId = Guid.NewGuid();
+        var stageId = Guid.NewGuid();
+
+        var entry = new PersonalScheduleEntry
+        {
+            PersonalScheduleEntryId = entryId,
+            PersonalScheduleId = scheduleId,
+            EngagementId = engagementId,
+            Notes = "Old notes",
+            NotificationsEnabled = false
+        };
+
+        var schedule = CreateTestSchedule(scheduleId, userId);
+        var engagement = new Engagement { EngagementId = engagementId, TimeSlotId = timeSlotId, ArtistId = artistId };
+        var timeSlot = new TimeSlot { TimeSlotId = timeSlotId, StageId = stageId, StartTimeUtc = _now, EndTimeUtc = _now.AddHours(1) };
+        var artist = new Artist { ArtistId = artistId, Name = "Test Artist" };
+        var stage = new Stage { StageId = stageId, Name = "Main Stage" };
+
+        var request = new UpdateScheduleEntryRequest(Notes: "Updated notes", NotificationsEnabled: true);
+
+        _mockScheduleRepo.Setup(r => r.GetEntryByIdAsync(entryId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(entry);
+        _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(schedule);
+        _mockEngagementRepo.Setup(r => r.GetByIdAsync(engagementId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(engagement);
+        _mockTimeSlotRepo.Setup(r => r.GetByIdAsync(timeSlotId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(timeSlot);
+        _mockArtistRepo.Setup(r => r.GetByIdAsync(artistId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(artist);
+        _mockStageRepo.Setup(r => r.GetByIdAsync(stageId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(stage);
+
+        // Act
+        var result = await _sut.UpdateEntryAsync(entryId, userId, request);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.PersonalScheduleEntryId.Should().Be(entryId);
+        result.ArtistName.Should().Be("Test Artist");
+        result.StageName.Should().Be("Main Stage");
+
+        _mockScheduleRepo.Verify(r => r.UpdateEntryAsync(
+            It.Is<PersonalScheduleEntry>(e => e.PersonalScheduleEntryId == entryId && e.Notes == "Updated notes" && e.NotificationsEnabled),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task UpdateEntryAsync_WithNonExistentEntry_ThrowsPersonalScheduleEntryNotFoundException()
+    {
+        // Arrange
+        var entryId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        var request = new UpdateScheduleEntryRequest(Notes: "Updated", NotificationsEnabled: true);
+
+        _mockScheduleRepo.Setup(r => r.GetEntryByIdAsync(entryId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((PersonalScheduleEntry?)null);
+
+        // Act
+        var act = () => _sut.UpdateEntryAsync(entryId, userId, request);
+
+        // Assert
+        await act.Should().ThrowAsync<PersonalScheduleEntryNotFoundException>();
+    }
+
+    [Fact]
+    public async Task UpdateEntryAsync_WithWrongUser_ThrowsForbiddenException()
+    {
+        // Arrange
+        var entryId = Guid.NewGuid();
+        var scheduleId = Guid.NewGuid();
+        var ownerId = Guid.NewGuid();
+        var differentUserId = Guid.NewGuid();
+
+        var entry = new PersonalScheduleEntry
+        {
+            PersonalScheduleEntryId = entryId,
+            PersonalScheduleId = scheduleId,
+            EngagementId = Guid.NewGuid()
+        };
+
+        var schedule = CreateTestSchedule(scheduleId, ownerId);
+        var request = new UpdateScheduleEntryRequest(Notes: "Updated", NotificationsEnabled: null);
+
+        _mockScheduleRepo.Setup(r => r.GetEntryByIdAsync(entryId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(entry);
+        _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(schedule);
+
+        // Act
+        var act = () => _sut.UpdateEntryAsync(entryId, differentUserId, request);
 
         // Assert
         await act.Should().ThrowAsync<ForbiddenException>();

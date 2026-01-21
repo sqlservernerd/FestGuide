@@ -34,6 +34,30 @@ public class SqlServerEngagementRepository : IEngagementRepository
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<Engagement>> GetByIdsAsync(IEnumerable<Guid> engagementIds, CancellationToken ct = default)
+    {
+        var engagementIdsList = engagementIds?.ToList();
+        if (engagementIdsList == null || !engagementIdsList.Any())
+        {
+            return Array.Empty<Engagement>();
+        }
+
+        const string sql = """
+            SELECT 
+                EngagementId, TimeSlotId, ArtistId, Notes,
+                IsDeleted, DeletedAtUtc,
+                CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
+            FROM schedule.Engagement
+            WHERE EngagementId IN @EngagementIds AND IsDeleted = 0
+            """;
+
+        var result = await _connection.QueryAsync<Engagement>(
+            new CommandDefinition(sql, new { EngagementIds = engagementIdsList }, cancellationToken: ct));
+
+        return result.ToList();
+    }
+
+    /// <inheritdoc />
     public async Task<Engagement?> GetByTimeSlotAsync(Guid timeSlotId, CancellationToken ct = default)
     {
         const string sql = """

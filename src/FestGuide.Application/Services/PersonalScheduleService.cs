@@ -48,13 +48,36 @@ public class PersonalScheduleService : IPersonalScheduleService
     public async Task<IReadOnlyList<PersonalScheduleSummaryDto>> GetMySchedulesAsync(Guid userId, CancellationToken ct = default)
     {
         var schedules = await _scheduleRepository.GetByUserAsync(userId, ct);
-        var result = new List<PersonalScheduleSummaryDto>();
+        if (!schedules.Any())
+        {
+            return Array.Empty<PersonalScheduleSummaryDto>();
+        }
 
+        // Collect all unique edition IDs
+        var editionIds = schedules.Select(s => s.EditionId).Distinct().ToList();
+
+        // Batch fetch all editions
+        var editions = await _editionRepository.GetByIdsAsync(editionIds, ct);
+        var editionDict = editions.ToDictionary(e => e.EditionId);
+
+        // Collect all unique festival IDs from the editions
+        var festivalIds = editions.Select(e => e.FestivalId).Distinct().ToList();
+
+        // Batch fetch all festivals
+        var festivals = await _festivalRepository.GetByIdsAsync(festivalIds, ct);
+        var festivalDict = festivals.ToDictionary(f => f.FestivalId);
+
+        // Build result DTOs
+        var result = new List<PersonalScheduleSummaryDto>();
         foreach (var schedule in schedules)
         {
             var entries = await _scheduleRepository.GetEntriesAsync(schedule.PersonalScheduleId, ct);
-            var edition = await _editionRepository.GetByIdAsync(schedule.EditionId, ct);
-            var festival = edition != null ? await _festivalRepository.GetByIdAsync(edition.FestivalId, ct) : null;
+            editionDict.TryGetValue(schedule.EditionId, out var edition);
+            Festival? festival = null;
+            if (edition != null)
+            {
+                festivalDict.TryGetValue(edition.FestivalId, out festival);
+            }
 
             result.Add(new PersonalScheduleSummaryDto(
                 schedule.PersonalScheduleId,
@@ -370,16 +393,50 @@ public class PersonalScheduleService : IPersonalScheduleService
         IReadOnlyList<PersonalScheduleEntry> entries,
         CancellationToken ct)
     {
-        var result = new List<PersonalScheduleEntryDto>();
+        if (!entries.Any())
+        {
+            return Array.Empty<PersonalScheduleEntryDto>();
+        }
 
+        // Collect all unique IDs
+        var engagementIds = entries.Select(e => e.EngagementId).Distinct().ToList();
+
+        // Batch fetch all engagements
+        var engagements = await _engagementRepository.GetByIdsAsync(engagementIds, ct);
+        var engagementDict = engagements.ToDictionary(e => e.EngagementId);
+
+        // Collect all unique time slot, artist IDs from the engagements
+        var timeSlotIds = engagements.Select(e => e.TimeSlotId).Distinct().ToList();
+        var artistIds = engagements.Select(e => e.ArtistId).Distinct().ToList();
+
+        // Batch fetch time slots and artists
+        var timeSlots = await _timeSlotRepository.GetByIdsAsync(timeSlotIds, ct);
+        var artists = await _artistRepository.GetByIdsAsync(artistIds, ct);
+
+        var timeSlotDict = timeSlots.ToDictionary(ts => ts.TimeSlotId);
+        var artistDict = artists.ToDictionary(a => a.ArtistId);
+
+        // Collect all unique stage IDs from the time slots
+        var stageIds = timeSlots.Select(ts => ts.StageId).Distinct().ToList();
+
+        // Batch fetch stages
+        var stages = await _stageRepository.GetByIdsAsync(stageIds, ct);
+        var stageDict = stages.ToDictionary(s => s.StageId);
+
+        // Build DTOs using the dictionaries
+        var result = new List<PersonalScheduleEntryDto>();
         foreach (var entry in entries)
         {
-            var engagement = await _engagementRepository.GetByIdAsync(entry.EngagementId, ct);
-            if (engagement == null) continue;
+            if (!engagementDict.TryGetValue(entry.EngagementId, out var engagement))
+                continue;
 
-            var timeSlot = await _timeSlotRepository.GetByIdAsync(engagement.TimeSlotId, ct);
-            var artist = await _artistRepository.GetByIdAsync(engagement.ArtistId, ct);
-            var stage = timeSlot != null ? await _stageRepository.GetByIdAsync(timeSlot.StageId, ct) : null;
+            timeSlotDict.TryGetValue(engagement.TimeSlotId, out var timeSlot);
+            artistDict.TryGetValue(engagement.ArtistId, out var artist);
+            Stage? stage = null;
+            if (timeSlot != null)
+            {
+                stageDict.TryGetValue(timeSlot.StageId, out stage);
+            }
 
             result.Add(PersonalScheduleEntryDto.FromEntity(
                 entry,

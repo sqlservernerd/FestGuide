@@ -36,11 +36,17 @@ public class FestivalsController : ControllerBase
     /// </summary>
     [HttpGet("search")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<FestivalSummaryDto>>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Search([FromQuery] string q, [FromQuery] int limit = 20, CancellationToken ct = default)
     {
         if (string.IsNullOrWhiteSpace(q))
         {
             return Ok(ApiResponse<IReadOnlyList<FestivalSummaryDto>>.Success(Array.Empty<FestivalSummaryDto>()));
+        }
+
+        if (limit < 1 || limit > 100)
+        {
+            return BadRequest(CreateError("INVALID_LIMIT", "Limit must be between 1 and 100."));
         }
 
         var festivals = await _festivalService.SearchAsync(q, null, limit, ct);

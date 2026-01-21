@@ -14,6 +14,11 @@ public interface IEditionRepository
     Task<FestivalEdition?> GetByIdAsync(Guid editionId, CancellationToken ct = default);
 
     /// <summary>
+    /// Gets multiple editions by their unique identifiers.
+    /// </summary>
+    Task<IReadOnlyList<FestivalEdition>> GetByIdsAsync(IEnumerable<Guid> editionIds, CancellationToken ct = default);
+
+    /// <summary>
     /// Gets all editions for a festival.
     /// </summary>
     Task<IReadOnlyList<FestivalEdition>> GetByFestivalAsync(Guid festivalId, CancellationToken ct = default);
