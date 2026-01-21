@@ -36,6 +36,9 @@ public static class DataAccessServiceExtensions
         services.AddScoped<ITimeSlotRepository, SqlServerTimeSlotRepository>();
         services.AddScoped<IEngagementRepository, SqlServerEngagementRepository>();
 
+        // Phase 4 Repositories - Attendee Experience
+        services.AddScoped<IPersonalScheduleRepository, SqlServerPersonalScheduleRepository>();
+
         return services;
     }
 }
