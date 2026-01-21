@@ -39,6 +39,11 @@ public static class DataAccessServiceExtensions
         // Phase 4 Repositories - Attendee Experience
         services.AddScoped<IPersonalScheduleRepository, SqlServerPersonalScheduleRepository>();
 
+        // Phase 5 Repositories - Real-Time & Notifications
+        services.AddScoped<IDeviceTokenRepository, SqlServerDeviceTokenRepository>();
+        services.AddScoped<INotificationLogRepository, SqlServerNotificationLogRepository>();
+        services.AddScoped<INotificationPreferenceRepository, SqlServerNotificationPreferenceRepository>();
+
         return services;
     }
 }

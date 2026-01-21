@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FestGuide.Application\FestGuide.Application.csproj" />
     <ProjectReference Include="..\FestGuide.DataAccess\FestGuide.DataAccess.csproj" />
+    <ProjectReference Include="..\FestGuide.Integrations\FestGuide.Integrations.csproj" />
   </ItemGroup>
 
   <ItemGroup>

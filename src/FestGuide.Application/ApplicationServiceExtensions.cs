@@ -34,6 +34,9 @@ public static class ApplicationServiceExtensions
         // Phase 4 Services - Attendee Experience
         services.AddScoped<IPersonalScheduleService, PersonalScheduleService>();
 
+        // Phase 5 Services - Real-Time & Notifications
+        services.AddScoped<INotificationService, NotificationService>();
+
         // Authorization
         services.AddScoped<IFestivalAuthorizationService, FestivalAuthorizationService>();
 
