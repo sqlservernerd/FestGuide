@@ -56,7 +56,13 @@ public class PermissionService : IPermissionService
         var result = new List<PermissionSummaryDto>();
         foreach (var permission in permissions)
         {
-            userLookup.TryGetValue(permission.UserId, out var user);
+            if (!userLookup.TryGetValue(permission.UserId, out var user))
+            {
+                _logger.LogWarning(
+                    "User {UserId} not found for permission {PermissionId} in festival {FestivalId}. This may indicate data integrity issues.",
+                    permission.UserId, permission.FestivalPermissionId, festivalId);
+            }
+            
             result.Add(new PermissionSummaryDto(
                 permission.FestivalPermissionId,
                 permission.UserId,
@@ -267,11 +273,22 @@ public class PermissionService : IPermissionService
         var result = new List<PendingInvitationDto>();
         foreach (var permission in pendingPermissions)
         {
-            festivalLookup.TryGetValue(permission.FestivalId, out var festival);
+            if (!festivalLookup.TryGetValue(permission.FestivalId, out var festival))
+            {
+                _logger.LogWarning(
+                    "Festival {FestivalId} not found for permission {PermissionId}. This may indicate data integrity issues.",
+                    permission.FestivalId, permission.FestivalPermissionId);
+            }
+            
             User? invitedBy = null;
             if (permission.InvitedByUserId.HasValue)
             {
-                userLookup.TryGetValue(permission.InvitedByUserId.Value, out invitedBy);
+                if (!userLookup.TryGetValue(permission.InvitedByUserId.Value, out invitedBy))
+                {
+                    _logger.LogWarning(
+                        "Inviting user {UserId} not found for permission {PermissionId}. This may indicate data integrity issues.",
+                        permission.InvitedByUserId.Value, permission.FestivalPermissionId);
+                }
             }
 
             result.Add(new PendingInvitationDto(
