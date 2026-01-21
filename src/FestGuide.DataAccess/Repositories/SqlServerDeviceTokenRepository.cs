@@ -11,8 +11,8 @@ namespace FestGuide.DataAccess.Repositories;
 public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
 {
     // SQL Server has a hard limit of 2100 parameters per statement. We cap at 2000 to leave
-    // headroom for additional parameters (e.g., non-batched WHERE clauses, framework/Dapper
-    // parameters, or future query changes) and avoid hitting the hard limit.
+    // headroom for additional query parameters such as those in WHERE clauses, framework/Dapper
+    // overhead, or future query modifications, and avoid hitting the hard limit.
     private const int MaxSqlParameterCount = 2000;
 
     private readonly IDbConnection _connection;

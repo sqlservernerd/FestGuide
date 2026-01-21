@@ -25,7 +25,21 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 // Add SignalR
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    // Set maximum message size to 128KB to support large schedule updates
+    options.MaximumReceiveMessageSize = 128 * 1024;
+
+    // Enable detailed errors in development for easier debugging
+    if (builder.Environment.IsDevelopment())
+    {
+        options.EnableDetailedErrors = true;
+    }
+
+    // Configure keep-alive and timeout intervals for varying network conditions
+    options.KeepAliveInterval = TimeSpan.FromSeconds(15);
+    options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+});
 
 // Add authentication
 builder.Services.AddAuthentication(options =>
