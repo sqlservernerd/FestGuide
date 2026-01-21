@@ -13,6 +13,11 @@ public interface IEngagementRepository
     Task<Engagement?> GetByIdAsync(Guid engagementId, CancellationToken ct = default);
 
     /// <summary>
+    /// Gets multiple engagements by their unique identifiers.
+    /// </summary>
+    Task<IReadOnlyList<Engagement>> GetByIdsAsync(IEnumerable<Guid> engagementIds, CancellationToken ct = default);
+
+    /// <summary>
     /// Gets the engagement for a time slot.
     /// </summary>
     Task<Engagement?> GetByTimeSlotAsync(Guid timeSlotId, CancellationToken ct = default);

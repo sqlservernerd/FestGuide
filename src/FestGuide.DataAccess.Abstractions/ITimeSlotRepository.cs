@@ -13,6 +13,11 @@ public interface ITimeSlotRepository
     Task<TimeSlot?> GetByIdAsync(Guid timeSlotId, CancellationToken ct = default);
 
     /// <summary>
+    /// Gets multiple time slots by their unique identifiers.
+    /// </summary>
+    Task<IReadOnlyList<TimeSlot>> GetByIdsAsync(IEnumerable<Guid> timeSlotIds, CancellationToken ct = default);
+
+    /// <summary>
     /// Gets all time slots for a stage within an edition.
     /// </summary>
     Task<IReadOnlyList<TimeSlot>> GetByStageAndEditionAsync(Guid stageId, Guid editionId, CancellationToken ct = default);

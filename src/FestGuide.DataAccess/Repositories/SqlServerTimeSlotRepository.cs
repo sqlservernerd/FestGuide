@@ -34,6 +34,30 @@ public class SqlServerTimeSlotRepository : ITimeSlotRepository
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<TimeSlot>> GetByIdsAsync(IEnumerable<Guid> timeSlotIds, CancellationToken ct = default)
+    {
+        var timeSlotIdsList = timeSlotIds?.ToList();
+        if (timeSlotIdsList == null || !timeSlotIdsList.Any())
+        {
+            return Array.Empty<TimeSlot>();
+        }
+
+        const string sql = """
+            SELECT 
+                TimeSlotId, StageId, EditionId, StartTimeUtc, EndTimeUtc,
+                IsDeleted, DeletedAtUtc,
+                CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
+            FROM venue.TimeSlot
+            WHERE TimeSlotId IN @TimeSlotIds AND IsDeleted = 0
+            """;
+
+        var result = await _connection.QueryAsync<TimeSlot>(
+            new CommandDefinition(sql, new { TimeSlotIds = timeSlotIdsList }, cancellationToken: ct));
+
+        return result.ToList();
+    }
+
+    /// <inheritdoc />
     public async Task<IReadOnlyList<TimeSlot>> GetByStageAndEditionAsync(Guid stageId, Guid editionId, CancellationToken ct = default)
     {
         const string sql = """

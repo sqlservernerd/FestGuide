@@ -35,6 +35,30 @@ public class SqlServerEditionRepository : IEditionRepository
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<FestivalEdition>> GetByIdsAsync(IEnumerable<Guid> editionIds, CancellationToken ct = default)
+    {
+        var editionIdsList = editionIds?.ToList();
+        if (editionIdsList == null || !editionIdsList.Any())
+        {
+            return Array.Empty<FestivalEdition>();
+        }
+
+        const string sql = """
+            SELECT 
+                EditionId, FestivalId, Name, StartDateUtc, EndDateUtc,
+                TimezoneId, TicketUrl, Status, IsDeleted, DeletedAtUtc,
+                CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
+            FROM core.FestivalEdition
+            WHERE EditionId IN @EditionIds AND IsDeleted = 0
+            """;
+
+        var result = await _connection.QueryAsync<FestivalEdition>(
+            new CommandDefinition(sql, new { EditionIds = editionIdsList }, cancellationToken: ct));
+
+        return result.ToList();
+    }
+
+    /// <inheritdoc />
     public async Task<IReadOnlyList<FestivalEdition>> GetByFestivalAsync(Guid festivalId, CancellationToken ct = default)
     {
         const string sql = """
