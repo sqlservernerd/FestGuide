@@ -39,6 +39,8 @@ public class NotificationService : INotificationService
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
+    private const int NotificationBatchSize = 100;
+
     #region Device Management
 
     /// <inheritdoc />
@@ -291,16 +293,15 @@ public class NotificationService : INotificationService
         Dictionary<string, string>? data = null,
         CancellationToken ct = default)
     {
-        const int BatchSize = 100;
         var userIdList = userIds.ToList();
 
-        for (var i = 0; i < userIdList.Count; i += BatchSize)
+        for (var i = 0; i < userIdList.Count; i += NotificationBatchSize)
         {
             ct.ThrowIfCancellationRequested();
 
             var batch = userIdList
                 .Skip(i)
-                .Take(BatchSize);
+                .Take(NotificationBatchSize);
 
             var sendTasks = batch.Select(userId =>
                 SendToUserAsync(

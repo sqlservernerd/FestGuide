@@ -16,7 +16,7 @@ namespace FestGuide.Api.Controllers;
 [Route("api/v1/devices")]
 [Produces("application/json")]
 [Authorize]
-public class DevicesController : ControllerBase
+public class DevicesController : BaseApiController
 {
     private readonly INotificationService _notificationService;
     private readonly IValidator<RegisterDeviceRequest> _registerValidator;
@@ -108,23 +108,6 @@ public class DevicesController : ControllerBase
 
         await _notificationService.UnregisterDeviceByTokenAsync(token, ct);
         return NoContent();
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        if (userIdClaim is null)
-        {
-            throw new InvalidOperationException("Authenticated user does not contain a NameIdentifier claim.");
-        }
-
-        if (!Guid.TryParse(userIdClaim, out var userId))
-        {
-            throw new InvalidOperationException("User NameIdentifier claim is not a valid GUID.");
-        }
-
-        return userId;
     }
 
     private static ApiErrorResponse CreateError(string code, string message) =>
