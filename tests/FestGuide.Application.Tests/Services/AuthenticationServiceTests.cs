@@ -224,7 +224,7 @@ public class AuthenticationServiceTests
                     TokenId = Guid.NewGuid(),
                     UserId = userId,
                     TokenHash = tokenHash,
-                    ExpiresAtUtc = _now.AddHours(24),
+                    ExpiresAtUtc = DateTime.UtcNow.AddHours(24), // Use actual future time for IsValid check
                     IsUsed = false
                 };
 
@@ -329,7 +329,7 @@ public class AuthenticationServiceTests
                     TokenId = Guid.NewGuid(),
                     UserId = userId,
                     TokenHash = tokenHash,
-                    ExpiresAtUtc = _now.AddHours(1),
+                    ExpiresAtUtc = DateTime.UtcNow.AddHours(1), // Use actual future time for IsValid check
                     IsUsed = false
                 };
 

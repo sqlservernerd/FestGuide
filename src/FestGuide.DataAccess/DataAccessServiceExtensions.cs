@@ -19,11 +19,22 @@ public static class DataAccessServiceExtensions
         // Register IDbConnection factory
         services.AddScoped<IDbConnection>(_ => new SqlConnection(connectionString));
 
-        // Register repositories
+        // Phase 1 Repositories - Authentication & User Management
         services.AddScoped<IUserRepository, SqlServerUserRepository>();
         services.AddScoped<IRefreshTokenRepository, SqlServerRefreshTokenRepository>();
         services.AddScoped<IEmailVerificationTokenRepository, SqlServerEmailVerificationTokenRepository>();
         services.AddScoped<IPasswordResetTokenRepository, SqlServerPasswordResetTokenRepository>();
+        services.AddScoped<IFestivalPermissionRepository, SqlServerFestivalPermissionRepository>();
+
+        // Phase 2 Repositories - Organizer Publishing
+        services.AddScoped<IFestivalRepository, SqlServerFestivalRepository>();
+        services.AddScoped<IEditionRepository, SqlServerEditionRepository>();
+        services.AddScoped<IVenueRepository, SqlServerVenueRepository>();
+        services.AddScoped<IStageRepository, SqlServerStageRepository>();
+        services.AddScoped<IArtistRepository, SqlServerArtistRepository>();
+        services.AddScoped<IScheduleRepository, SqlServerScheduleRepository>();
+        services.AddScoped<ITimeSlotRepository, SqlServerTimeSlotRepository>();
+        services.AddScoped<IEngagementRepository, SqlServerEngagementRepository>();
 
         return services;
     }

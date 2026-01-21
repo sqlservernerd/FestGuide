@@ -1,4 +1,5 @@
 using FestGuide.Infrastructure.Email;
+using FestGuide.Infrastructure.Timezone;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
@@ -33,6 +34,9 @@ public static class InfrastructureServiceExtensions
             new ConsoleEmailService(
                 sp.GetRequiredService<ILogger<ConsoleEmailService>>(),
                 baseUrl ?? "https://localhost:5001"));
+
+        // Register timezone service (NodaTime-based IANA timezone handling)
+        services.AddSingleton<ITimezoneService, NodaTimeTimezoneService>();
 
         return services;
     }

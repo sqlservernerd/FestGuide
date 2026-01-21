@@ -1,5 +1,6 @@
 using FluentValidation;
 using FestGuide.Application.Dtos;
+using FestGuide.Infrastructure.Timezone;
 
 namespace FestGuide.Application.Validators;
 
@@ -8,9 +9,7 @@ namespace FestGuide.Application.Validators;
 /// </summary>
 public class UpdateProfileRequestValidator : AbstractValidator<UpdateProfileRequest>
 {
-    private static readonly HashSet<string> ValidTimezones = new(TimeZoneInfo.GetSystemTimeZones().Select(tz => tz.Id));
-
-    public UpdateProfileRequestValidator()
+    public UpdateProfileRequestValidator(ITimezoneService timezoneService)
     {
         RuleFor(x => x.DisplayName)
             .MinimumLength(2).WithMessage("Display name must be at least 2 characters long.")
@@ -18,15 +17,8 @@ public class UpdateProfileRequestValidator : AbstractValidator<UpdateProfileRequ
             .When(x => !string.IsNullOrEmpty(x.DisplayName));
 
         RuleFor(x => x.PreferredTimezoneId)
-            .Must(BeValidTimezone).WithMessage("Invalid timezone identifier.")
+            .Must(tz => tz != null && timezoneService.IsValidTimezone(tz))
+            .WithMessage("Invalid IANA timezone identifier. Use format like 'America/New_York' or 'Europe/London'.")
             .When(x => !string.IsNullOrEmpty(x.PreferredTimezoneId));
-    }
-
-    private static bool BeValidTimezone(string? timezoneId)
-    {
-        if (string.IsNullOrEmpty(timezoneId))
-            return true;
-
-        return ValidTimezones.Contains(timezoneId);
     }
 }
