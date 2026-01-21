@@ -994,7 +994,7 @@ public class NotificationServiceTests
         // Act
         await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
-        // Assert - should not send because >= start time (inclusive)
+        // Assert - Notifications should be blocked at the quiet hours start boundary
         _mockPushProvider.Verify(p => p.SendAsync(
             It.IsAny<string>(),
             It.IsAny<string>(),
@@ -1022,7 +1022,7 @@ public class NotificationServiceTests
         // Act
         await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
-        // Assert - should not send because <= end time (inclusive)
+        // Assert - Notifications should be blocked at the quiet hours end boundary
         _mockPushProvider.Verify(p => p.SendAsync(
             It.IsAny<string>(),
             It.IsAny<string>(),
@@ -1050,7 +1050,7 @@ public class NotificationServiceTests
         // Act
         await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
-        // Assert - should not send because >= start time (inclusive)
+        // Assert - Notifications should be blocked at the quiet hours start boundary
         _mockPushProvider.Verify(p => p.SendAsync(
             It.IsAny<string>(),
             It.IsAny<string>(),
@@ -1078,7 +1078,7 @@ public class NotificationServiceTests
         // Act
         await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
-        // Assert - should not send because <= end time (inclusive)
+        // Assert - Notifications should be blocked at the quiet hours end boundary
         _mockPushProvider.Verify(p => p.SendAsync(
             It.IsAny<string>(),
             It.IsAny<string>(),
