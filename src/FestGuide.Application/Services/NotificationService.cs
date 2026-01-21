@@ -395,12 +395,13 @@ public class NotificationService : INotificationService
         var end = prefs.QuietHoursEnd.Value;
 
         // Handle quiet hours that span midnight (e.g., 23:00 to 06:00)
+        // Start is inclusive, end is exclusive
         if (start > end)
         {
-            return now >= start || now <= end;
+            return now >= start || now < end;
         }
 
-        return now >= start && now <= end;
+        return now >= start && now < end;
     }
 
     #endregion

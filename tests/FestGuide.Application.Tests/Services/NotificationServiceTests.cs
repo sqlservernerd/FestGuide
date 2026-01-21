@@ -1003,7 +1003,7 @@ public class NotificationServiceTests
     }
 
     [Fact]
-    public async Task SendToUserAsync_AtQuietHoursEndBoundary_DoesNotSend()
+    public async Task SendToUserAsync_AtQuietHoursEndBoundary_Sends()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -1012,22 +1012,28 @@ public class NotificationServiceTests
         prefs.QuietHoursStart = new TimeOnly(22, 0);
         prefs.QuietHoursEnd = new TimeOnly(8, 0);
 
-        // Mock current time to be exactly 08:00 UTC (quiet hours end boundary)
+        // Mock current time to be exactly 08:00 UTC (quiet hours end boundary - exclusive)
         var boundaryTime = new DateTime(2026, 1, 20, 8, 0, 0, DateTimeKind.Utc);
         _mockDateTimeProvider.Setup(x => x.UtcNow).Returns(boundaryTime);
 
+        var devices = new List<DeviceToken> { CreateTestDeviceToken(userId: userId) };
+
         _mockPreferenceRepo.Setup(r => r.GetByUserAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(prefs);
+        _mockDeviceTokenRepo.Setup(r => r.GetByUserAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(devices);
+        _mockNotificationLogRepo.Setup(r => r.CreateAsync(It.IsAny<NotificationLog>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Guid.NewGuid());
 
         // Act
         await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
-        // Assert - Notifications should be blocked at the quiet hours end boundary
+        // Assert - Notifications should be allowed at the quiet hours end boundary (exclusive)
         _mockPushProvider.Verify(p => p.SendAsync(
             It.IsAny<string>(),
             It.IsAny<string>(),
             It.IsAny<PushNotificationMessage>(),
-            It.IsAny<CancellationToken>()), Times.Never);
+            It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
@@ -1059,7 +1065,7 @@ public class NotificationServiceTests
     }
 
     [Fact]
-    public async Task SendToUserAsync_AtSameDayQuietHoursEndBoundary_DoesNotSend()
+    public async Task SendToUserAsync_AtSameDayQuietHoursEndBoundary_Sends()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -1068,22 +1074,28 @@ public class NotificationServiceTests
         prefs.QuietHoursStart = new TimeOnly(13, 0);
         prefs.QuietHoursEnd = new TimeOnly(15, 0);
 
-        // Mock current time to be exactly 15:00 UTC (quiet hours end boundary)
+        // Mock current time to be exactly 15:00 UTC (quiet hours end boundary - exclusive)
         var boundaryTime = new DateTime(2026, 1, 20, 15, 0, 0, DateTimeKind.Utc);
         _mockDateTimeProvider.Setup(x => x.UtcNow).Returns(boundaryTime);
 
+        var devices = new List<DeviceToken> { CreateTestDeviceToken(userId: userId) };
+
         _mockPreferenceRepo.Setup(r => r.GetByUserAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(prefs);
+        _mockDeviceTokenRepo.Setup(r => r.GetByUserAsync(userId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(devices);
+        _mockNotificationLogRepo.Setup(r => r.CreateAsync(It.IsAny<NotificationLog>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(Guid.NewGuid());
 
         // Act
         await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
-        // Assert - Notifications should be blocked at the quiet hours end boundary
+        // Assert - Notifications should be allowed at the quiet hours end boundary (exclusive)
         _mockPushProvider.Verify(p => p.SendAsync(
             It.IsAny<string>(),
             It.IsAny<string>(),
             It.IsAny<PushNotificationMessage>(),
-            It.IsAny<CancellationToken>()), Times.Never);
+            It.IsAny<CancellationToken>()), Times.Once);
     }
 
     #endregion
