@@ -16,7 +16,7 @@ namespace FestGuide.Api.Controllers;
 [Route("api/v1/notifications")]
 [Produces("application/json")]
 [Authorize]
-public class NotificationsController : ControllerBase
+public class NotificationsController : BaseApiController
 {
     private readonly INotificationService _notificationService;
     private readonly IValidator<UpdateNotificationPreferenceRequest> _preferenceValidator;
@@ -123,23 +123,6 @@ public class NotificationsController : ControllerBase
 
         var prefs = await _notificationService.UpdatePreferencesAsync(userId, request, ct);
         return Ok(ApiResponse<NotificationPreferenceDto>.Success(prefs));
-    }
-
-    private Guid GetCurrentUserId()
-    {
-        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-        if (userIdClaim is null)
-        {
-            throw new InvalidOperationException("Authenticated user does not contain a NameIdentifier claim.");
-        }
-
-        if (!Guid.TryParse(userIdClaim, out var userId))
-        {
-            throw new InvalidOperationException("User NameIdentifier claim is not a valid GUID.");
-        }
-
-        return userId;
     }
 
     private static ApiErrorResponse CreateError(string code, string message) =>
