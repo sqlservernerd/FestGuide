@@ -174,6 +174,36 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyDictionary<Guid, IReadOnlyList<PersonalScheduleEntry>>> GetEntriesByScheduleIdsAsync(IEnumerable<Guid> personalScheduleIds, CancellationToken ct = default)
+    {
+        var scheduleIdsList = personalScheduleIds.ToList();
+        if (!scheduleIdsList.Any())
+        {
+            return new Dictionary<Guid, IReadOnlyList<PersonalScheduleEntry>>();
+        }
+
+        const string sql = """
+            SELECT 
+                PersonalScheduleEntryId, PersonalScheduleId, EngagementId, Notes,
+                NotificationsEnabled, IsDeleted, DeletedAtUtc,
+                CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
+            FROM attendee.PersonalScheduleEntry
+            WHERE PersonalScheduleId IN @PersonalScheduleIds AND IsDeleted = 0
+            ORDER BY PersonalScheduleId, CreatedAtUtc
+            """;
+
+        var result = await _connection.QueryAsync<PersonalScheduleEntry>(
+            new CommandDefinition(sql, new { PersonalScheduleIds = scheduleIdsList }, cancellationToken: ct));
+
+        // Group entries by schedule ID
+        return result
+            .GroupBy(e => e.PersonalScheduleId)
+            .ToDictionary(
+                g => g.Key,
+                g => (IReadOnlyList<PersonalScheduleEntry>)g.ToList());
+    }
+
+    /// <inheritdoc />
     public async Task<PersonalScheduleEntry?> GetEntryByIdAsync(Guid entryId, CancellationToken ct = default)
     {
         const string sql = """

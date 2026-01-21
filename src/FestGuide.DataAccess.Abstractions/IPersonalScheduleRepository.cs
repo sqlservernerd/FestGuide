@@ -53,6 +53,14 @@ public interface IPersonalScheduleRepository
     Task<IReadOnlyList<PersonalScheduleEntry>> GetEntriesAsync(Guid personalScheduleId, CancellationToken ct = default);
 
     /// <summary>
+    /// Gets entries for multiple personal schedules in a single batch query.
+    /// </summary>
+    /// <param name="personalScheduleIds">The IDs of the personal schedules.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>A dictionary mapping schedule IDs to their entries.</returns>
+    Task<IReadOnlyDictionary<Guid, IReadOnlyList<PersonalScheduleEntry>>> GetEntriesByScheduleIdsAsync(IEnumerable<Guid> personalScheduleIds, CancellationToken ct = default);
+
+    /// <summary>
     /// Gets a specific entry by ID.
     /// </summary>
     Task<PersonalScheduleEntry?> GetEntryByIdAsync(Guid entryId, CancellationToken ct = default);

@@ -67,11 +67,16 @@ public class PersonalScheduleService : IPersonalScheduleService
         var festivals = await _festivalRepository.GetByIdsAsync(festivalIds, ct);
         var festivalDict = festivals.ToDictionary(f => f.FestivalId);
 
+        // Batch fetch entries for all schedules
+        var scheduleIds = schedules.Select(s => s.PersonalScheduleId).ToList();
+        var entriesBySchedule = await _scheduleRepository.GetEntriesByScheduleIdsAsync(scheduleIds, ct);
+
         // Build result DTOs
         var result = new List<PersonalScheduleSummaryDto>();
         foreach (var schedule in schedules)
         {
-            var entries = await _scheduleRepository.GetEntriesAsync(schedule.PersonalScheduleId, ct);
+            entriesBySchedule.TryGetValue(schedule.PersonalScheduleId, out var entries);
+            var entryCount = entries?.Count ?? 0;
             editionDict.TryGetValue(schedule.EditionId, out var edition);
             Festival? festival = null;
             if (edition != null)
@@ -86,7 +91,7 @@ public class PersonalScheduleService : IPersonalScheduleService
                 festival?.Name,
                 schedule.Name,
                 schedule.IsDefault,
-                entries.Count));
+                entryCount));
         }
 
         return result;
@@ -98,10 +103,15 @@ public class PersonalScheduleService : IPersonalScheduleService
         var schedules = await _scheduleRepository.GetByUserAndEditionAsync(userId, editionId, ct);
         var result = new List<PersonalScheduleDto>();
 
+        // Batch fetch entries for all schedules
+        var scheduleIds = schedules.Select(s => s.PersonalScheduleId).ToList();
+        var entriesBySchedule = await _scheduleRepository.GetEntriesByScheduleIdsAsync(scheduleIds, ct);
+
         foreach (var schedule in schedules)
         {
-            var entries = await _scheduleRepository.GetEntriesAsync(schedule.PersonalScheduleId, ct);
-            result.Add(PersonalScheduleDto.FromEntity(schedule, entries.Count));
+            entriesBySchedule.TryGetValue(schedule.PersonalScheduleId, out var entries);
+            var entryCount = entries?.Count ?? 0;
+            result.Add(PersonalScheduleDto.FromEntity(schedule, entryCount));
         }
 
         return result;
@@ -425,10 +435,10 @@ public class PersonalScheduleService : IPersonalScheduleService
 
         // Build DTOs using the dictionaries
         // Filter entries to only those with valid engagements
-        var validEntries = entries.Where(e => engagementDict.ContainsKey(e.EngagementId));
+        var entriesWithValidEngagements = entries.Where(e => engagementDict.ContainsKey(e.EngagementId));
         
         var result = new List<PersonalScheduleEntryDto>();
-        foreach (var entry in validEntries)
+        foreach (var entry in entriesWithValidEngagements)
         {
             // Safe to access directly since validEntries are pre-filtered to only contain valid engagement IDs
             var engagement = engagementDict[entry.EngagementId];

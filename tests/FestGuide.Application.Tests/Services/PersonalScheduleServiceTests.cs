@@ -131,8 +131,8 @@ public class PersonalScheduleServiceTests
 
         _mockScheduleRepo.Setup(r => r.GetByUserAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(schedules);
-        _mockScheduleRepo.Setup(r => r.GetEntriesAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<PersonalScheduleEntry>());
+        _mockScheduleRepo.Setup(r => r.GetEntriesByScheduleIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Dictionary<Guid, IReadOnlyList<PersonalScheduleEntry>>());
         _mockEditionRepo.Setup(r => r.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<FestivalEdition> { edition });
         _mockFestivalRepo.Setup(r => r.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
@@ -179,8 +179,8 @@ public class PersonalScheduleServiceTests
 
         _mockScheduleRepo.Setup(r => r.GetByUserAndEditionAsync(userId, editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(schedules);
-        _mockScheduleRepo.Setup(r => r.GetEntriesAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<PersonalScheduleEntry>());
+        _mockScheduleRepo.Setup(r => r.GetEntriesByScheduleIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Dictionary<Guid, IReadOnlyList<PersonalScheduleEntry>>());
 
         // Act
         var result = await _sut.GetByEditionAsync(userId, editionId);
