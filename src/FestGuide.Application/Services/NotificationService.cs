@@ -333,7 +333,7 @@ public class NotificationService : INotificationService
             // to avoid data loss for large festivals
             const int batchSize = 1000;
             var offset = 0;
-            var allUserIds = new HashSet<Guid>();
+            var allUserIds = new HashSet<Guid>(batchSize);
             
             while (true)
             {
