@@ -64,15 +64,10 @@ public class ScheduleHub : Hub
     public async Task JoinPersonalSchedule(Guid scheduleId)
     {
         var userId = GetCurrentUserId();
-        if (userId == null)
-        {
-            _logger.LogWarning("Unauthenticated user attempted to join personal schedule {ScheduleId}", scheduleId);
-            throw new HubException("User is not authenticated.");
-        }
 
         // Verify ownership
         var schedule = await _personalScheduleRepository.GetByIdAsync(scheduleId).ConfigureAwait(false);
-        if (schedule == null || schedule.UserId != userId.Value)
+        if (schedule == null || schedule.UserId != userId)
         {
             _logger.LogWarning("User {UserId} attempted to join personal schedule {ScheduleId} they don't own", userId, scheduleId);
             throw new HubException("Personal schedule not found or access denied.");
@@ -106,10 +101,28 @@ public class ScheduleHub : Hub
         await base.OnDisconnectedAsync(exception).ConfigureAwait(false);
     }
 
-    private Guid? GetCurrentUserId()
+    private Guid GetCurrentUserId()
     {
-        var userIdClaim = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+        var user = Context.User;
+        if (user == null)
+        {
+            _logger.LogError(
+                "User context is null for authorized connection {ConnectionId}",
+                Context.ConnectionId);
+            throw new HubException("Authenticated user context is required.");
+        }
+
+        var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            _logger.LogError(
+                "Failed to parse user id claim for connection {ConnectionId}. Claim value: {ClaimValue}",
+                Context.ConnectionId,
+                userIdClaim);
+            throw new HubException("Invalid user identifier.");
+        }
+
+        return userId;
     }
 
     public static string GetEditionGroupName(Guid editionId) => $"edition-{editionId}";

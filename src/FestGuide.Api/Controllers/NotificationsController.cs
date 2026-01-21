@@ -43,9 +43,7 @@ public class NotificationsController : ControllerBase
         CancellationToken ct = default)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
-
-        var notifications = await _notificationService.GetNotificationsAsync(userId.Value, limit, offset, ct);
+        var notifications = await _notificationService.GetNotificationsAsync(userId, limit, offset, ct);
         return Ok(ApiResponse<IReadOnlyList<NotificationDto>>.Success(notifications));
     }
 
@@ -57,9 +55,7 @@ public class NotificationsController : ControllerBase
     public async Task<IActionResult> GetUnreadCount(CancellationToken ct)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
-
-        var count = await _notificationService.GetUnreadCountAsync(userId.Value, ct);
+        var count = await _notificationService.GetUnreadCountAsync(userId, ct);
         return Ok(ApiResponse<UnreadCountDto>.Success(new UnreadCountDto(count)));
     }
 
@@ -73,11 +69,9 @@ public class NotificationsController : ControllerBase
     public async Task<IActionResult> MarkAsRead(Guid notificationId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
-
         try
         {
-            await _notificationService.MarkAsReadAsync(userId.Value, notificationId, ct);
+            await _notificationService.MarkAsReadAsync(userId, notificationId, ct);
             return NoContent();
         }
         catch (ForbiddenException ex)
@@ -94,9 +88,7 @@ public class NotificationsController : ControllerBase
     public async Task<IActionResult> MarkAllAsRead(CancellationToken ct)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
-
-        await _notificationService.MarkAllAsReadAsync(userId.Value, ct);
+        await _notificationService.MarkAllAsReadAsync(userId, ct);
         return NoContent();
     }
 
@@ -108,9 +100,7 @@ public class NotificationsController : ControllerBase
     public async Task<IActionResult> GetPreferences(CancellationToken ct)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
-
-        var prefs = await _notificationService.GetPreferencesAsync(userId.Value, ct);
+        var prefs = await _notificationService.GetPreferencesAsync(userId, ct);
         return Ok(ApiResponse<NotificationPreferenceDto>.Success(prefs));
     }
 
@@ -125,22 +115,31 @@ public class NotificationsController : ControllerBase
         CancellationToken ct)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
-
         var validation = await _preferenceValidator.ValidateAsync(request, ct);
         if (!validation.IsValid)
         {
             return BadRequest(CreateValidationError(validation));
         }
 
-        var prefs = await _notificationService.UpdatePreferencesAsync(userId.Value, request, ct);
+        var prefs = await _notificationService.UpdatePreferencesAsync(userId, request, ct);
         return Ok(ApiResponse<NotificationPreferenceDto>.Success(prefs));
     }
 
-    private Guid? GetCurrentUserId()
+    private Guid GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+
+        if (userIdClaim is null)
+        {
+            throw new InvalidOperationException("Authenticated user does not contain a NameIdentifier claim.");
+        }
+
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            throw new InvalidOperationException("User NameIdentifier claim is not a valid GUID.");
+        }
+
+        return userId;
     }
 
     private static ApiErrorResponse CreateError(string code, string message) =>

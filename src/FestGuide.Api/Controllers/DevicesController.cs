@@ -41,15 +41,13 @@ public class DevicesController : ControllerBase
     public async Task<IActionResult> RegisterDevice([FromBody] RegisterDeviceRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
-
         var validation = await _registerValidator.ValidateAsync(request, ct);
         if (!validation.IsValid)
         {
             return BadRequest(CreateValidationError(validation));
         }
 
-        var device = await _notificationService.RegisterDeviceAsync(userId.Value, request, ct);
+        var device = await _notificationService.RegisterDeviceAsync(userId, request, ct);
 
         return CreatedAtAction(
             nameof(GetDevices),
@@ -64,9 +62,7 @@ public class DevicesController : ControllerBase
     public async Task<IActionResult> GetDevices(CancellationToken ct)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
-
-        var devices = await _notificationService.GetDevicesAsync(userId.Value, ct);
+        var devices = await _notificationService.GetDevicesAsync(userId, ct);
         return Ok(ApiResponse<IReadOnlyList<DeviceTokenDto>>.Success(devices));
     }
 
@@ -80,11 +76,9 @@ public class DevicesController : ControllerBase
     public async Task<IActionResult> UnregisterDevice(Guid deviceId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
-        if (userId == null) return Unauthorized();
-
         try
         {
-            await _notificationService.UnregisterDeviceAsync(userId.Value, deviceId, ct);
+            await _notificationService.UnregisterDeviceAsync(userId, deviceId, ct);
             return NoContent();
         }
         catch (ForbiddenException ex)
@@ -116,10 +110,21 @@ public class DevicesController : ControllerBase
         return NoContent();
     }
 
-    private Guid? GetCurrentUserId()
+    private Guid GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+
+        if (userIdClaim is null)
+        {
+            throw new InvalidOperationException("Authenticated user does not contain a NameIdentifier claim.");
+        }
+
+        if (!Guid.TryParse(userIdClaim, out var userId))
+        {
+            throw new InvalidOperationException("User NameIdentifier claim is not a valid GUID.");
+        }
+
+        return userId;
     }
 
     private static ApiErrorResponse CreateError(string code, string message) =>
