@@ -34,6 +34,30 @@ public class SqlServerFestivalRepository : IFestivalRepository
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<Festival>> GetByIdsAsync(IEnumerable<Guid> festivalIds, CancellationToken ct = default)
+    {
+        var festivalIdsList = festivalIds?.ToList();
+        if (festivalIdsList == null || !festivalIdsList.Any())
+        {
+            return Array.Empty<Festival>();
+        }
+
+        const string sql = """
+            SELECT 
+                FestivalId, Name, Description, ImageUrl, WebsiteUrl,
+                OwnerUserId, IsDeleted, DeletedAtUtc,
+                CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
+            FROM core.Festival
+            WHERE FestivalId IN @FestivalIds AND IsDeleted = 0
+            """;
+
+        var festivals = await _connection.QueryAsync<Festival>(
+            new CommandDefinition(sql, new { FestivalIds = festivalIdsList }, cancellationToken: ct));
+
+        return festivals.ToList();
+    }
+
+    /// <inheritdoc />
     public async Task<IReadOnlyList<Festival>> GetByOwnerAsync(Guid ownerUserId, CancellationToken ct = default)
     {
         const string sql = """

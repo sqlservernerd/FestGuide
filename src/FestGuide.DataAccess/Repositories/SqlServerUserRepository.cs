@@ -52,6 +52,31 @@ public class SqlServerUserRepository : IUserRepository
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<User>> GetByIdsAsync(IEnumerable<Guid> userIds, CancellationToken ct = default)
+    {
+        var userIdsList = userIds?.ToList();
+        if (userIdsList == null || !userIdsList.Any())
+        {
+            return Array.Empty<User>();
+        }
+
+        const string sql = """
+            SELECT 
+                UserId, Email, EmailNormalized, EmailVerified, PasswordHash,
+                DisplayName, UserType, PreferredTimezoneId, IsDeleted, DeletedAtUtc,
+                FailedLoginAttempts, LockoutEndUtc, CreatedAtUtc, CreatedBy,
+                ModifiedAtUtc, ModifiedBy
+            FROM identity.[User]
+            WHERE UserId IN @UserIds AND IsDeleted = 0
+            """;
+
+        var users = await _connection.QueryAsync<User>(
+            new CommandDefinition(sql, new { UserIds = userIdsList }, cancellationToken: ct));
+
+        return users.ToList();
+    }
+
+    /// <inheritdoc />
     public async Task<bool> ExistsByEmailAsync(string email, CancellationToken ct = default)
     {
         const string sql = """

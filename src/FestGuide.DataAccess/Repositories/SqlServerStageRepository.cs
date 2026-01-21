@@ -34,6 +34,30 @@ public class SqlServerStageRepository : IStageRepository
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<Stage>> GetByIdsAsync(IEnumerable<Guid> stageIds, CancellationToken ct = default)
+    {
+        var stageIdsList = stageIds?.ToList();
+        if (stageIdsList == null || !stageIdsList.Any())
+        {
+            return Array.Empty<Stage>();
+        }
+
+        const string sql = """
+            SELECT 
+                StageId, VenueId, Name, Description, SortOrder,
+                IsDeleted, DeletedAtUtc,
+                CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
+            FROM venue.Stage
+            WHERE StageId IN @StageIds AND IsDeleted = 0
+            """;
+
+        var stages = await _connection.QueryAsync<Stage>(
+            new CommandDefinition(sql, new { StageIds = stageIdsList }, cancellationToken: ct));
+
+        return stages.ToList();
+    }
+
+    /// <inheritdoc />
     public async Task<IReadOnlyList<Stage>> GetByVenueAsync(Guid venueId, CancellationToken ct = default)
     {
         const string sql = """

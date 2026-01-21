@@ -13,6 +13,11 @@ public interface IStageRepository
     Task<Stage?> GetByIdAsync(Guid stageId, CancellationToken ct = default);
 
     /// <summary>
+    /// Gets multiple stages by their unique identifiers.
+    /// </summary>
+    Task<IReadOnlyList<Stage>> GetByIdsAsync(IEnumerable<Guid> stageIds, CancellationToken ct = default);
+
+    /// <summary>
     /// Gets all stages for a venue.
     /// </summary>
     Task<IReadOnlyList<Stage>> GetByVenueAsync(Guid venueId, CancellationToken ct = default);

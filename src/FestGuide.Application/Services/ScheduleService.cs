@@ -78,28 +78,16 @@ public class ScheduleService : IScheduleService
 
         // Build lookup maps
         var engagementByTimeSlot = engagements.ToDictionary(e => e.TimeSlotId);
-        var stages = new Dictionary<Guid, Stage>();
-        var artists = new Dictionary<Guid, Artist>();
 
-        // Load stages
-        foreach (var stageId in timeSlots.Select(ts => ts.StageId).Distinct().Where(stageId => !stages.ContainsKey(stageId)))
-        {
-            var stage = await _stageRepository.GetByIdAsync(stageId, ct);
-            if (stage != null)
-            {
-                stages[stageId] = stage;
-            }
-        }
+        // Batch fetch stages and artists to avoid N+1 query issue
+        var stageIds = timeSlots.Select(ts => ts.StageId).Distinct().ToList();
+        var artistIds = engagements.Select(e => e.ArtistId).Distinct().ToList();
 
-        // Load artists
-        foreach (var artistId in engagements.Select(e => e.ArtistId).Distinct().Where(artistId => !artists.ContainsKey(artistId)))
-        {
-            var artist = await _artistRepository.GetByIdAsync(artistId, ct);
-            if (artist != null)
-            {
-                artists[artistId] = artist;
-            }
-        }
+        var stagesList = await _stageRepository.GetByIdsAsync(stageIds, ct);
+        var artistsList = await _artistRepository.GetByIdsAsync(artistIds, ct);
+
+        var stages = stagesList.ToDictionary(s => s.StageId);
+        var artists = artistsList.ToDictionary(a => a.ArtistId);
 
         // Build schedule items
         var items = timeSlots.Select(ts =>

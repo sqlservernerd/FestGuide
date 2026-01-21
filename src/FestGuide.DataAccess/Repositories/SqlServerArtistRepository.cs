@@ -35,6 +35,31 @@ public class SqlServerArtistRepository : IArtistRepository
     }
 
     /// <inheritdoc />
+    public async Task<IReadOnlyList<Artist>> GetByIdsAsync(IEnumerable<Guid> artistIds, CancellationToken ct = default)
+    {
+        var artistIdsList = artistIds?.ToList();
+        if (artistIdsList == null || !artistIdsList.Any())
+        {
+            return Array.Empty<Artist>();
+        }
+
+        const string sql = """
+            SELECT 
+                ArtistId, FestivalId, Name, Genre, Bio,
+                ImageUrl, WebsiteUrl, SpotifyUrl,
+                IsDeleted, DeletedAtUtc,
+                CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
+            FROM core.Artist
+            WHERE ArtistId IN @ArtistIds AND IsDeleted = 0
+            """;
+
+        var artists = await _connection.QueryAsync<Artist>(
+            new CommandDefinition(sql, new { ArtistIds = artistIdsList }, cancellationToken: ct));
+
+        return artists.ToList();
+    }
+
+    /// <inheritdoc />
     public async Task<IReadOnlyList<Artist>> GetByFestivalAsync(Guid festivalId, CancellationToken ct = default)
     {
         const string sql = """

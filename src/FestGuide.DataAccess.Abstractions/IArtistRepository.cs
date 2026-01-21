@@ -13,6 +13,11 @@ public interface IArtistRepository
     Task<Artist?> GetByIdAsync(Guid artistId, CancellationToken ct = default);
 
     /// <summary>
+    /// Gets multiple artists by their unique identifiers.
+    /// </summary>
+    Task<IReadOnlyList<Artist>> GetByIdsAsync(IEnumerable<Guid> artistIds, CancellationToken ct = default);
+
+    /// <summary>
     /// Gets all artists for a festival.
     /// </summary>
     Task<IReadOnlyList<Artist>> GetByFestivalAsync(Guid festivalId, CancellationToken ct = default);

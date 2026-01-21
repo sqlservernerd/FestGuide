@@ -13,6 +13,11 @@ public interface IFestivalRepository
     Task<Festival?> GetByIdAsync(Guid festivalId, CancellationToken ct = default);
 
     /// <summary>
+    /// Gets multiple festivals by their unique identifiers.
+    /// </summary>
+    Task<IReadOnlyList<Festival>> GetByIdsAsync(IEnumerable<Guid> festivalIds, CancellationToken ct = default);
+
+    /// <summary>
     /// Gets all festivals owned by a user.
     /// </summary>
     Task<IReadOnlyList<Festival>> GetByOwnerAsync(Guid ownerUserId, CancellationToken ct = default);

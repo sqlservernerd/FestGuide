@@ -28,6 +28,9 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IArtistService, ArtistService>();
         services.AddScoped<IScheduleService, ScheduleService>();
 
+        // Phase 3 Services - Permissions
+        services.AddScoped<IPermissionService, PermissionService>();
+
         // Authorization
         services.AddScoped<IFestivalAuthorizationService, FestivalAuthorizationService>();
 

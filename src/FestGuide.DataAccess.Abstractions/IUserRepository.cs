@@ -18,6 +18,11 @@ public interface IUserRepository
     Task<User?> GetByEmailAsync(string email, CancellationToken ct = default);
 
     /// <summary>
+    /// Gets multiple users by their unique identifiers.
+    /// </summary>
+    Task<IReadOnlyList<User>> GetByIdsAsync(IEnumerable<Guid> userIds, CancellationToken ct = default);
+
+    /// <summary>
     /// Checks if a user exists with the specified email.
     /// </summary>
     Task<bool> ExistsByEmailAsync(string email, CancellationToken ct = default);
