@@ -58,7 +58,7 @@ public class ScheduleHubService : IScheduleHubService
                 change.Message,
                 timestamp = DateTime.UtcNow
             },
-            ct);
+            ct).ConfigureAwait(false);
 
         _logger.LogInformation("Schedule change broadcast to edition {EditionId}: {ChangeType}",
             editionId, change.ChangeType);
@@ -77,7 +77,7 @@ public class ScheduleHubService : IScheduleHubService
                 version,
                 timestamp = DateTime.UtcNow
             },
-            ct);
+            ct).ConfigureAwait(false);
 
         _logger.LogInformation("Schedule published broadcast to edition {EditionId}, version {Version}",
             editionId, version);
@@ -96,7 +96,7 @@ public class ScheduleHubService : IScheduleHubService
                 updateType,
                 timestamp = DateTime.UtcNow
             },
-            ct);
+            ct).ConfigureAwait(false);
 
         _logger.LogInformation("Personal schedule update broadcast: {ScheduleId}, {UpdateType}",
             scheduleId, updateType);

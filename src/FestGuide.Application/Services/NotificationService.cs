@@ -61,7 +61,7 @@ public class NotificationService : INotificationService
             ModifiedBy = userId
         };
 
-        await _deviceTokenRepository.UpsertAsync(deviceToken, ct);
+        await _deviceTokenRepository.UpsertAsync(deviceToken, ct).ConfigureAwait(false);
 
         _logger.LogInformation("Device registered for user {UserId} on platform {Platform}", userId, request.Platform);
 
@@ -71,20 +71,20 @@ public class NotificationService : INotificationService
     /// <inheritdoc />
     public async Task<IReadOnlyList<DeviceTokenDto>> GetDevicesAsync(Guid userId, CancellationToken ct = default)
     {
-        var devices = await _deviceTokenRepository.GetByUserAsync(userId, ct);
+        var devices = await _deviceTokenRepository.GetByUserAsync(userId, ct).ConfigureAwait(false);
         return devices.Select(DeviceTokenDto.FromEntity).ToList();
     }
 
     /// <inheritdoc />
     public async Task UnregisterDeviceAsync(Guid userId, Guid deviceTokenId, CancellationToken ct = default)
     {
-        var device = await _deviceTokenRepository.GetByIdAsync(deviceTokenId, ct);
+        var device = await _deviceTokenRepository.GetByIdAsync(deviceTokenId, ct).ConfigureAwait(false);
         if (device == null || device.UserId != userId)
         {
             throw new ForbiddenException("Device not found or does not belong to user.");
         }
 
-        await _deviceTokenRepository.DeactivateAsync(deviceTokenId, userId, ct);
+        await _deviceTokenRepository.DeactivateAsync(deviceTokenId, userId, ct).ConfigureAwait(false);
 
         _logger.LogInformation("Device {DeviceTokenId} unregistered for user {UserId}", deviceTokenId, userId);
     }
@@ -95,7 +95,7 @@ public class NotificationService : INotificationService
         // NOTE: For token-based unregistration, we use Guid.Empty since we don't have authenticated user context.
         // This makes it impossible to audit who deactivated a device token, but is necessary for
         // unauthenticated device token cleanup scenarios.
-        await _deviceTokenRepository.DeactivateByTokenAsync(token, Guid.Empty, ct);
+        await _deviceTokenRepository.DeactivateByTokenAsync(token, Guid.Empty, ct).ConfigureAwait(false);
     }
 
     #endregion
@@ -105,7 +105,7 @@ public class NotificationService : INotificationService
     /// <inheritdoc />
     public async Task<NotificationPreferenceDto> GetPreferencesAsync(Guid userId, CancellationToken ct = default)
     {
-        var prefs = await _preferenceRepository.GetByUserAsync(userId, ct);
+        var prefs = await _preferenceRepository.GetByUserAsync(userId, ct).ConfigureAwait(false);
         if (prefs == null)
         {
             return NotificationPreferenceDto.Default();
@@ -117,7 +117,7 @@ public class NotificationService : INotificationService
     /// <inheritdoc />
     public async Task<NotificationPreferenceDto> UpdatePreferencesAsync(Guid userId, UpdateNotificationPreferenceRequest request, CancellationToken ct = default)
     {
-        var existing = await _preferenceRepository.GetByUserAsync(userId, ct);
+        var existing = await _preferenceRepository.GetByUserAsync(userId, ct).ConfigureAwait(false);
         var now = _dateTimeProvider.UtcNow;
 
         var prefs = existing ?? new NotificationPreference
@@ -140,7 +140,7 @@ public class NotificationService : INotificationService
         prefs.ModifiedAtUtc = now;
         prefs.ModifiedBy = userId;
 
-        await _preferenceRepository.UpsertAsync(prefs, ct);
+        await _preferenceRepository.UpsertAsync(prefs, ct).ConfigureAwait(false);
 
         _logger.LogInformation("Notification preferences updated for user {UserId}", userId);
 
@@ -154,32 +154,32 @@ public class NotificationService : INotificationService
     /// <inheritdoc />
     public async Task<IReadOnlyList<NotificationDto>> GetNotificationsAsync(Guid userId, int limit = 50, int offset = 0, CancellationToken ct = default)
     {
-        var logs = await _notificationLogRepository.GetByUserAsync(userId, limit, offset, ct);
+        var logs = await _notificationLogRepository.GetByUserAsync(userId, limit, offset, ct).ConfigureAwait(false);
         return logs.Select(NotificationDto.FromEntity).ToList();
     }
 
     /// <inheritdoc />
     public async Task<int> GetUnreadCountAsync(Guid userId, CancellationToken ct = default)
     {
-        return await _notificationLogRepository.GetUnreadCountAsync(userId, ct);
+        return await _notificationLogRepository.GetUnreadCountAsync(userId, ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task MarkAsReadAsync(Guid userId, Guid notificationId, CancellationToken ct = default)
     {
-        var log = await _notificationLogRepository.GetByIdAsync(notificationId, ct);
+        var log = await _notificationLogRepository.GetByIdAsync(notificationId, ct).ConfigureAwait(false);
         if (log == null || log.UserId != userId)
         {
             throw new ForbiddenException("Notification not found or does not belong to user.");
         }
 
-        await _notificationLogRepository.MarkAsReadAsync(notificationId, userId, ct);
+        await _notificationLogRepository.MarkAsReadAsync(notificationId, userId, ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
     public async Task MarkAllAsReadAsync(Guid userId, CancellationToken ct = default)
     {
-        await _notificationLogRepository.MarkAllAsReadAsync(userId, userId, ct);
+        await _notificationLogRepository.MarkAllAsReadAsync(userId, userId, ct).ConfigureAwait(false);
     }
 
     #endregion
@@ -198,7 +198,7 @@ public class NotificationService : INotificationService
         CancellationToken ct = default)
     {
         // Check user preferences
-        var prefs = await _preferenceRepository.GetByUserAsync(userId, ct);
+        var prefs = await _preferenceRepository.GetByUserAsync(userId, ct).ConfigureAwait(false);
         if (prefs != null && !prefs.PushEnabled)
         {
             _logger.LogDebug("Push notifications disabled for user {UserId}, skipping", userId);
@@ -219,7 +219,7 @@ public class NotificationService : INotificationService
             return;
         }
 
-        var devices = await _deviceTokenRepository.GetByUserAsync(userId, ct);
+        var devices = await _deviceTokenRepository.GetByUserAsync(userId, ct).ConfigureAwait(false);
         if (!devices.Any())
         {
             _logger.LogDebug("No registered devices for user {UserId}", userId);
@@ -255,10 +255,10 @@ public class NotificationService : INotificationService
             try
             {
                 var message = new PushNotificationMessage(title, body, notificationType, data);
-                await _pushProvider.SendAsync(device.Token, device.Platform, message, ct);
+                await _pushProvider.SendAsync(device.Token, device.Platform, message, ct).ConfigureAwait(false);
 
                 log.IsDelivered = true;
-                await _deviceTokenRepository.UpdateLastUsedAsync(device.DeviceTokenId, now, ct);
+                await _deviceTokenRepository.UpdateLastUsedAsync(device.DeviceTokenId, now, ct).ConfigureAwait(false);
 
                 _logger.LogInformation("Notification sent to user {UserId} on device {DeviceId}", userId, device.DeviceTokenId);
             }
@@ -273,11 +273,11 @@ public class NotificationService : INotificationService
                 if (ex.Message.Contains("invalid", StringComparison.OrdinalIgnoreCase) || 
                     ex.Message.Contains("unregistered", StringComparison.OrdinalIgnoreCase))
                 {
-                    await _deviceTokenRepository.DeactivateAsync(device.DeviceTokenId, Guid.Empty, ct);
+                    await _deviceTokenRepository.DeactivateAsync(device.DeviceTokenId, Guid.Empty, ct).ConfigureAwait(false);
                 }
             }
 
-            await _notificationLogRepository.CreateAsync(log, ct);
+            await _notificationLogRepository.CreateAsync(log, ct).ConfigureAwait(false);
         }
     }
 
@@ -314,7 +314,7 @@ public class NotificationService : INotificationService
                     data,
                     ct));
 
-            await Task.WhenAll(sendTasks);
+            await Task.WhenAll(sendTasks).ConfigureAwait(false);
         }
     }
 
@@ -326,14 +326,14 @@ public class NotificationService : INotificationService
         // If we have a specific engagement, only notify users who have that engagement saved
         if (change.EngagementId.HasValue)
         {
-            userIds = await _personalScheduleRepository.GetUserIdsWithEngagementAsync(change.EngagementId.Value, ct);
+            userIds = await _personalScheduleRepository.GetUserIdsWithEngagementAsync(change.EngagementId.Value, ct).ConfigureAwait(false);
         }
         else
         {
             // Otherwise, notify all users who have schedules for this edition
             // NOTE: Limited to MaxSchedulesPerEdition schedules. If an edition has more schedules than this limit,
             // some users may not receive notifications. Consider implementing batch processing for very large editions.
-            var schedules = await _personalScheduleRepository.GetByEditionAsync(change.EditionId, limit: MaxSchedulesPerEdition, offset: 0, ct);
+            var schedules = await _personalScheduleRepository.GetByEditionAsync(change.EditionId, limit: MaxSchedulesPerEdition, offset: 0, ct).ConfigureAwait(false);
             userIds = schedules.Select(s => s.UserId).Distinct();
         }
 
@@ -361,7 +361,7 @@ public class NotificationService : INotificationService
             "Edition",
             change.EditionId,
             data,
-            ct);
+            ct).ConfigureAwait(false);
 
         _logger.LogInformation("Schedule change notification sent to {Count} users for edition {EditionId}",
             userIdList.Count, change.EditionId);

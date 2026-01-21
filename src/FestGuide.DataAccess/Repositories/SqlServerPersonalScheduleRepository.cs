@@ -30,7 +30,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         return await _connection.QuerySingleOrDefaultAsync<PersonalSchedule>(
-            new CommandDefinition(sql, new { PersonalScheduleId = personalScheduleId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { PersonalScheduleId = personalScheduleId }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -47,7 +47,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         var result = await _connection.QueryAsync<PersonalSchedule>(
-            new CommandDefinition(sql, new { UserId = userId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { UserId = userId }, cancellationToken: ct)).ConfigureAwait(false);
 
         return result.ToList();
     }
@@ -66,7 +66,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         var result = await _connection.QueryAsync<PersonalSchedule>(
-            new CommandDefinition(sql, new { UserId = userId, EditionId = editionId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { UserId = userId, EditionId = editionId }, cancellationToken: ct)).ConfigureAwait(false);
 
         return result.ToList();
     }
@@ -85,7 +85,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         return await _connection.QuerySingleOrDefaultAsync<PersonalSchedule>(
-            new CommandDefinition(sql, new { UserId = userId, EditionId = editionId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { UserId = userId, EditionId = editionId }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -104,7 +104,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, personalSchedule, cancellationToken: ct));
+            new CommandDefinition(sql, personalSchedule, cancellationToken: ct)).ConfigureAwait(false);
 
         return personalSchedule.PersonalScheduleId;
     }
@@ -123,7 +123,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, personalSchedule, cancellationToken: ct));
+            new CommandDefinition(sql, personalSchedule, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -137,7 +137,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { PersonalScheduleId = personalScheduleId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { PersonalScheduleId = personalScheduleId }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -151,7 +151,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         return await _connection.ExecuteScalarAsync<bool>(
-            new CommandDefinition(sql, new { PersonalScheduleId = personalScheduleId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { PersonalScheduleId = personalScheduleId }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -168,7 +168,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         var result = await _connection.QueryAsync<PersonalScheduleEntry>(
-            new CommandDefinition(sql, new { PersonalScheduleId = personalScheduleId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { PersonalScheduleId = personalScheduleId }, cancellationToken: ct)).ConfigureAwait(false);
 
         return result.ToList();
     }
@@ -193,7 +193,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         var result = await _connection.QueryAsync<PersonalScheduleEntry>(
-            new CommandDefinition(sql, new { PersonalScheduleIds = scheduleIdsList }, cancellationToken: ct));
+            new CommandDefinition(sql, new { PersonalScheduleIds = scheduleIdsList }, cancellationToken: ct)).ConfigureAwait(false);
 
         // Group entries by schedule ID
         return result
@@ -216,7 +216,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         return await _connection.QuerySingleOrDefaultAsync<PersonalScheduleEntry>(
-            new CommandDefinition(sql, new { EntryId = entryId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { EntryId = entryId }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -253,7 +253,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, entry, cancellationToken: ct));
+            new CommandDefinition(sql, entry, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -267,7 +267,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { EntryId = entryId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { EntryId = entryId }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -283,7 +283,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         return await _connection.ExecuteScalarAsync<bool>(
-            new CommandDefinition(sql, new { PersonalScheduleId = personalScheduleId, EngagementId = engagementId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { PersonalScheduleId = personalScheduleId, EngagementId = engagementId }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -296,7 +296,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         return await _connection.QuerySingleOrDefaultAsync<Guid?>(
-            new CommandDefinition(sql, new { EntryId = entryId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { EntryId = entryId }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -309,7 +309,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { PersonalScheduleId = personalScheduleId, SyncedAtUtc = syncedAtUtc }, cancellationToken: ct));
+            new CommandDefinition(sql, new { PersonalScheduleId = personalScheduleId, SyncedAtUtc = syncedAtUtc }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -327,7 +327,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         var result = await _connection.QueryAsync<PersonalSchedule>(
-            new CommandDefinition(sql, new { EditionId = editionId, Limit = limit, Offset = offset }, cancellationToken: ct));
+            new CommandDefinition(sql, new { EditionId = editionId, Limit = limit, Offset = offset }, cancellationToken: ct)).ConfigureAwait(false);
 
         return result.ToList();
     }
@@ -346,7 +346,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             """;
 
         var result = await _connection.QueryAsync<Guid>(
-            new CommandDefinition(sql, new { EngagementId = engagementId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { EngagementId = engagementId }, cancellationToken: ct)).ConfigureAwait(false);
 
         return result.ToList();
     }

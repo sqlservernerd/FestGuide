@@ -31,7 +31,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
             """;
 
         return await _connection.QuerySingleOrDefaultAsync<NotificationLog>(
-            new CommandDefinition(sql, new { NotificationLogId = notificationLogId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { NotificationLogId = notificationLogId }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -50,7 +50,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
             """;
 
         var result = await _connection.QueryAsync<NotificationLog>(
-            new CommandDefinition(sql, new { UserId = userId, Limit = limit, Offset = offset }, cancellationToken: ct));
+            new CommandDefinition(sql, new { UserId = userId, Limit = limit, Offset = offset }, cancellationToken: ct)).ConfigureAwait(false);
 
         return result.ToList();
     }
@@ -70,7 +70,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
             """;
 
         var result = await _connection.QueryAsync<NotificationLog>(
-            new CommandDefinition(sql, new { UserId = userId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { UserId = userId }, cancellationToken: ct)).ConfigureAwait(false);
 
         return result.ToList();
     }
@@ -85,7 +85,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
             """;
 
         return await _connection.ExecuteScalarAsync<int>(
-            new CommandDefinition(sql, new { UserId = userId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { UserId = userId }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -106,7 +106,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, notificationLog, cancellationToken: ct));
+            new CommandDefinition(sql, notificationLog, cancellationToken: ct)).ConfigureAwait(false);
 
         return notificationLog.NotificationLogId;
     }
@@ -129,7 +129,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, notificationLogs, cancellationToken: ct));
+            new CommandDefinition(sql, notificationLogs, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -144,7 +144,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { NotificationLogId = notificationLogId, ModifiedBy = modifiedBy }, cancellationToken: ct));
+            new CommandDefinition(sql, new { NotificationLogId = notificationLogId, ModifiedBy = modifiedBy }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -159,7 +159,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { UserId = userId, ModifiedBy = modifiedBy }, cancellationToken: ct));
+            new CommandDefinition(sql, new { UserId = userId, ModifiedBy = modifiedBy }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -174,7 +174,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { NotificationLogId = notificationLogId, IsDelivered = isDelivered, ErrorMessage = errorMessage }, cancellationToken: ct));
+            new CommandDefinition(sql, new { NotificationLogId = notificationLogId, IsDelivered = isDelivered, ErrorMessage = errorMessage }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -186,6 +186,6 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { DaysToKeep = daysToKeep }, cancellationToken: ct));
+            new CommandDefinition(sql, new { DaysToKeep = daysToKeep }, cancellationToken: ct)).ConfigureAwait(false);
     }
 }

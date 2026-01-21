@@ -32,7 +32,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
             """;
 
         return await _connection.QuerySingleOrDefaultAsync<DeviceToken>(
-            new CommandDefinition(sql, new { DeviceTokenId = deviceTokenId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { DeviceTokenId = deviceTokenId }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -48,7 +48,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
             """;
 
         return await _connection.QuerySingleOrDefaultAsync<DeviceToken>(
-            new CommandDefinition(sql, new { Token = token }, cancellationToken: ct));
+            new CommandDefinition(sql, new { Token = token }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -65,7 +65,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
             """;
 
         var result = await _connection.QueryAsync<DeviceToken>(
-            new CommandDefinition(sql, new { UserId = userId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { UserId = userId }, cancellationToken: ct)).ConfigureAwait(false);
 
         return result.ToList();
     }
@@ -96,7 +96,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
                 """;
 
             var batchResult = await _connection.QueryAsync<DeviceToken>(
-                new CommandDefinition(sql, new { UserIds = batch }, cancellationToken: ct));
+                new CommandDefinition(sql, new { UserIds = batch }, cancellationToken: ct)).ConfigureAwait(false);
 
             results.AddRange(batchResult);
         }
@@ -134,7 +134,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, deviceToken, cancellationToken: ct));
+            new CommandDefinition(sql, deviceToken, cancellationToken: ct)).ConfigureAwait(false);
 
         return deviceToken.DeviceTokenId;
     }
@@ -151,7 +151,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { DeviceTokenId = deviceTokenId, ModifiedBy = modifiedBy }, cancellationToken: ct));
+            new CommandDefinition(sql, new { DeviceTokenId = deviceTokenId, ModifiedBy = modifiedBy }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -166,7 +166,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { Token = token, ModifiedBy = modifiedBy }, cancellationToken: ct));
+            new CommandDefinition(sql, new { Token = token, ModifiedBy = modifiedBy }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -181,7 +181,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { UserId = userId, ModifiedBy = modifiedBy }, cancellationToken: ct));
+            new CommandDefinition(sql, new { UserId = userId, ModifiedBy = modifiedBy }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -194,7 +194,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, new { DeviceTokenId = deviceTokenId, LastUsedAtUtc = lastUsedAtUtc }, cancellationToken: ct));
+            new CommandDefinition(sql, new { DeviceTokenId = deviceTokenId, LastUsedAtUtc = lastUsedAtUtc }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -208,6 +208,6 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, cancellationToken: ct));
+            new CommandDefinition(sql, cancellationToken: ct)).ConfigureAwait(false);
     }
 }

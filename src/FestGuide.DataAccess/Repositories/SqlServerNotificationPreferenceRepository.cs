@@ -31,7 +31,7 @@ public class SqlServerNotificationPreferenceRepository : INotificationPreference
             """;
 
         return await _connection.QuerySingleOrDefaultAsync<NotificationPreference>(
-            new CommandDefinition(sql, new { UserId = userId }, cancellationToken: ct));
+            new CommandDefinition(sql, new { UserId = userId }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
@@ -68,7 +68,7 @@ public class SqlServerNotificationPreferenceRepository : INotificationPreference
             """;
 
         await _connection.ExecuteAsync(
-            new CommandDefinition(sql, preference, cancellationToken: ct));
+            new CommandDefinition(sql, preference, cancellationToken: ct)).ConfigureAwait(false);
 
         return preference.NotificationPreferenceId;
     }
