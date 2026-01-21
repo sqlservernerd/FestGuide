@@ -10,6 +10,8 @@ namespace FestGuide.DataAccess.Repositories;
 /// </summary>
 public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
 {
+    private const int MaxSqlParameterCount = 2000; // SQL Server has a limit of 2100 parameters, use 2000 for safety
+
     private readonly IDbConnection _connection;
 
     public SqlServerDeviceTokenRepository(IDbConnection connection)
@@ -77,13 +79,12 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
             return Array.Empty<DeviceToken>();
         }
 
-        // Handle large user sets by batching to avoid SQL Server parameter limits (2100)
-        const int batchSize = 2000;
+        // Handle large user sets by batching to avoid SQL Server parameter limits
         var results = new List<DeviceToken>();
 
-        for (int i = 0; i < userIdArray.Length; i += batchSize)
+        for (int i = 0; i < userIdArray.Length; i += MaxSqlParameterCount)
         {
-            var batch = userIdArray.Skip(i).Take(batchSize).ToArray();
+            var batch = userIdArray.Skip(i).Take(MaxSqlParameterCount).ToArray();
 
             const string sql = """
                 SELECT 

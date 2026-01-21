@@ -12,6 +12,8 @@ namespace FestGuide.Application.Services;
 /// </summary>
 public class NotificationService : INotificationService
 {
+    private const int MaxSchedulesPerEdition = 10000; // Maximum number of schedules to fetch per edition for notifications
+
     private readonly IDeviceTokenRepository _deviceTokenRepository;
     private readonly INotificationLogRepository _notificationLogRepository;
     private readonly INotificationPreferenceRepository _preferenceRepository;
@@ -310,8 +312,7 @@ public class NotificationService : INotificationService
         else
         {
             // Otherwise, notify all users who have schedules for this edition
-            // Use default pagination to get all schedules
-            var schedules = await _personalScheduleRepository.GetByEditionAsync(change.EditionId, limit: 10000, offset: 0, ct);
+            var schedules = await _personalScheduleRepository.GetByEditionAsync(change.EditionId, limit: MaxSchedulesPerEdition, offset: 0, ct);
             userIds = schedules.Select(s => s.UserId).Distinct();
         }
 
@@ -366,7 +367,16 @@ public class NotificationService : INotificationService
         }
 
         var now = TimeOnly.FromTimeSpan(_dateTimeProvider.UtcNow.TimeOfDay);
-        return now >= prefs.QuietHoursStart.Value && now <= prefs.QuietHoursEnd.Value;
+        var start = prefs.QuietHoursStart.Value;
+        var end = prefs.QuietHoursEnd.Value;
+
+        // Handle quiet hours that span midnight (e.g., 23:00 to 06:00)
+        if (start > end)
+        {
+            return now >= start || now <= end;
+        }
+
+        return now >= start && now <= end;
     }
 
     #endregion
