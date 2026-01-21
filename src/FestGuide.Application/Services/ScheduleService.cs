@@ -82,22 +82,22 @@ public class ScheduleService : IScheduleService
         var artists = new Dictionary<Guid, Artist>();
 
         // Load stages
-        foreach (var timeSlot in timeSlots.Where(ts => !stages.ContainsKey(ts.StageId)))
+        foreach (var stageId in timeSlots.Select(ts => ts.StageId).Distinct().Where(stageId => !stages.ContainsKey(stageId)))
         {
-            var stage = await _stageRepository.GetByIdAsync(timeSlot.StageId, ct);
+            var stage = await _stageRepository.GetByIdAsync(stageId, ct);
             if (stage != null)
             {
-                stages[timeSlot.StageId] = stage;
+                stages[stageId] = stage;
             }
         }
 
         // Load artists
-        foreach (var engagement in engagements.Where(e => !artists.ContainsKey(e.ArtistId)))
+        foreach (var artistId in engagements.Select(e => e.ArtistId).Distinct().Where(artistId => !artists.ContainsKey(artistId)))
         {
-            var artist = await _artistRepository.GetByIdAsync(engagement.ArtistId, ct);
+            var artist = await _artistRepository.GetByIdAsync(artistId, ct);
             if (artist != null)
             {
-                artists[engagement.ArtistId] = artist;
+                artists[artistId] = artist;
             }
         }
 
