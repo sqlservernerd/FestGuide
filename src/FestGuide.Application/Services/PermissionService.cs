@@ -281,14 +281,12 @@ public class PermissionService : IPermissionService
             }
             
             User? invitedBy = null;
-            if (permission.InvitedByUserId.HasValue)
+            if (permission.InvitedByUserId.HasValue &&
+                !userLookup.TryGetValue(permission.InvitedByUserId.Value, out invitedBy))
             {
-                if (!userLookup.TryGetValue(permission.InvitedByUserId.Value, out invitedBy))
-                {
-                    _logger.LogWarning(
-                        "Inviting user {UserId} not found for permission {PermissionId}. This may indicate data integrity issues.",
-                        permission.InvitedByUserId.Value, permission.FestivalPermissionId);
-                }
+                _logger.LogWarning(
+                    "Inviting user {UserId} not found for permission {PermissionId}. This may indicate data integrity issues.",
+                    permission.InvitedByUserId.Value, permission.FestivalPermissionId);
             }
 
             result.Add(new PendingInvitationDto(
@@ -362,6 +360,7 @@ public class PermissionService : IPermissionService
         {
             throw new ConflictException("This invitation has been revoked.");
         }
+
         await _permissionRepository.RevokeAsync(permissionId, ct);
 
         _logger.LogInformation(
