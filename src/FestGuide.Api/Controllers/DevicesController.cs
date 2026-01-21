@@ -94,8 +94,12 @@ public class DevicesController : ControllerBase
     }
 
     /// <summary>
-    /// Unregisters a device by its token (for logout scenarios).
+    /// Unregisters a device by its token. Requires authentication.
     /// </summary>
+    /// <remarks>
+    /// This endpoint requires the user to be authenticated to unregister a device.
+    /// This ensures only authorized users can deactivate device tokens, following a security-first approach.
+    /// </remarks>
     [HttpDelete("by-token")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
