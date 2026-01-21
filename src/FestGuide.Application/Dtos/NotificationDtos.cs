@@ -67,7 +67,8 @@ public sealed record NotificationPreferenceDto(
     int ReminderMinutesBefore,
     bool AnnouncementsEnabled,
     TimeOnly? QuietHoursStart,
-    TimeOnly? QuietHoursEnd)
+    TimeOnly? QuietHoursEnd,
+    string TimeZoneId)
 {
     public static NotificationPreferenceDto FromEntity(NotificationPreference pref) =>
         new(
@@ -78,10 +79,11 @@ public sealed record NotificationPreferenceDto(
             pref.ReminderMinutesBefore,
             pref.AnnouncementsEnabled,
             pref.QuietHoursStart,
-            pref.QuietHoursEnd);
+            pref.QuietHoursEnd,
+            pref.TimeZoneId);
 
     public static NotificationPreferenceDto Default() =>
-        new(true, true, true, true, 30, true, null, null);
+        new(true, true, true, true, 30, true, null, null, "UTC");
 }
 
 /// <summary>
@@ -95,7 +97,8 @@ public sealed record UpdateNotificationPreferenceRequest(
     int? ReminderMinutesBefore,
     bool? AnnouncementsEnabled,
     TimeOnly? QuietHoursStart,
-    TimeOnly? QuietHoursEnd);
+    TimeOnly? QuietHoursEnd,
+    string? TimeZoneId);
 
 /// <summary>
 /// Response DTO for unread notification count.

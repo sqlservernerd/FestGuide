@@ -55,4 +55,11 @@ public class NotificationPreference : BaseEntity
     /// Gets or sets quiet hours end time (local to user).
     /// </summary>
     public TimeOnly? QuietHoursEnd { get; set; }
+
+    /// <summary>
+    /// Gets or sets the user's IANA timezone identifier (e.g., "America/New_York", "Europe/London").
+    /// Used to correctly apply quiet hours in the user's local timezone.
+    /// Defaults to "UTC" if not specified.
+    /// </summary>
+    public string TimeZoneId { get; set; } = "UTC";
 }

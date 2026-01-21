@@ -196,7 +196,8 @@ public class UpdateNotificationPreferenceRequestValidatorTests
             ReminderMinutesBefore: 30,
             AnnouncementsEnabled: true,
             QuietHoursStart: new TimeOnly(13, 0),
-            QuietHoursEnd: new TimeOnly(15, 0));
+            QuietHoursEnd: new TimeOnly(15, 0),
+            TimeZoneId: null);
 
         // Act
         var result = _validator.TestValidate(request);
@@ -220,7 +221,8 @@ public class UpdateNotificationPreferenceRequestValidatorTests
             ReminderMinutesBefore: minutes,
             AnnouncementsEnabled: null,
             QuietHoursStart: null,
-            QuietHoursEnd: null);
+            QuietHoursEnd: null,
+            TimeZoneId: null);
 
         // Act
         var result = _validator.TestValidate(request);
@@ -245,7 +247,8 @@ public class UpdateNotificationPreferenceRequestValidatorTests
             ReminderMinutesBefore: minutes,
             AnnouncementsEnabled: null,
             QuietHoursStart: null,
-            QuietHoursEnd: null);
+            QuietHoursEnd: null,
+            TimeZoneId: null);
 
         // Act
         var result = _validator.TestValidate(request);
@@ -271,7 +274,8 @@ public class UpdateNotificationPreferenceRequestValidatorTests
             ReminderMinutesBefore: minutes,
             AnnouncementsEnabled: null,
             QuietHoursStart: null,
-            QuietHoursEnd: null);
+            QuietHoursEnd: null,
+            TimeZoneId: null);
 
         // Act
         var result = _validator.TestValidate(request);
@@ -292,7 +296,8 @@ public class UpdateNotificationPreferenceRequestValidatorTests
             ReminderMinutesBefore: null,
             AnnouncementsEnabled: null,
             QuietHoursStart: null,
-            QuietHoursEnd: null);
+            QuietHoursEnd: null,
+            TimeZoneId: null);
 
         // Act
         var result = _validator.TestValidate(request);
@@ -313,7 +318,8 @@ public class UpdateNotificationPreferenceRequestValidatorTests
             ReminderMinutesBefore: null,
             AnnouncementsEnabled: null,
             QuietHoursStart: new TimeOnly(22, 0),
-            QuietHoursEnd: null);
+            QuietHoursEnd: null,
+            TimeZoneId: null);
 
         // Act
         var result = _validator.TestValidate(request);
@@ -335,7 +341,8 @@ public class UpdateNotificationPreferenceRequestValidatorTests
             ReminderMinutesBefore: null,
             AnnouncementsEnabled: null,
             QuietHoursStart: null,
-            QuietHoursEnd: new TimeOnly(8, 0));
+            QuietHoursEnd: new TimeOnly(8, 0),
+            TimeZoneId: null);
 
         // Act
         var result = _validator.TestValidate(request);
@@ -357,7 +364,8 @@ public class UpdateNotificationPreferenceRequestValidatorTests
             ReminderMinutesBefore: null,
             AnnouncementsEnabled: null,
             QuietHoursStart: new TimeOnly(22, 0),
-            QuietHoursEnd: new TimeOnly(8, 0));
+            QuietHoursEnd: new TimeOnly(8, 0),
+            TimeZoneId: null);
 
         // Act
         var result = _validator.TestValidate(request);
@@ -378,7 +386,8 @@ public class UpdateNotificationPreferenceRequestValidatorTests
             ReminderMinutesBefore: null,
             AnnouncementsEnabled: null,
             QuietHoursStart: new TimeOnly(22, 0),
-            QuietHoursEnd: new TimeOnly(22, 0));
+            QuietHoursEnd: new TimeOnly(22, 0),
+            TimeZoneId: null);
 
         // Act
         var result = _validator.TestValidate(request);
@@ -400,7 +409,8 @@ public class UpdateNotificationPreferenceRequestValidatorTests
             ReminderMinutesBefore: null,
             AnnouncementsEnabled: null,
             QuietHoursStart: new TimeOnly(13, 0),
-            QuietHoursEnd: new TimeOnly(15, 0));
+            QuietHoursEnd: new TimeOnly(15, 0),
+            TimeZoneId: null);
 
         // Act
         var result = _validator.TestValidate(request);
@@ -422,7 +432,8 @@ public class UpdateNotificationPreferenceRequestValidatorTests
             ReminderMinutesBefore: null,
             AnnouncementsEnabled: null,
             QuietHoursStart: new TimeOnly(22, 0),
-            QuietHoursEnd: new TimeOnly(8, 0));
+            QuietHoursEnd: new TimeOnly(8, 0),
+            TimeZoneId: null);
 
         // Act
         var result = _validator.TestValidate(request);
@@ -443,7 +454,8 @@ public class UpdateNotificationPreferenceRequestValidatorTests
             ReminderMinutesBefore: null,
             AnnouncementsEnabled: null,
             QuietHoursStart: null,
-            QuietHoursEnd: null);
+            QuietHoursEnd: null,
+            TimeZoneId: null);
 
         // Act
         var result = _validator.TestValidate(request);
