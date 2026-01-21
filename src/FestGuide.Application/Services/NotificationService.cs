@@ -92,7 +92,9 @@ public class NotificationService : INotificationService
     /// <inheritdoc />
     public async Task UnregisterDeviceByTokenAsync(string token, CancellationToken ct = default)
     {
-        // For token-based unregistration, we use Guid.Empty since we don't have authenticated user context
+        // NOTE: For token-based unregistration, we use Guid.Empty since we don't have authenticated user context.
+        // This makes it impossible to audit who deactivated a device token, but is necessary for
+        // unauthenticated device token cleanup scenarios.
         await _deviceTokenRepository.DeactivateByTokenAsync(token, Guid.Empty, ct);
     }
 
@@ -228,6 +230,9 @@ public class NotificationService : INotificationService
 
         foreach (var device in devices)
         {
+            // NOTE: NotificationLog uses Guid.Empty for CreatedBy and ModifiedBy fields when notifications
+            // are system-generated. This is a design pattern to distinguish system-generated notifications
+            // from user-initiated operations, though it makes auditing system operations more difficult.
             var log = new NotificationLog
             {
                 NotificationLogId = Guid.NewGuid(),
@@ -262,7 +267,9 @@ public class NotificationService : INotificationService
                 log.ErrorMessage = ex.Message;
                 _logger.LogWarning(ex, "Failed to send notification to device {DeviceId}", device.DeviceTokenId);
 
-                // Deactivate invalid tokens
+                // NOTE: Deactivate invalid tokens using string matching.
+                // This is a known limitation - it's fragile and language-dependent.
+                // Future improvement: Use specific exception types or error codes from the push notification provider.
                 if (ex.Message.Contains("invalid", StringComparison.OrdinalIgnoreCase) || 
                     ex.Message.Contains("unregistered", StringComparison.OrdinalIgnoreCase))
                 {
@@ -285,18 +292,30 @@ public class NotificationService : INotificationService
         Dictionary<string, string>? data = null,
         CancellationToken ct = default)
     {
-        var sendTasks = userIds.Select(userId =>
-            SendToUserAsync(
-                userId,
-                notificationType,
-                title,
-                body,
-                relatedEntityType,
-                relatedEntityId,
-                data,
-                ct));
+        const int BatchSize = 100;
+        var userIdList = userIds.ToList();
 
-        await Task.WhenAll(sendTasks);
+        for (var i = 0; i < userIdList.Count; i += BatchSize)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            var batch = userIdList
+                .Skip(i)
+                .Take(BatchSize);
+
+            var sendTasks = batch.Select(userId =>
+                SendToUserAsync(
+                    userId,
+                    notificationType,
+                    title,
+                    body,
+                    relatedEntityType,
+                    relatedEntityId,
+                    data,
+                    ct));
+
+            await Task.WhenAll(sendTasks);
+        }
     }
 
     /// <inheritdoc />
@@ -312,6 +331,8 @@ public class NotificationService : INotificationService
         else
         {
             // Otherwise, notify all users who have schedules for this edition
+            // NOTE: Limited to MaxSchedulesPerEdition schedules. If an edition has more schedules than this limit,
+            // some users may not receive notifications. Consider implementing batch processing for very large editions.
             var schedules = await _personalScheduleRepository.GetByEditionAsync(change.EditionId, limit: MaxSchedulesPerEdition, offset: 0, ct);
             userIds = schedules.Select(s => s.UserId).Distinct();
         }
@@ -366,6 +387,9 @@ public class NotificationService : INotificationService
             return false;
         }
 
+        // NOTE: This implementation uses UTC time to compare against user-local quiet hours settings.
+        // This is a known limitation and will produce incorrect behavior for users in different time zones.
+        // Future improvement: Store user timezone information and convert UTC to user's local time.
         var now = TimeOnly.FromTimeSpan(_dateTimeProvider.UtcNow.TimeOfDay);
         var start = prefs.QuietHoursStart.Value;
         var end = prefs.QuietHoursEnd.Value;

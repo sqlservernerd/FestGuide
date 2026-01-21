@@ -101,11 +101,11 @@ public class DevicesController : ControllerBase
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UnregisterDeviceByToken([FromQuery] string token, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(token) || token.Length > 512)
+        if (string.IsNullOrWhiteSpace(token) || token.Length > 256)
         {
             return BadRequest(CreateError(
                 "VALIDATION_ERROR",
-                "The 'token' query parameter is required and must be between 1 and 512 characters long."));
+                "The 'token' query parameter is required and must be between 1 and 256 characters long."));
         }
 
         await _notificationService.UnregisterDeviceByTokenAsync(token, ct);
