@@ -31,7 +31,7 @@ public class ScheduleHub : Hub
     public async Task JoinEdition(Guid editionId)
     {
         // Verify that the edition exists before allowing access
-        var edition = await _editionRepository.GetByIdAsync(editionId).ConfigureAwait(false);
+        var edition = await _editionRepository.GetByIdAsync(editionId, Context.ConnectionAborted).ConfigureAwait(false);
         if (edition == null)
         {
             _logger.LogWarning("Connection {ConnectionId} attempted to join non-existent edition {EditionId}",
@@ -66,7 +66,7 @@ public class ScheduleHub : Hub
         var userId = GetCurrentUserId();
 
         // Verify ownership
-        var schedule = await _personalScheduleRepository.GetByIdAsync(scheduleId).ConfigureAwait(false);
+        var schedule = await _personalScheduleRepository.GetByIdAsync(scheduleId, Context.ConnectionAborted).ConfigureAwait(false);
         if (schedule == null || schedule.UserId != userId)
         {
             _logger.LogWarning("User {UserId} attempted to join personal schedule {ScheduleId} they don't own", userId, scheduleId);
