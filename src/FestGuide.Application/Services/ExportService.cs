@@ -201,14 +201,10 @@ public class ExportService : IExportService
         }
 
         // Batch fetch all stages
-        var stageIds = new HashSet<Guid>();
-        foreach (var timeSlot in timeSlots)
-        {
-            if (timeSlot != null)
-            {
-                stageIds.Add(timeSlot.StageId);
-            }
-        }
+        var stageIds = timeSlots
+            .Where(ts => ts != null)
+            .Select(ts => ts!.StageId)
+            .ToHashSet();
         
         var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
         var stages = await Task.WhenAll(stageTasks).ConfigureAwait(false);
@@ -296,14 +292,10 @@ public class ExportService : IExportService
         }
 
         // Batch fetch all artists
-        var artistIds = new HashSet<Guid>();
-        foreach (var engagement in engagements)
-        {
-            if (engagement != null)
-            {
-                artistIds.Add(engagement.ArtistId);
-            }
-        }
+        var artistIds = engagements
+            .Where(e => e != null)
+            .Select(e => e!.ArtistId)
+            .ToHashSet();
         
         var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();
         var artists = await Task.WhenAll(artistTasks).ConfigureAwait(false);

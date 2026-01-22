@@ -254,22 +254,22 @@ public class AnalyticsService : IAnalyticsService
         var engagementTasks = engagementIds.Select(id => _engagementRepository.GetByIdAsync(id, ct)).ToArray();
         var engagements = await Task.WhenAll(engagementTasks).ConfigureAwait(false);
         
-        var validEngagements = new List<Domain.Entities.Engagement>();
+        var engagementDictionary = new Dictionary<Guid, Domain.Entities.Engagement>();
         foreach (var engagement in engagements)
         {
             if (engagement != null)
             {
-                validEngagements.Add(engagement);
+                engagementDictionary[engagement.EngagementId] = engagement;
             }
         }
 
-        if (validEngagements.Count == 0)
+        if (engagementDictionary.Count == 0)
         {
             return Array.Empty<EngagementAnalyticsDto>();
         }
 
         // Batch fetch artists
-        var artistIds = validEngagements.Select(e => e.ArtistId).Distinct().ToList();
+        var artistIds = engagementDictionary.Values.Select(e => e.ArtistId).Distinct().ToList();
         var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();
         var artists = await Task.WhenAll(artistTasks).ConfigureAwait(false);
         
@@ -283,7 +283,7 @@ public class AnalyticsService : IAnalyticsService
         }
 
         // Batch fetch time slots
-        var timeSlotIds = validEngagements.Select(e => e.TimeSlotId).Distinct().ToList();
+        var timeSlotIds = engagementDictionary.Values.Select(e => e.TimeSlotId).Distinct().ToList();
         var timeSlotTasks = timeSlotIds.Select(id => _timeSlotRepository.GetByIdAsync(id, ct)).ToArray();
         var timeSlots = await Task.WhenAll(timeSlotTasks).ConfigureAwait(false);
         
@@ -297,14 +297,10 @@ public class AnalyticsService : IAnalyticsService
         }
 
         // Batch fetch stages
-        var stageIds = new HashSet<Guid>();
-        foreach (var timeSlot in timeSlots)
-        {
-            if (timeSlot != null)
-            {
-                stageIds.Add(timeSlot.StageId);
-            }
-        }
+        var stageIds = timeSlots
+            .Where(ts => ts != null)
+            .Select(ts => ts!.StageId)
+            .ToHashSet();
         
         var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
         var stages = await Task.WhenAll(stageTasks).ConfigureAwait(false);
@@ -323,8 +319,10 @@ public class AnalyticsService : IAnalyticsService
 
         foreach (var (engagementId, saveCount) in topEngagements)
         {
-            var engagement = validEngagements.FirstOrDefault(e => e.EngagementId == engagementId);
-            if (engagement == null) continue;
+            if (!engagementDictionary.TryGetValue(engagementId, out var engagement))
+            {
+                continue;
+            }
 
             artistDictionary.TryGetValue(engagement.ArtistId, out var artist);
             timeSlotDictionary.TryGetValue(engagement.TimeSlotId, out var timeSlot);
@@ -481,14 +479,10 @@ public class AnalyticsService : IAnalyticsService
         }
 
         // Batch fetch all stages
-        var stageIds = new HashSet<Guid>();
-        foreach (var timeSlot in timeSlots)
-        {
-            if (timeSlot != null)
-            {
-                stageIds.Add(timeSlot.StageId);
-            }
-        }
+        var stageIds = timeSlots
+            .Where(ts => ts != null)
+            .Select(ts => ts!.StageId)
+            .ToHashSet();
         
         var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
         var stages = await Task.WhenAll(stageTasks).ConfigureAwait(false);
