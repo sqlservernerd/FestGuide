@@ -27,6 +27,9 @@ public interface INotificationService
     /// <summary>
     /// Unregisters a device by token.
     /// </summary>
+    /// <param name="userId">The ID of the user unregistering the device. Used for audit trails.</param>
+    /// <param name="token">The device token to unregister.</param>
+    /// <param name="ct">Cancellation token.</param>
     Task UnregisterDeviceByTokenAsync(Guid userId, string token, CancellationToken ct = default);
 
     #endregion

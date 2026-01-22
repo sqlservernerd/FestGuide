@@ -94,6 +94,7 @@ public class NotificationService : INotificationService
     public async Task UnregisterDeviceByTokenAsync(Guid userId, string token, CancellationToken ct = default)
     {
         await _deviceTokenRepository.DeactivateByTokenAsync(token, userId, ct).ConfigureAwait(false);
+        _logger.LogInformation("Device with token unregistered for user {UserId}", userId);
     }
 
     #endregion
