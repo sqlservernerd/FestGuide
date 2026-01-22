@@ -21,6 +21,7 @@ public class ScheduleServiceTests
     private readonly Mock<IArtistRepository> _mockArtistRepo;
     private readonly Mock<IEditionRepository> _mockEditionRepo;
     private readonly Mock<IFestivalAuthorizationService> _mockAuthService;
+    private readonly Mock<INotificationService> _mockNotificationService;
     private readonly Mock<IDateTimeProvider> _mockDateTimeProvider;
     private readonly Mock<ILogger<ScheduleService>> _mockLogger;
     private readonly ScheduleService _sut;
@@ -35,6 +36,7 @@ public class ScheduleServiceTests
         _mockArtistRepo = new Mock<IArtistRepository>();
         _mockEditionRepo = new Mock<IEditionRepository>();
         _mockAuthService = new Mock<IFestivalAuthorizationService>();
+        _mockNotificationService = new Mock<INotificationService>();
         _mockDateTimeProvider = new Mock<IDateTimeProvider>();
         _mockLogger = new Mock<ILogger<ScheduleService>>();
 
@@ -48,6 +50,7 @@ public class ScheduleServiceTests
             _mockArtistRepo.Object,
             _mockEditionRepo.Object,
             _mockAuthService.Object,
+            _mockNotificationService.Object,
             _mockDateTimeProvider.Object,
             _mockLogger.Object);
     }

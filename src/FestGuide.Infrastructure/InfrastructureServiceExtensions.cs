@@ -1,4 +1,3 @@
-using FestGuide.Infrastructure.Email;
 using FestGuide.Infrastructure.Timezone;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -29,11 +28,7 @@ public static class InfrastructureServiceExtensions
             builder.AddSerilog(Log.Logger, dispose: true);
         });
 
-        // Register email service (console logger for development)
-        services.AddScoped<IEmailService>(sp =>
-            new ConsoleEmailService(
-                sp.GetRequiredService<ILogger<ConsoleEmailService>>(),
-                baseUrl ?? "https://localhost:5001"));
+        // Note: IEmailService is registered by IntegrationServiceExtensions (SmtpEmailService)
 
         // Register timezone service (NodaTime-based IANA timezone handling)
         services.AddSingleton<ITimezoneService, NodaTimeTimezoneService>();

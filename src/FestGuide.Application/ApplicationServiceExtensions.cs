@@ -37,6 +37,10 @@ public static class ApplicationServiceExtensions
         // Phase 5 Services - Real-Time & Notifications
         services.AddScoped<INotificationService, NotificationService>();
 
+        // Phase 6 Services - Analytics & Reporting
+        services.AddScoped<IAnalyticsService, AnalyticsService>();
+        services.AddScoped<IExportService, ExportService>();
+
         // Authorization
         services.AddScoped<IFestivalAuthorizationService, FestivalAuthorizationService>();
 

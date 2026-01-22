@@ -44,6 +44,9 @@ public static class DataAccessServiceExtensions
         services.AddScoped<INotificationLogRepository, SqlServerNotificationLogRepository>();
         services.AddScoped<INotificationPreferenceRepository, SqlServerNotificationPreferenceRepository>();
 
+        // Phase 6 Repositories - Analytics & Reporting
+        services.AddScoped<IAnalyticsRepository, SqlServerAnalyticsRepository>();
+
         return services;
     }
 }

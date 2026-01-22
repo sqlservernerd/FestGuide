@@ -5,6 +5,7 @@ using FestGuide.Domain.Entities;
 using FestGuide.Domain.Enums;
 using FestGuide.Domain.Exceptions;
 using FestGuide.Infrastructure;
+using FestGuide.Infrastructure.Email;
 using Microsoft.Extensions.Logging;
 
 namespace FestGuide.Application.Services;
@@ -18,6 +19,7 @@ public class PermissionService : IPermissionService
     private readonly IFestivalRepository _festivalRepository;
     private readonly IUserRepository _userRepository;
     private readonly IFestivalAuthorizationService _authorizationService;
+    private readonly IEmailService _emailService;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<PermissionService> _logger;
 
@@ -26,6 +28,7 @@ public class PermissionService : IPermissionService
         IFestivalRepository festivalRepository,
         IUserRepository userRepository,
         IFestivalAuthorizationService authorizationService,
+        IEmailService emailService,
         IDateTimeProvider dateTimeProvider,
         ILogger<PermissionService> logger)
     {
@@ -33,6 +36,7 @@ public class PermissionService : IPermissionService
         _festivalRepository = festivalRepository ?? throw new ArgumentNullException(nameof(festivalRepository));
         _userRepository = userRepository ?? throw new ArgumentNullException(nameof(userRepository));
         _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+        _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -153,7 +157,26 @@ public class PermissionService : IPermissionService
             "User {InvitingUserId} invited {Email} to festival {FestivalId} with role {Role}",
             invitingUserId, request.Email, festivalId, request.Role);
 
-        // TODO: Send invitation email (Phase 3 enhancement)
+        // Get festival and inviter details for the email
+        var festival = await _festivalRepository.GetByIdAsync(festivalId, ct);
+        var inviter = await _userRepository.GetByIdAsync(invitingUserId, ct);
+
+        // Send invitation email
+        try
+        {
+            await _emailService.SendInvitationEmailAsync(
+                request.Email,
+                festival?.Name ?? "Unknown Festival",
+                inviter?.DisplayName ?? inviter?.Email ?? "A team member",
+                request.Role.ToString(),
+                isNewUser,
+                ct);
+        }
+        catch (Exception ex)
+        {
+            // Log but don't fail the invitation - email is best-effort
+            _logger.LogWarning(ex, "Failed to send invitation email to {Email}", request.Email);
+        }
 
         var message = isNewUser
             ? $"Invitation sent to {request.Email}. They will need to create an account to accept."
@@ -167,6 +190,9 @@ public class PermissionService : IPermissionService
             isNewUser,
             message);
     }
+
+
+
 
     /// <inheritdoc />
     public async Task<PermissionDto> UpdateAsync(Guid permissionId, Guid userId, UpdatePermissionRequest request, CancellationToken ct = default)

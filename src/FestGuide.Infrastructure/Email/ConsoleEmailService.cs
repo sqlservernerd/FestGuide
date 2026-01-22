@@ -103,4 +103,37 @@ public class ConsoleEmailService : IEmailService
 
         return Task.CompletedTask;
     }
+
+    /// <inheritdoc />
+    public Task SendInvitationEmailAsync(string toAddress, string festivalName, string inviterName, string role, bool isNewUser, CancellationToken ct = default)
+    {
+        var accountMessage = isNewUser
+            ? "You'll need to create a FestGuide account to accept this invitation."
+            : "Log in to your FestGuide account to access the festival.";
+
+        _logger.LogInformation(
+            """
+            ========================================
+            FESTIVAL INVITATION
+            ========================================
+            To: {ToAddress}
+            
+            Subject: You've been invited to join {FestivalName} on FestGuide
+            
+            {InviterName} has invited you to join {FestivalName} as a team member.
+            
+            Your role: {Role}
+            
+            {AccountMessage}
+            
+            With FestGuide, you can:
+            - Manage festival schedules and performances
+            - Coordinate with your team
+            - Track attendee engagement
+            ========================================
+            """,
+            toAddress, festivalName, inviterName, festivalName, role, accountMessage);
+
+        return Task.CompletedTask;
+    }
 }

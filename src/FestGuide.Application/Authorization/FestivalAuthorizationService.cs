@@ -101,4 +101,15 @@ public class FestivalAuthorizationService : IFestivalAuthorizationService
         // Administrator/Owner or user with Schedule scope can publish
         return await _permissionRepository.HasScopeAsync(userId, festivalId, PermissionScope.Schedule, ct);
     }
+
+    /// <inheritdoc />
+    public async Task<bool> CanViewAnalyticsAsync(Guid userId, Guid festivalId, CancellationToken ct = default)
+    {
+        _logger.LogDebug(
+            "Checking analytics view capability for user {UserId} on festival {FestivalId}",
+            userId, festivalId);
+        
+        // Any team member can view analytics (Viewer role or higher)
+        return await _permissionRepository.HasRoleOrHigherAsync(userId, festivalId, FestivalRole.Viewer, ct);
+    }
 }

@@ -1,0 +1,362 @@
+using System.Text.Json;
+using FestGuide.Application.Authorization;
+using FestGuide.Application.Dtos;
+using FestGuide.DataAccess.Abstractions;
+using FestGuide.Domain.Entities;
+using FestGuide.Domain.Exceptions;
+using FestGuide.Infrastructure;
+using Microsoft.Extensions.Logging;
+
+namespace FestGuide.Application.Services;
+
+/// <summary>
+/// Analytics service implementation.
+/// </summary>
+public class AnalyticsService : IAnalyticsService
+{
+    private readonly IAnalyticsRepository _analyticsRepository;
+    private readonly IEditionRepository _editionRepository;
+    private readonly IFestivalRepository _festivalRepository;
+    private readonly IEngagementRepository _engagementRepository;
+    private readonly IArtistRepository _artistRepository;
+    private readonly ITimeSlotRepository _timeSlotRepository;
+    private readonly IStageRepository _stageRepository;
+    private readonly IFestivalAuthorizationService _authService;
+    private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly ILogger<AnalyticsService> _logger;
+
+    public AnalyticsService(
+        IAnalyticsRepository analyticsRepository,
+        IEditionRepository editionRepository,
+        IFestivalRepository festivalRepository,
+        IEngagementRepository engagementRepository,
+        IArtistRepository artistRepository,
+        ITimeSlotRepository timeSlotRepository,
+        IStageRepository stageRepository,
+        IFestivalAuthorizationService authService,
+        IDateTimeProvider dateTimeProvider,
+        ILogger<AnalyticsService> logger)
+    {
+        _analyticsRepository = analyticsRepository ?? throw new ArgumentNullException(nameof(analyticsRepository));
+        _editionRepository = editionRepository ?? throw new ArgumentNullException(nameof(editionRepository));
+        _festivalRepository = festivalRepository ?? throw new ArgumentNullException(nameof(festivalRepository));
+        _engagementRepository = engagementRepository ?? throw new ArgumentNullException(nameof(engagementRepository));
+        _artistRepository = artistRepository ?? throw new ArgumentNullException(nameof(artistRepository));
+        _timeSlotRepository = timeSlotRepository ?? throw new ArgumentNullException(nameof(timeSlotRepository));
+        _stageRepository = stageRepository ?? throw new ArgumentNullException(nameof(stageRepository));
+        _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+        _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+    }
+
+    /// <inheritdoc />
+    public async Task TrackEventAsync(Guid? userId, TrackEventRequest request, CancellationToken ct = default)
+    {
+        var now = _dateTimeProvider.UtcNow;
+        
+        Guid? festivalId = null;
+        if (request.EditionId.HasValue)
+        {
+            var edition = await _editionRepository.GetByIdAsync(request.EditionId.Value, ct);
+            festivalId = edition?.FestivalId;
+        }
+
+        var analyticsEvent = new AnalyticsEvent
+        {
+            AnalyticsEventId = Guid.NewGuid(),
+            UserId = userId,
+            FestivalId = festivalId,
+            EditionId = request.EditionId,
+            EventType = request.EventType,
+            EntityType = request.EntityType,
+            EntityId = request.EntityId,
+            Metadata = request.Metadata != null ? JsonSerializer.Serialize(request.Metadata) : null,
+            Platform = request.Platform,
+            SessionId = request.SessionId,
+            EventTimestampUtc = now,
+            CreatedAtUtc = now
+        };
+
+        await _analyticsRepository.RecordEventAsync(analyticsEvent, ct);
+
+        _logger.LogDebug("Analytics event recorded: {EventType} for edition {EditionId}",
+            request.EventType, request.EditionId);
+    }
+
+    /// <inheritdoc />
+    public async Task TrackScheduleViewAsync(Guid? userId, Guid editionId, string? platform, string? sessionId, CancellationToken ct = default)
+    {
+        var request = new TrackEventRequest(
+            EventType: "schedule_view",
+            EditionId: editionId,
+            EntityType: "Schedule",
+            EntityId: null,
+            Platform: platform,
+            SessionId: sessionId,
+            Metadata: null);
+
+        await TrackEventAsync(userId, request, ct);
+    }
+
+    /// <inheritdoc />
+    public async Task TrackEngagementSaveAsync(Guid userId, Guid editionId, Guid engagementId, CancellationToken ct = default)
+    {
+        var request = new TrackEventRequest(
+            EventType: "engagement_save",
+            EditionId: editionId,
+            EntityType: "Engagement",
+            EntityId: engagementId,
+            Platform: null,
+            SessionId: null,
+            Metadata: null);
+
+        await TrackEventAsync(userId, request, ct);
+    }
+
+    /// <inheritdoc />
+    public async Task<EditionDashboardDto> GetEditionDashboardAsync(Guid editionId, Guid organizerId, CancellationToken ct = default)
+    {
+        var edition = await _editionRepository.GetByIdAsync(editionId, ct)
+            ?? throw new EditionNotFoundException(editionId);
+
+        await EnsureOrganizerAccessAsync(edition.FestivalId, organizerId, ct);
+
+        var festival = await _festivalRepository.GetByIdAsync(edition.FestivalId, ct);
+
+        var scheduleViews = await _analyticsRepository.GetScheduleViewCountAsync(editionId, ct: ct);
+        var uniqueViewers = await _analyticsRepository.GetUniqueViewerCountAsync(editionId, ct: ct);
+        var personalSchedules = await _analyticsRepository.GetPersonalScheduleCountAsync(editionId, ct);
+        var totalSaves = await _analyticsRepository.GetTotalEngagementSavesAsync(editionId, ct);
+        var topArtistsRaw = await _analyticsRepository.GetTopArtistsAsync(editionId, 5, ct);
+        var topEngagementsRaw = await _analyticsRepository.GetTopSavedEngagementsAsync(editionId, 5, ct);
+        var platformDistribution = await _analyticsRepository.GetPlatformDistributionAsync(editionId, ct);
+
+        var topArtists = topArtistsRaw.Select(a => new TopArtistDto(a.ArtistId, a.ArtistName, a.SaveCount)).ToList();
+        var topEngagements = await BuildTopEngagementDtosAsync(topEngagementsRaw, ct);
+
+        var totalPlatformCount = platformDistribution.Sum(p => p.Count);
+        var platforms = platformDistribution.Select(p => new PlatformDistributionDto(
+            p.Platform,
+            p.Count,
+            totalPlatformCount > 0 ? Math.Round((decimal)p.Count / totalPlatformCount * 100, 1) : 0
+        )).ToList();
+
+        return new EditionDashboardDto(
+            editionId,
+            edition.Name,
+            festival?.Name ?? "Unknown",
+            scheduleViews,
+            uniqueViewers,
+            personalSchedules,
+            totalSaves,
+            topArtists,
+            topEngagements,
+            platforms);
+    }
+
+    /// <inheritdoc />
+    public async Task<FestivalAnalyticsSummaryDto> GetFestivalSummaryAsync(Guid festivalId, Guid organizerId, CancellationToken ct = default)
+    {
+        await EnsureOrganizerAccessAsync(festivalId, organizerId, ct);
+
+        var festival = await _festivalRepository.GetByIdAsync(festivalId, ct)
+            ?? throw new FestivalNotFoundException(festivalId);
+
+        var editions = await _editionRepository.GetByFestivalAsync(festivalId, ct);
+
+        var editionMetrics = new List<EditionMetricsSummaryDto>();
+        int totalViews = 0, totalSchedules = 0, totalSaves = 0;
+
+        foreach (var edition in editions)
+        {
+            var views = await _analyticsRepository.GetScheduleViewCountAsync(edition.EditionId, ct: ct);
+            var schedules = await _analyticsRepository.GetPersonalScheduleCountAsync(edition.EditionId, ct);
+            var saves = await _analyticsRepository.GetTotalEngagementSavesAsync(edition.EditionId, ct);
+
+            editionMetrics.Add(new EditionMetricsSummaryDto(
+                edition.EditionId,
+                edition.Name,
+                views,
+                schedules,
+                saves));
+
+            totalViews += views;
+            totalSchedules += schedules;
+            totalSaves += saves;
+        }
+
+        return new FestivalAnalyticsSummaryDto(
+            festivalId,
+            festival.Name,
+            editions.Count,
+            totalViews,
+            totalSchedules,
+            totalSaves,
+            editionMetrics);
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ArtistAnalyticsDto>> GetTopArtistsAsync(Guid editionId, Guid organizerId, int limit = 10, CancellationToken ct = default)
+    {
+        var edition = await _editionRepository.GetByIdAsync(editionId, ct)
+            ?? throw new EditionNotFoundException(editionId);
+
+        await EnsureOrganizerAccessAsync(edition.FestivalId, organizerId, ct);
+
+        var topArtists = await _analyticsRepository.GetTopArtistsAsync(editionId, limit, ct);
+        var totalSaves = topArtists.Sum(a => a.SaveCount);
+
+        var result = new List<ArtistAnalyticsDto>();
+        int rank = 1;
+
+        foreach (var (artistId, artistName, saveCount) in topArtists)
+        {
+            var artist = await _artistRepository.GetByIdAsync(artistId, ct);
+            result.Add(new ArtistAnalyticsDto(
+                artistId,
+                artistName,
+                artist?.ImageUrl,
+                saveCount,
+                rank++,
+                totalSaves > 0 ? Math.Round((decimal)saveCount / totalSaves * 100, 1) : 0));
+        }
+
+        return result;
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<EngagementAnalyticsDto>> GetTopEngagementsAsync(Guid editionId, Guid organizerId, int limit = 10, CancellationToken ct = default)
+    {
+        var edition = await _editionRepository.GetByIdAsync(editionId, ct)
+            ?? throw new EditionNotFoundException(editionId);
+
+        await EnsureOrganizerAccessAsync(edition.FestivalId, organizerId, ct);
+
+        var topEngagements = await _analyticsRepository.GetTopSavedEngagementsAsync(editionId, limit, ct);
+        var result = new List<EngagementAnalyticsDto>();
+        int rank = 1;
+
+        foreach (var (engagementId, saveCount) in topEngagements)
+        {
+            var engagement = await _engagementRepository.GetByIdAsync(engagementId, ct);
+            if (engagement == null) continue;
+
+            var artist = await _artistRepository.GetByIdAsync(engagement.ArtistId, ct);
+            var timeSlot = await _timeSlotRepository.GetByIdAsync(engagement.TimeSlotId, ct);
+            var stage = timeSlot != null ? await _stageRepository.GetByIdAsync(timeSlot.StageId, ct) : null;
+
+            result.Add(new EngagementAnalyticsDto(
+                engagementId,
+                engagement.ArtistId,
+                artist?.Name ?? "Unknown",
+                timeSlot?.StageId ?? Guid.Empty,
+                stage?.Name ?? "Unknown",
+                timeSlot?.StartTimeUtc ?? DateTime.MinValue,
+                timeSlot?.EndTimeUtc ?? DateTime.MinValue,
+                saveCount,
+                rank++));
+        }
+
+        return result;
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<TimelineDataPointDto>> GetEventTimelineAsync(Guid editionId, Guid organizerId, TimelineRequest request, CancellationToken ct = default)
+    {
+        var edition = await _editionRepository.GetByIdAsync(editionId, ct)
+            ?? throw new EditionNotFoundException(editionId);
+
+        await EnsureOrganizerAccessAsync(edition.FestivalId, organizerId, ct);
+
+        var timeline = await _analyticsRepository.GetEventTimelineAsync(
+            editionId,
+            request.EventType ?? "schedule_view",
+            request.FromUtc,
+            request.ToUtc,
+            ct);
+
+        return timeline.Select(t => new TimelineDataPointDto(t.Hour, t.Count)).ToList();
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<DailyActiveUsersDto>> GetDailyActiveUsersAsync(Guid editionId, Guid organizerId, DateTime fromUtc, DateTime toUtc, CancellationToken ct = default)
+    {
+        var edition = await _editionRepository.GetByIdAsync(editionId, ct)
+            ?? throw new EditionNotFoundException(editionId);
+
+        await EnsureOrganizerAccessAsync(edition.FestivalId, organizerId, ct);
+
+        var dau = await _analyticsRepository.GetDailyActiveUsersAsync(editionId, fromUtc, toUtc, ct);
+        return dau.Select(d => new DailyActiveUsersDto(d.Date, d.Count)).ToList();
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<PlatformDistributionDto>> GetPlatformDistributionAsync(Guid editionId, Guid organizerId, CancellationToken ct = default)
+    {
+        var edition = await _editionRepository.GetByIdAsync(editionId, ct)
+            ?? throw new EditionNotFoundException(editionId);
+
+        await EnsureOrganizerAccessAsync(edition.FestivalId, organizerId, ct);
+
+        var distribution = await _analyticsRepository.GetPlatformDistributionAsync(editionId, ct);
+        var total = distribution.Sum(d => d.Count);
+
+        return distribution.Select(d => new PlatformDistributionDto(
+            d.Platform,
+            d.Count,
+            total > 0 ? Math.Round((decimal)d.Count / total * 100, 1) : 0
+        )).ToList();
+    }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<EventTypeDistributionDto>> GetEventTypeDistributionAsync(Guid editionId, Guid organizerId, DateTime? fromUtc, DateTime? toUtc, CancellationToken ct = default)
+    {
+        var edition = await _editionRepository.GetByIdAsync(editionId, ct)
+            ?? throw new EditionNotFoundException(editionId);
+
+        await EnsureOrganizerAccessAsync(edition.FestivalId, organizerId, ct);
+
+        var distribution = await _analyticsRepository.GetEventTypeDistributionAsync(editionId, fromUtc, toUtc, ct);
+        var total = distribution.Sum(d => d.Count);
+
+        return distribution.Select(d => new EventTypeDistributionDto(
+            d.EventType,
+            d.Count,
+            total > 0 ? Math.Round((decimal)d.Count / total * 100, 1) : 0
+        )).ToList();
+    }
+
+    private async Task EnsureOrganizerAccessAsync(Guid festivalId, Guid organizerId, CancellationToken ct)
+    {
+        if (!await _authService.CanViewAnalyticsAsync(organizerId, festivalId, ct))
+        {
+            throw new ForbiddenException("You do not have permission to view analytics for this festival.");
+        }
+    }
+
+    private async Task<IReadOnlyList<TopEngagementDto>> BuildTopEngagementDtosAsync(
+        IReadOnlyList<(Guid EngagementId, int SaveCount)> engagements,
+        CancellationToken ct)
+    {
+        var result = new List<TopEngagementDto>();
+
+        foreach (var (engagementId, saveCount) in engagements)
+        {
+            var engagement = await _engagementRepository.GetByIdAsync(engagementId, ct);
+            if (engagement == null) continue;
+
+            var artist = await _artistRepository.GetByIdAsync(engagement.ArtistId, ct);
+            var timeSlot = await _timeSlotRepository.GetByIdAsync(engagement.TimeSlotId, ct);
+            var stage = timeSlot != null ? await _stageRepository.GetByIdAsync(timeSlot.StageId, ct) : null;
+
+            result.Add(new TopEngagementDto(
+                engagementId,
+                artist?.Name,
+                stage?.Name,
+                timeSlot?.StartTimeUtc,
+                saveCount));
+        }
+
+        return result;
+    }
+}

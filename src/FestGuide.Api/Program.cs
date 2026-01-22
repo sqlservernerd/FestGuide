@@ -4,6 +4,7 @@ using FestGuide.Application;
 using FestGuide.Application.Services;
 using FestGuide.DataAccess;
 using FestGuide.Infrastructure;
+using FestGuide.Integrations;
 using FestGuide.Integrations.PushNotifications;
 using FestGuide.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -85,6 +86,7 @@ builder.Services.AddInfrastructureServices(baseUrl);
 builder.Services.AddSecurityServices();
 builder.Services.AddApplicationServices();
 builder.Services.AddDataAccessServices(connectionString);
+builder.Services.AddIntegrationServices(builder.Configuration);
 
 // Phase 5 - Push notification provider (stub for development)
 builder.Services.AddScoped<IPushNotificationProvider, StubPushNotificationProvider>();

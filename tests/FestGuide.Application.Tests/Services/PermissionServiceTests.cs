@@ -8,6 +8,7 @@ using FestGuide.Domain.Entities;
 using FestGuide.Domain.Enums;
 using FestGuide.Domain.Exceptions;
 using FestGuide.Infrastructure;
+using FestGuide.Infrastructure.Email;
 using Microsoft.Extensions.Logging;
 
 namespace FestGuide.Application.Tests.Services;
@@ -18,6 +19,7 @@ public class PermissionServiceTests
     private readonly Mock<IFestivalRepository> _mockFestivalRepo;
     private readonly Mock<IUserRepository> _mockUserRepo;
     private readonly Mock<IFestivalAuthorizationService> _mockAuthService;
+    private readonly Mock<IEmailService> _mockEmailService;
     private readonly Mock<IDateTimeProvider> _mockDateTimeProvider;
     private readonly Mock<ILogger<PermissionService>> _mockLogger;
     private readonly PermissionService _sut;
@@ -29,6 +31,7 @@ public class PermissionServiceTests
         _mockFestivalRepo = new Mock<IFestivalRepository>();
         _mockUserRepo = new Mock<IUserRepository>();
         _mockAuthService = new Mock<IFestivalAuthorizationService>();
+        _mockEmailService = new Mock<IEmailService>();
         _mockDateTimeProvider = new Mock<IDateTimeProvider>();
         _mockLogger = new Mock<ILogger<PermissionService>>();
 
@@ -39,6 +42,7 @@ public class PermissionServiceTests
             _mockFestivalRepo.Object,
             _mockUserRepo.Object,
             _mockAuthService.Object,
+            _mockEmailService.Object,
             _mockDateTimeProvider.Object,
             _mockLogger.Object);
     }

@@ -79,4 +79,13 @@ public interface IFestivalAuthorizationService
     /// <param name="ct">Cancellation token.</param>
     /// <returns>True if the user can publish schedules.</returns>
     Task<bool> CanPublishScheduleAsync(Guid userId, Guid festivalId, CancellationToken ct = default);
+
+    /// <summary>
+    /// Checks if a user can view analytics for a festival.
+    /// </summary>
+    /// <param name="userId">The user ID.</param>
+    /// <param name="festivalId">The festival ID.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <returns>True if the user can view analytics.</returns>
+    Task<bool> CanViewAnalyticsAsync(Guid userId, Guid festivalId, CancellationToken ct = default);
 }
