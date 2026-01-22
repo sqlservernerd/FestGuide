@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using System.Xml.Serialization;
 
 namespace FestGuide.Infrastructure;
 
@@ -33,6 +34,7 @@ public class SmtpOptions
     /// Use secure configuration providers such as user secrets, environment variables, or a secret store.
     /// </summary>
     [JsonIgnore]
+    [XmlIgnore]
     public string Password { get; set; } = string.Empty;
 
     /// <summary>

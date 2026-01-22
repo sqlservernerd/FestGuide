@@ -136,21 +136,7 @@ public class PermissionService : IPermissionService
 
         var now = _dateTimeProvider.UtcNow;
         
-        // Get festival and inviter details for the email
-        var festival = await _festivalRepository.GetByIdAsync(festivalId, ct);
-        var inviter = await _userRepository.GetByIdAsync(invitingUserId, ct);
-
-        // Send invitation email first - if this fails, no permission is created
-        // This ensures the user is notified before we grant access
-        await _emailService.SendInvitationEmailAsync(
-            request.Email,
-            festival?.Name ?? "Unknown Festival",
-            inviter?.DisplayName ?? inviter?.Email ?? "A team member",
-            request.Role.ToString(),
-            isNewUser,
-            ct);
-
-        // Create the permission after successful email sending
+        // Create the permission first
         var permission = new FestivalPermission
         {
             FestivalPermissionId = Guid.NewGuid(),
@@ -168,6 +154,21 @@ public class PermissionService : IPermissionService
         };
 
         await _permissionRepository.CreateAsync(permission, ct);
+
+        // Get festival and inviter details for the email
+        var festival = await _festivalRepository.GetByIdAsync(festivalId, ct);
+        var inviter = await _userRepository.GetByIdAsync(invitingUserId, ct);
+
+        // Send invitation email after permission is created
+        // If email sending fails, the permission still exists but the user won't be notified
+        // The email service will throw EmailDeliveryException on failure, which will be propagated
+        await _emailService.SendInvitationEmailAsync(
+            request.Email,
+            festival?.Name ?? "Unknown Festival",
+            inviter?.DisplayName ?? inviter?.Email ?? "A team member",
+            request.Role.ToString(),
+            isNewUser,
+            ct);
 
         _logger.LogInformation(
             "User {InvitingUserId} invited {Email} to festival {FestivalId} with role {Role}",
