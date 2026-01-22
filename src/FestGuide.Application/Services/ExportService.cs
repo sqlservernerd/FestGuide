@@ -13,6 +13,8 @@ namespace FestGuide.Application.Services;
 /// </summary>
 public class ExportService : IExportService
 {
+    private static readonly HashSet<char> InvalidFilenameChars = new(Path.GetInvalidFileNameChars()) { ' ' };
+    
     private readonly IEditionRepository _editionRepository;
     private readonly ITimeSlotRepository _timeSlotRepository;
     private readonly IEngagementRepository _engagementRepository;
@@ -393,15 +395,12 @@ public class ExportService : IExportService
         }
 
         // Use Span<char> and string.Create for efficient character replacement
-        var invalidChars = Path.GetInvalidFileNameChars();
-        var invalidCharSet = new HashSet<char>(invalidChars) { ' ' }; // Include space
-
-        return string.Create(name.Length, (name, invalidCharSet), (span, state) =>
+        return string.Create(name.Length, name, (span, state) =>
         {
-            state.name.AsSpan().CopyTo(span);
+            state.AsSpan().CopyTo(span);
             for (int i = 0; i < span.Length; i++)
             {
-                if (state.invalidCharSet.Contains(span[i]))
+                if (InvalidFilenameChars.Contains(span[i]))
                 {
                     span[i] = '_';
                 }
