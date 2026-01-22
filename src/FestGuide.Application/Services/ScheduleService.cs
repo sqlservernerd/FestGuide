@@ -175,7 +175,6 @@ public class ScheduleService : IScheduleService
         var timeSlot = await _timeSlotRepository.GetByIdAsync(timeSlotId, ct)
             ?? throw new TimeSlotNotFoundException(timeSlotId);
 
-
         return TimeSlotDto.FromEntity(timeSlot);
     }
 
