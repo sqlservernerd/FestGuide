@@ -52,6 +52,7 @@ public class AnalyticsService : IAnalyticsService
     /// <inheritdoc />
     public async Task TrackEventAsync(Guid? userId, TrackEventRequest request, CancellationToken ct = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
         var now = _dateTimeProvider.UtcNow;
         
         Guid? festivalId = null;
