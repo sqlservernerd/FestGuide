@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace FestGuide.Infrastructure;
 
 /// <summary>
@@ -30,6 +32,7 @@ public class SmtpOptions
     /// This value is sensitive and must not be stored in source control or in appsettings.json.
     /// Use secure configuration providers such as user secrets, environment variables, or a secret store.
     /// </summary>
+    [JsonIgnore]
     public string Password { get; set; } = string.Empty;
 
     /// <summary>
@@ -56,4 +59,12 @@ public class SmtpOptions
     /// Gets or sets the base URL for the application (used for generating links in emails).
     /// </summary>
     public string BaseUrl { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Returns a string representation of the SMTP options with sensitive data redacted.
+    /// </summary>
+    public override string ToString()
+    {
+        return $"SmtpOptions {{ Host = {Host}, Port = {Port}, Username = {Username}, Password = [REDACTED], FromAddress = {FromAddress}, FromName = {FromName}, UseSsl = {UseSsl}, Enabled = {Enabled}, BaseUrl = {BaseUrl} }}";
+    }
 }
