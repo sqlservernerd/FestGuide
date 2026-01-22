@@ -144,22 +144,62 @@ public class ExportService : IExportService
 
         var topEngagements = await _analyticsRepository.GetTopSavedEngagementsAsync(editionId, 100, ct).ConfigureAwait(false);
 
+        if (topEngagements.Count == 0)
+        {
+            var emptyFileName = $"{edition.Name.Replace(" ", "_")}_attendee_saves_{_dateTimeProvider.UtcNow:yyyyMMdd}.csv";
+            var emptyData = Encoding.UTF8.GetBytes(sb.ToString());
+            return new ExportResultDto(emptyFileName, "text/csv", emptyData);
+        }
+
+        // Batch fetch all engagements
+        var engagementIds = topEngagements.Select(e => e.EngagementId).ToList();
+        var engagementTasks = engagementIds.Select(id => _engagementRepository.GetByIdAsync(id, ct)).ToArray();
+        var engagements = await Task.WhenAll(engagementTasks).ConfigureAwait(false);
+        var engagementDictionary = engagements.Where(e => e != null).ToDictionary(e => e!.EngagementId, e => e!);
+
+        if (engagementDictionary.Count == 0)
+        {
+            var emptyFileName = $"{edition.Name.Replace(" ", "_")}_attendee_saves_{_dateTimeProvider.UtcNow:yyyyMMdd}.csv";
+            var emptyData = Encoding.UTF8.GetBytes(sb.ToString());
+            return new ExportResultDto(emptyFileName, "text/csv", emptyData);
+        }
+
+        // Batch fetch all artists
+        var artistIds = engagementDictionary.Values.Select(e => e.ArtistId).Distinct().ToList();
+        var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();
+        var artists = await Task.WhenAll(artistTasks).ConfigureAwait(false);
+        var artistDictionary = artists.Where(a => a != null).ToDictionary(a => a!.ArtistId, a => a!);
+
+        // Batch fetch all time slots
+        var timeSlotIds = engagementDictionary.Values.Select(e => e.TimeSlotId).Distinct().ToList();
+        var timeSlotTasks = timeSlotIds.Select(id => _timeSlotRepository.GetByIdAsync(id, ct)).ToArray();
+        var timeSlots = await Task.WhenAll(timeSlotTasks).ConfigureAwait(false);
+        var timeSlotDictionary = timeSlots.Where(t => t != null).ToDictionary(t => t!.TimeSlotId, t => t!);
+
+        // Batch fetch all stages
+        var stageIds = timeSlots.Where(t => t != null).Select(t => t!.StageId).Distinct().ToList();
+        var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
+        var stages = await Task.WhenAll(stageTasks).ConfigureAwait(false);
+        var stageDictionary = stages.Where(s => s != null).ToDictionary(s => s!.StageId, s => s!);
+
+        // Build CSV lines
         foreach (var item in topEngagements)
         {
             var (engagementId, saveCount) = item;
 
-            var engagement = await _engagementRepository.GetByIdAsync(engagementId, ct).ConfigureAwait(false);
-            if (engagement == null)
+            if (!engagementDictionary.TryGetValue(engagementId, out var engagement))
             {
                 continue;
             }
 
-            var artist = await _artistRepository.GetByIdAsync(engagement.ArtistId, ct).ConfigureAwait(false);
-            var timeSlot = await _timeSlotRepository.GetByIdAsync(engagement.TimeSlotId, ct).ConfigureAwait(false);
+            artistDictionary.TryGetValue(engagement.ArtistId, out var artist);
+            timeSlotDictionary.TryGetValue(engagement.TimeSlotId, out var timeSlot);
 
-            var stage = timeSlot != null
-                ? await _stageRepository.GetByIdAsync(timeSlot.StageId, ct).ConfigureAwait(false)
-                : null;
+            Domain.Entities.Stage? stage = null;
+            if (timeSlot != null)
+            {
+                stageDictionary.TryGetValue(timeSlot.StageId, out stage);
+            }
 
             var line =
                 $"{engagementId},{EscapeCsv(artist?.Name)},{EscapeCsv(stage?.Name)},{timeSlot?.StartTimeUtc:o},{timeSlot?.EndTimeUtc:o},{saveCount}";
@@ -180,24 +220,44 @@ public class ExportService : IExportService
 
         var timeSlots = await _timeSlotRepository.GetByEditionAsync(editionId, ct).ConfigureAwait(false);
 
-        foreach (var timeSlot in timeSlots.OrderBy(t => t.StartTimeUtc))
+        if (timeSlots.Count == 0)
         {
-            var stage = await _stageRepository
-                .GetByIdAsync(timeSlot.StageId, ct)
-                .ConfigureAwait(false);
+            return sb.ToString();
+        }
 
-            var engagement = await _engagementRepository
-                .GetByTimeSlotAsync(timeSlot.TimeSlotId, ct)
-                .ConfigureAwait(false);
+        var orderedTimeSlots = timeSlots.OrderBy(t => t.StartTimeUtc).ToList();
 
-            if (engagement == null)
+        // Batch fetch all stages
+        var stageIds = orderedTimeSlots.Select(t => t.StageId).Distinct().ToList();
+        var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
+        var stages = await Task.WhenAll(stageTasks).ConfigureAwait(false);
+        var stageDictionary = stages.Where(s => s != null).ToDictionary(s => s!.StageId, s => s!);
+
+        // Batch fetch all engagements
+        var timeSlotIds = orderedTimeSlots.Select(t => t.TimeSlotId).ToList();
+        var engagementTasks = timeSlotIds.Select(id => _engagementRepository.GetByTimeSlotAsync(id, ct)).ToArray();
+        var engagements = await Task.WhenAll(engagementTasks).ConfigureAwait(false);
+        var engagementDictionary = engagements
+            .Where(e => e != null)
+            .ToDictionary(e => e!.TimeSlotId, e => e!);
+
+        // Batch fetch all artists
+        var artistIds = engagements.Where(e => e != null).Select(e => e!.ArtistId).Distinct().ToList();
+        var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();
+        var artists = await Task.WhenAll(artistTasks).ConfigureAwait(false);
+        var artistDictionary = artists.Where(a => a != null).ToDictionary(a => a!.ArtistId, a => a!);
+
+        // Build CSV lines
+        foreach (var timeSlot in orderedTimeSlots)
+        {
+            stageDictionary.TryGetValue(timeSlot.StageId, out var stage);
+            
+            if (!engagementDictionary.TryGetValue(timeSlot.TimeSlotId, out var engagement))
             {
                 continue;
             }
 
-            var artist = await _artistRepository
-                .GetByIdAsync(engagement.ArtistId, ct)
-                .ConfigureAwait(false);
+            artistDictionary.TryGetValue(engagement.ArtistId, out var artist);
 
             sb.AppendLine(
                 $"{timeSlot.TimeSlotId},{timeSlot.StageId},{EscapeCsv(stage?.Name)},{timeSlot.StartTimeUtc:o},{timeSlot.EndTimeUtc:o},{engagement.ArtistId},{EscapeCsv(artist?.Name)}");

@@ -124,6 +124,7 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
             WHERE ae.EditionId = @EditionId 
               AND ae.EventType = 'engagement_save'
               AND ae.EntityType = 'Engagement'
+              AND a.IsDeleted = 0
             GROUP BY a.ArtistId, a.Name
             ORDER BY COUNT(*) DESC
             """;
