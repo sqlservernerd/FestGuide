@@ -164,26 +164,27 @@ public class AnalyticsService : IAnalyticsService
 
         var editions = await _editionRepository.GetByFestivalAsync(festivalId, ct);
 
-        var editionMetrics = new List<EditionMetricsSummaryDto>();
-        int totalViews = 0, totalSchedules = 0, totalSaves = 0;
-
-        foreach (var edition in editions)
+        var editionMetricsTasks = editions.Select(async edition =>
         {
-            var views = await _analyticsRepository.GetScheduleViewCountAsync(edition.EditionId, ct: ct);
-            var schedules = await _analyticsRepository.GetPersonalScheduleCountAsync(edition.EditionId, ct);
-            var saves = await _analyticsRepository.GetTotalEngagementSavesAsync(edition.EditionId, ct);
+            var viewsTask = _analyticsRepository.GetScheduleViewCountAsync(edition.EditionId, ct: ct);
+            var schedulesTask = _analyticsRepository.GetPersonalScheduleCountAsync(edition.EditionId, ct);
+            var savesTask = _analyticsRepository.GetTotalEngagementSavesAsync(edition.EditionId, ct);
 
-            editionMetrics.Add(new EditionMetricsSummaryDto(
+            await Task.WhenAll(viewsTask, schedulesTask, savesTask).ConfigureAwait(false);
+
+            return new EditionMetricsSummaryDto(
                 edition.EditionId,
                 edition.Name,
-                views,
-                schedules,
-                saves));
+                await viewsTask,
+                await schedulesTask,
+                await savesTask);
+        });
 
-            totalViews += views;
-            totalSchedules += schedules;
-            totalSaves += saves;
-        }
+        var editionMetrics = await Task.WhenAll(editionMetricsTasks).ConfigureAwait(false);
+
+        var totalViews = editionMetrics.Sum(m => m.ScheduleViews);
+        var totalSchedules = editionMetrics.Sum(m => m.PersonalSchedules);
+        var totalSaves = editionMetrics.Sum(m => m.EngagementSaves);
 
         return new FestivalAnalyticsSummaryDto(
             festivalId,
@@ -338,25 +339,40 @@ public class AnalyticsService : IAnalyticsService
         IReadOnlyList<(Guid EngagementId, int SaveCount)> engagements,
         CancellationToken ct)
     {
-        var result = new List<TopEngagementDto>();
-
-        foreach (var (engagementId, saveCount) in engagements)
+        var engagementTasks = engagements.Select(async item =>
         {
-            var engagement = await _engagementRepository.GetByIdAsync(engagementId, ct);
-            if (engagement == null) continue;
+            var (engagementId, saveCount) = item;
 
-            var artist = await _artistRepository.GetByIdAsync(engagement.ArtistId, ct);
-            var timeSlot = await _timeSlotRepository.GetByIdAsync(engagement.TimeSlotId, ct);
-            var stage = timeSlot != null ? await _stageRepository.GetByIdAsync(timeSlot.StageId, ct) : null;
+            var engagement = await _engagementRepository.GetByIdAsync(engagementId, ct)
+                .ConfigureAwait(false);
+            if (engagement == null)
+            {
+                return (TopEngagementDto?)null;
+            }
 
-            result.Add(new TopEngagementDto(
+            var artistTask = _artistRepository.GetByIdAsync(engagement.ArtistId, ct);
+            var timeSlotTask = _timeSlotRepository.GetByIdAsync(engagement.TimeSlotId, ct);
+
+            var artist = await artistTask.ConfigureAwait(false);
+            var timeSlot = await timeSlotTask.ConfigureAwait(false);
+
+            var stage = timeSlot != null
+                ? await _stageRepository.GetByIdAsync(timeSlot.StageId, ct).ConfigureAwait(false)
+                : null;
+
+            return new TopEngagementDto(
                 engagementId,
                 artist?.Name,
                 stage?.Name,
                 timeSlot?.StartTimeUtc,
-                saveCount));
-        }
+                saveCount);
+        });
 
-        return result;
+        var topEngagements = await Task.WhenAll(engagementTasks).ConfigureAwait(false);
+
+        return topEngagements
+            .Where(dto => dto != null)
+            .Cast<TopEngagementDto>()
+            .ToList();
     }
 }

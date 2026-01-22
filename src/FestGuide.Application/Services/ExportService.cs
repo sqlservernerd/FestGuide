@@ -144,16 +144,31 @@ public class ExportService : IExportService
 
         var topEngagements = await _analyticsRepository.GetTopSavedEngagementsAsync(editionId, 100, ct);
 
-        foreach (var (engagementId, saveCount) in topEngagements)
+        var csvLinesTasks = topEngagements.Select(async item =>
         {
-            var engagement = await _engagementRepository.GetByIdAsync(engagementId, ct);
-            if (engagement == null) continue;
+            var (engagementId, saveCount) = item;
 
-            var artist = await _artistRepository.GetByIdAsync(engagement.ArtistId, ct);
-            var timeSlot = await _timeSlotRepository.GetByIdAsync(engagement.TimeSlotId, ct);
-            var stage = timeSlot != null ? await _stageRepository.GetByIdAsync(timeSlot.StageId, ct) : null;
+            var engagement = await _engagementRepository.GetByIdAsync(engagementId, ct).ConfigureAwait(false);
+            if (engagement == null) return null;
 
-            sb.AppendLine($"{engagementId},{EscapeCsv(artist?.Name)},{EscapeCsv(stage?.Name)},{timeSlot?.StartTimeUtc:o},{timeSlot?.EndTimeUtc:o},{saveCount}");
+            var artistTask = _artistRepository.GetByIdAsync(engagement.ArtistId, ct);
+            var timeSlotTask = _timeSlotRepository.GetByIdAsync(engagement.TimeSlotId, ct);
+
+            var artist = await artistTask.ConfigureAwait(false);
+            var timeSlot = await timeSlotTask.ConfigureAwait(false);
+
+            var stage = timeSlot != null
+                ? await _stageRepository.GetByIdAsync(timeSlot.StageId, ct).ConfigureAwait(false)
+                : null;
+
+            return $"{engagementId},{EscapeCsv(artist?.Name)},{EscapeCsv(stage?.Name)},{timeSlot?.StartTimeUtc:o},{timeSlot?.EndTimeUtc:o},{saveCount}";
+        });
+
+        var csvLines = await Task.WhenAll(csvLinesTasks).ConfigureAwait(false);
+
+        foreach (var line in csvLines)
+        {
+            if (line != null) sb.AppendLine(line);
         }
 
         var fileName = $"{edition.Name.Replace(" ", "_")}_attendee_saves_{_dateTimeProvider.UtcNow:yyyyMMdd}.csv";
@@ -169,21 +184,32 @@ public class ExportService : IExportService
 
         var timeSlots = await _timeSlotRepository.GetByEditionAsync(editionId, ct);
 
-        foreach (var timeSlot in timeSlots.OrderBy(t => t.StartTimeUtc))
+        var csvLinesTasks = timeSlots.OrderBy(t => t.StartTimeUtc).Select(async timeSlot =>
         {
-            var stage = await _stageRepository.GetByIdAsync(timeSlot.StageId, ct);
-            var engagement = await _engagementRepository.GetByTimeSlotAsync(timeSlot.TimeSlotId, ct);
+            var stageTask = _stageRepository.GetByIdAsync(timeSlot.StageId, ct);
+            var engagementTask = _engagementRepository.GetByTimeSlotAsync(timeSlot.TimeSlotId, ct);
 
-            if (engagement != null)
+            var stage = await stageTask.ConfigureAwait(false);
+            var engagement = await engagementTask.ConfigureAwait(false);
+
+            if (engagement == null)
             {
-                var artist = await _artistRepository.GetByIdAsync(engagement.ArtistId, ct);
-                sb.AppendLine($"{timeSlot.TimeSlotId},{timeSlot.StageId},{EscapeCsv(stage?.Name)},{timeSlot.StartTimeUtc:o},{timeSlot.EndTimeUtc:o},{engagement.ArtistId},{EscapeCsv(artist?.Name)}");
+                return null;
             }
+
+            var artist = await _artistRepository.GetByIdAsync(engagement.ArtistId, ct).ConfigureAwait(false);
+            return $"{timeSlot.TimeSlotId},{timeSlot.StageId},{EscapeCsv(stage?.Name)},{timeSlot.StartTimeUtc:o},{timeSlot.EndTimeUtc:o},{engagement.ArtistId},{EscapeCsv(artist?.Name)}";
+        });
+
+        var csvLines = await Task.WhenAll(csvLinesTasks).ConfigureAwait(false);
+
+        foreach (var line in csvLines)
+        {
+            if (line != null) sb.AppendLine(line);
         }
 
         return sb.ToString();
     }
-
 
     private async Task<string> BuildArtistsCsvAsync(Guid editionId, CancellationToken ct)
     {

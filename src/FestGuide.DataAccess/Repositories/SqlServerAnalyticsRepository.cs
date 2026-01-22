@@ -60,15 +60,14 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
     /// <inheritdoc />
     public async Task<int> GetScheduleViewCountAsync(Guid editionId, DateTime? fromUtc = null, DateTime? toUtc = null, CancellationToken ct = default)
     {
-        var sql = """
+        const string sql = """
             SELECT COUNT(*)
             FROM analytics.AnalyticsEvent
             WHERE EditionId = @EditionId 
               AND EventType = 'schedule_view'
+              AND (@FromUtc IS NULL OR EventTimestampUtc >= @FromUtc)
+              AND (@ToUtc IS NULL OR EventTimestampUtc <= @ToUtc)
             """;
-
-        if (fromUtc.HasValue) sql += " AND EventTimestampUtc >= @FromUtc";
-        if (toUtc.HasValue) sql += " AND EventTimestampUtc <= @ToUtc";
 
         return await _connection.ExecuteScalarAsync<int>(
             new CommandDefinition(sql, new { EditionId = editionId, FromUtc = fromUtc, ToUtc = toUtc }, cancellationToken: ct));
@@ -77,16 +76,15 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
     /// <inheritdoc />
     public async Task<int> GetUniqueViewerCountAsync(Guid editionId, DateTime? fromUtc = null, DateTime? toUtc = null, CancellationToken ct = default)
     {
-        var sql = """
+        const string sql = """
             SELECT COUNT(DISTINCT UserId)
             FROM analytics.AnalyticsEvent
             WHERE EditionId = @EditionId 
               AND EventType = 'schedule_view'
               AND UserId IS NOT NULL
+              AND (@FromUtc IS NULL OR EventTimestampUtc >= @FromUtc)
+              AND (@ToUtc IS NULL OR EventTimestampUtc <= @ToUtc)
             """;
-
-        if (fromUtc.HasValue) sql += " AND EventTimestampUtc >= @FromUtc";
-        if (toUtc.HasValue) sql += " AND EventTimestampUtc <= @ToUtc";
 
         return await _connection.ExecuteScalarAsync<int>(
             new CommandDefinition(sql, new { EditionId = editionId, FromUtc = fromUtc, ToUtc = toUtc }, cancellationToken: ct));
@@ -231,16 +229,15 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
     /// <inheritdoc />
     public async Task<IReadOnlyList<(string EventType, int Count)>> GetEventTypeDistributionAsync(Guid editionId, DateTime? fromUtc = null, DateTime? toUtc = null, CancellationToken ct = default)
     {
-        var sql = """
+        const string sql = """
             SELECT EventType, COUNT(*) AS Count
             FROM analytics.AnalyticsEvent
             WHERE EditionId = @EditionId
+              AND (@FromUtc IS NULL OR EventTimestampUtc >= @FromUtc)
+              AND (@ToUtc IS NULL OR EventTimestampUtc <= @ToUtc)
+            GROUP BY EventType
+            ORDER BY COUNT(*) DESC
             """;
-
-        if (fromUtc.HasValue) sql += " AND EventTimestampUtc >= @FromUtc";
-        if (toUtc.HasValue) sql += " AND EventTimestampUtc <= @ToUtc";
-
-        sql += " GROUP BY EventType ORDER BY COUNT(*) DESC";
 
         var result = await _connection.QueryAsync<(string EventType, int Count)>(
             new CommandDefinition(sql, new { EditionId = editionId, FromUtc = fromUtc, ToUtc = toUtc }, cancellationToken: ct));

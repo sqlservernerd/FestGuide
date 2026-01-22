@@ -49,4 +49,9 @@ public class SmtpOptions
     /// Gets or sets whether email sending is enabled.
     /// </summary>
     public bool Enabled { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the base URL for the application (used for generating links in emails).
+    /// </summary>
+    public string BaseUrl { get; set; } = string.Empty;
 }

@@ -25,11 +25,12 @@ public class SmtpEmailService : IEmailService
     public async Task SendVerificationEmailAsync(string email, string displayName, string verificationToken, CancellationToken ct = default)
     {
         var subject = "Verify your FestGuide account";
+        var verificationUrl = BuildUrl($"verify-email?token={Uri.EscapeDataString(verificationToken)}");
         var htmlBody = BuildEmailTemplate(
             "Verify Your Email",
             $@"<p>Hi {displayName},</p>
                <p>Please verify your email address by clicking the button below:</p>
-               <p><a href=""#"" style=""background-color: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;"">Verify Email</a></p>
+               <p><a href=""{verificationUrl}"" style=""background-color: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;"">Verify Email</a></p>
                <p>This link will expire in 24 hours.</p>
                <p>If you didn't create a FestGuide account, you can ignore this email.</p>");
 
@@ -40,11 +41,12 @@ public class SmtpEmailService : IEmailService
     public async Task SendPasswordResetEmailAsync(string email, string displayName, string resetToken, CancellationToken ct = default)
     {
         var subject = "Reset your FestGuide password";
+        var resetUrl = BuildUrl($"reset-password?token={Uri.EscapeDataString(resetToken)}");
         var htmlBody = BuildEmailTemplate(
             "Reset Your Password",
             $@"<p>Hi {displayName},</p>
                <p>We received a request to reset your password. Click the button below to set a new password:</p>
-               <p><a href=""#"" style=""background-color: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;"">Reset Password</a></p>
+               <p><a href=""{resetUrl}"" style=""background-color: #6366f1; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;"">Reset Password</a></p>
                <p>This link will expire in 1 hour.</p>
                <p>If you didn't request a password reset, you can ignore this email.</p>");
 
@@ -115,7 +117,7 @@ public class SmtpEmailService : IEmailService
                 ? _options.Username
                 : _options.FromAddress;
 
-            var message = new MailMessage
+            using var message = new MailMessage
             {
                 From = new MailAddress(fromAddress, _options.FromName),
                 Subject = subject,
@@ -165,5 +167,18 @@ public class SmtpEmailService : IEmailService
     </div>
 </body>
 </html>";
+    }
+
+    private string BuildUrl(string path)
+    {
+        var baseUrl = _options.BaseUrl?.TrimEnd('/') ?? string.Empty;
+        
+        if (string.IsNullOrWhiteSpace(baseUrl))
+        {
+            _logger.LogWarning("BaseUrl is not configured in SmtpOptions. Using placeholder URL.");
+            return "#";
+        }
+
+        return $"{baseUrl}/{path.TrimStart('/')}";
     }
 }
