@@ -202,8 +202,8 @@ public class ExportService : IExportService
 
         // Batch fetch all stages
         var stageIds = timeSlots
-            .Where(ts => ts != null)
-            .Select(ts => ts!.StageId)
+            .OfType<Domain.Entities.TimeSlot>()
+            .Select(ts => ts.StageId)
             .ToHashSet();
         
         var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
@@ -293,8 +293,8 @@ public class ExportService : IExportService
 
         // Batch fetch all artists
         var artistIds = engagements
-            .Where(e => e != null)
-            .Select(e => e!.ArtistId)
+            .OfType<Domain.Entities.Engagement>()
+            .Select(e => e.ArtistId)
             .ToHashSet();
         
         var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();

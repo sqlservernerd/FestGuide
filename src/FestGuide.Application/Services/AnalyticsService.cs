@@ -298,8 +298,8 @@ public class AnalyticsService : IAnalyticsService
 
         // Batch fetch stages
         var stageIds = timeSlots
-            .Where(ts => ts != null)
-            .Select(ts => ts!.StageId)
+            .OfType<Domain.Entities.TimeSlot>()
+            .Select(ts => ts.StageId)
             .ToHashSet();
         
         var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
@@ -480,8 +480,8 @@ public class AnalyticsService : IAnalyticsService
 
         // Batch fetch all stages
         var stageIds = timeSlots
-            .Where(ts => ts != null)
-            .Select(ts => ts!.StageId)
+            .OfType<Domain.Entities.TimeSlot>()
+            .Select(ts => ts.StageId)
             .ToHashSet();
         
         var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
