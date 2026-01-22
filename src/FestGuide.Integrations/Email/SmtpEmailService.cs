@@ -21,6 +21,40 @@ public class SmtpEmailService : IEmailService
     {
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+        // Validate that required SMTP settings are configured when email sending is enabled
+        if (_options.Enabled)
+        {
+            var missingSettings = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(_options.Host))
+            {
+                missingSettings.Add("Host");
+            }
+
+            if (string.IsNullOrWhiteSpace(_options.FromAddress))
+            {
+                missingSettings.Add("FromAddress");
+            }
+
+            if (string.IsNullOrWhiteSpace(_options.Username))
+            {
+                missingSettings.Add("Username");
+            }
+
+            if (string.IsNullOrWhiteSpace(_options.Password))
+            {
+                missingSettings.Add("Password");
+            }
+
+            if (missingSettings.Count > 0)
+            {
+                _logger.LogWarning(
+                    "SMTP email sending is enabled but the following required settings are not configured: {MissingSettings}. " +
+                    "Email sending will fail. Configure these values using user secrets, environment variables, or a secure configuration provider.",
+                    string.Join(", ", missingSettings));
+            }
+        }
     }
 
     /// <inheritdoc />
@@ -145,11 +179,11 @@ public class SmtpEmailService : IEmailService
             await client.SendAsync(message, ct).ConfigureAwait(false);
             await client.DisconnectAsync(true, ct).ConfigureAwait(false);
 
-            _logger.LogInformation("Email sent successfully");
+            _logger.LogInformation("Email sent successfully to {ToAddress} with subject {Subject}", toAddress, subject);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send email");
+            _logger.LogError(ex, "Failed to send email to {ToAddress} with subject {Subject}", toAddress, subject);
             throw;
         }
     }

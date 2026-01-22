@@ -162,6 +162,9 @@ public class PermissionService : IPermissionService
         var inviter = await _userRepository.GetByIdAsync(invitingUserId, ct);
 
         // Send invitation email
+        // Note: Email sending is best-effort. If email fails, the invitation is still created successfully
+        // and the user is granted permissions. The user can still access the festival if they know about it.
+        // Consider tracking email delivery status separately if notification reliability is critical.
         try
         {
             await _emailService.SendInvitationEmailAsync(
@@ -174,7 +177,7 @@ public class PermissionService : IPermissionService
         }
         catch (Exception ex)
         {
-            // Log but don't fail the invitation - email is best-effort
+            // Log but don't fail the invitation - the permission has been granted regardless
             _logger.LogWarning(ex, "Failed to send invitation email to {Email}", request.Email);
         }
 
