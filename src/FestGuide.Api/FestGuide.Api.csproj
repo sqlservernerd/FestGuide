@@ -18,8 +18,8 @@
     <!--
       UserSecretsId identifies the local user secrets store for the FestGuide.Api project.
       Configure API secrets for local development using the .NET user-secrets tooling, e.g.:
-        dotnet user-secrets set "Jwt:SigningKey" "your-local-dev-key" --project src/FestGuide.Api/FestGuide.Api.csproj
-        dotnet user-secrets set "Smtp:Password" "your-smtp-password" --project src/FestGuide.Api/FestGuide.Api.csproj
+        dotnet user-secrets set "Jwt:SigningKey" "your-local-dev-key" -p src/FestGuide.Api/FestGuide.Api.csproj
+        dotnet user-secrets set "Smtp:Password" "your-smtp-password" -p src/FestGuide.Api/FestGuide.Api.csproj
       See the developer documentation/README for the full list of expected secret keys and structure.
     -->
     <UserSecretsId>43220b37-66d0-40e0-b8d4-0e835ff2a421</UserSecretsId>
