@@ -24,7 +24,7 @@ public class ExportServiceTests
     private readonly Mock<IDateTimeProvider> _mockDateTimeProvider;
     private readonly Mock<ILogger<ExportService>> _mockLogger;
     private readonly ExportService _sut;
-    private readonly DateTime _now = new(2026, 1, 20, 12, 0, 0, DateTimeKind.Utc);
+    private readonly DateTime _now = DateTime.UtcNow;
 
     public ExportServiceTests()
     {

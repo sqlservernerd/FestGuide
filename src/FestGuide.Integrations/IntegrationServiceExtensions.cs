@@ -20,6 +20,16 @@ public static class IntegrationServiceExtensions
     /// <summary>
     /// Adds integration services to the dependency injection container.
     /// </summary>
+    /// <param name="services">
+    /// The <see cref="IServiceCollection"/> to which integration services are added.
+    /// </param>
+    /// <param name="configuration">
+    /// The application configuration used to bind <see cref="SmtpOptions"/> from the
+    /// <c>"Smtp"</c> configuration section.
+    /// </param>
+    /// <returns>
+    /// The same <see cref="IServiceCollection"/> instance to allow for fluent chaining.
+    /// </returns>
     public static IServiceCollection AddIntegrationServices(this IServiceCollection services, IConfiguration configuration)
     {
         // Email services - SMTP implementation

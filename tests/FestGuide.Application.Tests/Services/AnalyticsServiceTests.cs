@@ -24,7 +24,7 @@ public class AnalyticsServiceTests
     private readonly Mock<IDateTimeProvider> _mockDateTimeProvider;
     private readonly Mock<ILogger<AnalyticsService>> _mockLogger;
     private readonly AnalyticsService _sut;
-    private readonly DateTime _now = new(2026, 7, 15, 12, 0, 0, DateTimeKind.Utc);
+    private readonly DateTime _now = DateTime.UtcNow;
 
     public AnalyticsServiceTests()
     {
