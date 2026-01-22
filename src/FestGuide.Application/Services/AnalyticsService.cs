@@ -193,7 +193,7 @@ public class AnalyticsService : IAnalyticsService
             totalViews,
             totalSchedules,
             totalSaves,
-            editionMetrics.ToList());
+            editionMetrics);
     }
 
     /// <inheritdoc />
@@ -372,6 +372,7 @@ public class AnalyticsService : IAnalyticsService
 
         return topEngagements
             .Where(dto => dto != null)
-            .ToList()!;
+            .Cast<TopEngagementDto>()
+            .ToList();
     }
 }
