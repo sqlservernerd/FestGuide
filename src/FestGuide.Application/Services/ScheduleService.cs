@@ -21,6 +21,7 @@ public class ScheduleService : IScheduleService
     private readonly IArtistRepository _artistRepository;
     private readonly IEditionRepository _editionRepository;
     private readonly IFestivalAuthorizationService _authorizationService;
+    private readonly INotificationService _notificationService;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ILogger<ScheduleService> _logger;
 
@@ -32,6 +33,7 @@ public class ScheduleService : IScheduleService
         IArtistRepository artistRepository,
         IEditionRepository editionRepository,
         IFestivalAuthorizationService authorizationService,
+        INotificationService notificationService,
         IDateTimeProvider dateTimeProvider,
         ILogger<ScheduleService> logger)
     {
@@ -42,6 +44,7 @@ public class ScheduleService : IScheduleService
         _artistRepository = artistRepository ?? throw new ArgumentNullException(nameof(artistRepository));
         _editionRepository = editionRepository ?? throw new ArgumentNullException(nameof(editionRepository));
         _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
+        _notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
@@ -149,7 +152,38 @@ public class ScheduleService : IScheduleService
         _logger.LogInformation("Schedule for edition {EditionId} published by user {UserId}, version {Version}",
             editionId, userId, schedule!.Version);
 
-        // TODO: Trigger notifications to affected attendees (Phase 5)
+        // Notify attendees who have saved entries for this edition
+        // The failure is logged but does not prevent the schedule from being published
+        try
+        {
+            var notification = new ScheduleChangeNotification(
+                EditionId: editionId,
+                ChangeType: "schedule_published",
+                EngagementId: null,
+                TimeSlotId: null,
+                ArtistName: null,
+                StageName: null,
+                OldStartTime: null,
+                NewStartTime: null,
+                Message: $"The schedule has been published (version {schedule.Version}).");
+
+            await _notificationService.SendScheduleChangeAsync(notification, ct);
+        }
+        catch (OperationCanceledException)
+        {
+            // Honor cancellation semantics
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Failed to send schedule published notification for edition {EditionId} by user {UserId}, version {Version}",
+                editionId,
+                userId,
+                schedule.Version);
+            throw;
+        }
 
         return ScheduleDto.FromEntity(schedule);
     }

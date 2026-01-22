@@ -57,6 +57,11 @@ public interface IFestivalPermissionRepository
     /// Creates a new permission.
     /// </summary>
     Task<Guid> CreateAsync(FestivalPermission permission, CancellationToken ct = default);
+    
+    /// <summary>
+    /// Creates a new permission within an existing transaction.
+    /// </summary>
+    Task<Guid> CreateAsync(FestivalPermission permission, ITransactionScope transactionScope, CancellationToken ct = default);
 
     /// <summary>
     /// Updates an existing permission.

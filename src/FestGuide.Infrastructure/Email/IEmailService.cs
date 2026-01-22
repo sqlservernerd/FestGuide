@@ -30,4 +30,15 @@ public interface IEmailService
     /// <param name="displayName">The user's display name.</param>
     /// <param name="ct">Cancellation token.</param>
     Task SendPasswordChangedNotificationAsync(string email, string displayName, CancellationToken ct = default);
+
+    /// <summary>
+    /// Sends a festival invitation email.
+    /// </summary>
+    /// <param name="toAddress">Recipient email address.</param>
+    /// <param name="festivalName">Name of the festival.</param>
+    /// <param name="inviterName">Name of the person sending the invitation.</param>
+    /// <param name="role">Role being granted.</param>
+    /// <param name="isNewUser">Whether the recipient needs to create an account.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task SendInvitationEmailAsync(string toAddress, string festivalName, string inviterName, string role, bool isNewUser, CancellationToken ct = default);
 }

@@ -18,6 +18,9 @@ public static class DataAccessServiceExtensions
     {
         // Register IDbConnection factory
         services.AddScoped<IDbConnection>(_ => new SqlConnection(connectionString));
+        
+        // Register transaction provider
+        services.AddScoped<IDbTransactionProvider, DbTransactionProvider>();
 
         // Phase 1 Repositories - Authentication & User Management
         services.AddScoped<IUserRepository, SqlServerUserRepository>();
@@ -43,6 +46,9 @@ public static class DataAccessServiceExtensions
         services.AddScoped<IDeviceTokenRepository, SqlServerDeviceTokenRepository>();
         services.AddScoped<INotificationLogRepository, SqlServerNotificationLogRepository>();
         services.AddScoped<INotificationPreferenceRepository, SqlServerNotificationPreferenceRepository>();
+
+        // Phase 6 Repositories - Analytics & Reporting
+        services.AddScoped<IAnalyticsRepository, SqlServerAnalyticsRepository>();
 
         return services;
     }

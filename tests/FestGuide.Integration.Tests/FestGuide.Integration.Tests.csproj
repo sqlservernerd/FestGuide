@@ -14,6 +14,7 @@
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
     <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Moq" />
   </ItemGroup>
 
   <ItemGroup>
@@ -22,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\FestGuide.Api\FestGuide.Api.csproj" />
+    <ProjectReference Include="..\..\src\FestGuide.Integrations\FestGuide.Integrations.csproj" />
   </ItemGroup>
 
 </Project>

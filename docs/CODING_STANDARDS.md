@@ -288,6 +288,28 @@ var scheduleItems =
 var festivals = await _repository.GetAllAsync(ct);
 var count = festivals.Count;    // ✓ Materialized
 var first = festivals.First();  // ✓ Uses same collection
+
+// ✓ Good: Explicit filtering in foreach loops
+// Use .OfType<T>() to filter out nulls and cast to non-nullable type
+foreach (var artist in artists.OfType<Artist>())
+{
+    artistDictionary[artist.ArtistId] = artist;
+}
+
+// ✓ Also acceptable: .Where() with null-forgiving operator (when type is already non-nullable)
+foreach (var artist in artists.Where(a => a != null))
+{
+    artistDictionary[artist!.ArtistId] = artist;
+}
+
+// ✗ Bad: Implicit filtering with if inside foreach
+foreach (var artist in artists)
+{
+    if (artist != null)
+    {
+        artistDictionary[artist.ArtistId] = artist;
+    }
+}
 ```
 
 ---
@@ -357,6 +379,71 @@ public class SqlServerFestivalRepository : IFestivalRepository
     }
 }
 ```
+
+### 3.2.1 Transaction Pattern
+
+When multiple database operations must succeed or fail together, use the transaction pattern:
+
+```csharp
+// ✅ Service with transaction support
+public class PermissionService : IPermissionService
+{
+    private readonly IFestivalPermissionRepository _permissionRepository;
+    private readonly IEmailService _emailService;
+    private readonly IDbTransactionProvider _transactionProvider;
+
+    public async Task<InvitationResultDto> InviteUserAsync(
+        Guid festivalId, 
+        Guid invitingUserId, 
+        InviteUserRequest request, 
+        CancellationToken ct = default)
+    {
+        // Use transaction when operations must be atomic
+        using var transaction = _transactionProvider.BeginTransaction();
+        
+        try
+        {
+            // Create permission record
+            var permission = new FestivalPermission { /* ... */ };
+            await _permissionRepository.CreateAsync(permission, transaction, ct);
+
+            // Send email - if this fails, permission creation will be rolled back
+            await _emailService.SendInvitationEmailAsync(/* ... */, ct);
+            
+            // Commit only if all operations succeed
+            transaction.Commit();
+            
+            return new InvitationResultDto(/* ... */);
+        }
+        catch (Exception ex)
+        {
+            // Transaction automatically rolls back on dispose if not committed
+            _logger.LogError(ex, "Failed to invite user. Transaction rolled back.");
+            throw;
+        }
+    }
+}
+```
+
+**Transaction Guidelines:**
+
+| **Guideline** | **Description** |
+|---|---|
+| Atomicity | Use transactions when multiple operations must all succeed or all fail |
+| Scope | Keep transaction scope as small as possible to reduce lock contention |
+| Disposal | Always use `using` statement to ensure proper disposal |
+| Auto-Rollback | Transactions automatically rollback on dispose if not committed |
+| Error Handling | Wrap transaction code in try-catch to handle and log failures |
+| External Services | Include external service calls (email, API) within transaction scope when consistency is required |
+
+**When to Use Transactions:**
+
+- ✅ Creating a database record and sending a notification email
+- ✅ Transferring ownership between users
+- ✅ Creating multiple related records that depend on each other
+- ✅ Updating multiple tables that must remain consistent
+- ❌ Simple single-record CRUD operations
+- ❌ Read-only operations
 
 ### 3.3 Service Pattern
 
