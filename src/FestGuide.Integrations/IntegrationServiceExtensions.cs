@@ -34,9 +34,13 @@ public static class IntegrationServiceExtensions
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
-        // Email services - SMTP implementation
-        services.Configure<SmtpOptions>(configuration.GetSection(SmtpOptions.SectionName));
-        services.AddScoped<IEmailService, SmtpEmailService>();
+        // Email services - SMTP implementation (only when enabled)
+        var smtpEnabled = configuration.GetValue<bool>("Smtp:Enabled", false);
+        if (smtpEnabled)
+        {
+            services.Configure<SmtpOptions>(configuration.GetSection(SmtpOptions.SectionName));
+            services.AddScoped<IEmailService, SmtpEmailService>();
+        }
 
         // Placeholder for future implementation:
         // - IWebhookService

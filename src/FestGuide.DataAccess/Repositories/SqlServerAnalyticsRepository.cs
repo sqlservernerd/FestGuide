@@ -167,7 +167,6 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
             FROM analytics.AnalyticsEvent
             WHERE EditionId = @EditionId
             GROUP BY Platform
-            ORDER BY COUNT(*) DESC
             """;
 
         var result = await _connection.QueryAsync<(string Platform, int Count)>(

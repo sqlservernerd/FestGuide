@@ -83,9 +83,8 @@ builder.Services.AddAuthorization();
 // Add custom services
 // IMPORTANT: Service registration order matters for IEmailService.
 // AddInfrastructureServices registers ConsoleEmailService (fallback for development).
-// AddIntegrationServices registers SmtpEmailService (production email via SMTP).
-// The last registration wins, so AddIntegrationServices must be called after
-// AddInfrastructureServices to ensure SMTP is used when configured.
+// AddIntegrationServices conditionally registers SmtpEmailService (production email via SMTP)
+// only when Smtp:Enabled is true in configuration.
 var baseUrl = builder.Configuration["AppSettings:BaseUrl"] ?? "https://localhost:5001";
 builder.Services.AddInfrastructureServices(baseUrl);
 builder.Services.AddSecurityServices();

@@ -153,18 +153,36 @@ public class ScheduleService : IScheduleService
             editionId, userId, schedule!.Version);
 
         // Notify attendees who have saved entries for this edition
-        var notification = new ScheduleChangeNotification(
-            EditionId: editionId,
-            ChangeType: "schedule_published",
-            EngagementId: null,
-            TimeSlotId: null,
-            ArtistName: null,
-            StageName: null,
-            OldStartTime: null,
-            NewStartTime: null,
-            Message: $"The schedule has been published (version {schedule.Version}).");
+        // The failure is logged but does not prevent the schedule from being published
+        try
+        {
+            var notification = new ScheduleChangeNotification(
+                EditionId: editionId,
+                ChangeType: "schedule_published",
+                EngagementId: null,
+                TimeSlotId: null,
+                ArtistName: null,
+                StageName: null,
+                OldStartTime: null,
+                NewStartTime: null,
+                Message: $"The schedule has been published (version {schedule.Version}).");
 
-        await _notificationService.SendScheduleChangeAsync(notification, ct);
+            await _notificationService.SendScheduleChangeAsync(notification, ct);
+        }
+        catch (OperationCanceledException)
+        {
+            // Honor cancellation semantics
+            throw;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(
+                ex,
+                "Failed to send schedule published notification for edition {EditionId} by user {UserId}, version {Version}",
+                editionId,
+                userId,
+                schedule.Version);
+        }
 
         return ScheduleDto.FromEntity(schedule);
     }

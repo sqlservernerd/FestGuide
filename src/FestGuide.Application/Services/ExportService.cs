@@ -153,9 +153,24 @@ public class ExportService : IExportService
             return new ExportResultDto(emptyFileName, "text/csv", emptyData);
         }
 
-        // Batch fetch all engagements
+        // Batch fetch all engagements with error handling for individual failures
         var engagementIds = topEngagements.Select(e => e.EngagementId).ToList();
-        var engagementTasks = engagementIds.Select(id => _engagementRepository.GetByIdAsync(id, ct)).ToArray();
+        var engagementTasks = engagementIds.Select(async id =>
+        {
+            try
+            {
+                return await _engagementRepository.GetByIdAsync(id, ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to fetch engagement {EngagementId} during export for edition {EditionId}",
+                    id,
+                    editionId);
+                return null;
+            }
+        }).ToArray();
         var engagements = await Task.WhenAll(engagementTasks);
         
         var engagementDictionary = new Dictionary<Guid, Domain.Entities.Engagement>();
@@ -182,9 +197,24 @@ public class ExportService : IExportService
             return new ExportResultDto(emptyFileName, "text/csv", emptyData);
         }
 
-        // Batch fetch all artists
+        // Batch fetch all artists with error handling for individual failures
         var artistIds = engagementDictionary.Values.Select(e => e.ArtistId).Distinct().ToList();
-        var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();
+        var artistTasks = artistIds.Select(async id =>
+        {
+            try
+            {
+                return await _artistRepository.GetByIdAsync(id, ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to fetch artist {ArtistId} during export for edition {EditionId}",
+                    id,
+                    editionId);
+                return null;
+            }
+        }).ToArray();
         var artists = await Task.WhenAll(artistTasks);
         
         var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
@@ -204,9 +234,24 @@ public class ExportService : IExportService
                 editionId);
         }
 
-        // Batch fetch all time slots
+        // Batch fetch all time slots with error handling for individual failures
         var timeSlotIds = engagementDictionary.Values.Select(e => e.TimeSlotId).Distinct().ToList();
-        var timeSlotTasks = timeSlotIds.Select(id => _timeSlotRepository.GetByIdAsync(id, ct)).ToArray();
+        var timeSlotTasks = timeSlotIds.Select(async id =>
+        {
+            try
+            {
+                return await _timeSlotRepository.GetByIdAsync(id, ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to fetch time slot {TimeSlotId} during export for edition {EditionId}",
+                    id,
+                    editionId);
+                return null;
+            }
+        }).ToArray();
         var timeSlots = await Task.WhenAll(timeSlotTasks);
         
         var timeSlotDictionary = new Dictionary<Guid, Domain.Entities.TimeSlot>();
@@ -226,13 +271,28 @@ public class ExportService : IExportService
                 editionId);
         }
 
-        // Batch fetch all stages
+        // Batch fetch all stages with error handling for individual failures
         var stageIds = timeSlots
             .OfType<Domain.Entities.TimeSlot>()
             .Select(ts => ts.StageId)
             .ToHashSet();
         
-        var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
+        var stageTasks = stageIds.Select(async id =>
+        {
+            try
+            {
+                return await _stageRepository.GetByIdAsync(id, ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(
+                    ex,
+                    "Failed to fetch stage {StageId} during export for edition {EditionId}",
+                    id,
+                    editionId);
+                return null;
+            }
+        }).ToArray();
         var stages = await Task.WhenAll(stageTasks);
         
         var stageDictionary = new Dictionary<Guid, Domain.Entities.Stage>();

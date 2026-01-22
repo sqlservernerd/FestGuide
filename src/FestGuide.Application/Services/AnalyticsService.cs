@@ -213,9 +213,24 @@ public class AnalyticsService : IAnalyticsService
         var artists = await Task.WhenAll(artistTasks);
         
         var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
-        foreach (var artist in artists.OfType<Domain.Entities.Artist>())
+        var missingArtistIds = new List<Guid>();
+
+        for (int i = 0; i < artists.Length; i++)
         {
+            var artist = artists[i];
+            if (artist is null)
+            {
+                missingArtistIds.Add(artistIds[i]);
+                continue;
+            }
+
             artistDictionary[artist.ArtistId] = artist;
+        }
+
+        if (missingArtistIds.Count > 0)
+        {
+            throw new InvalidOperationException(
+                $"Artist entities not found for IDs: {string.Join(", ", missingArtistIds)}");
         }
 
         var result = new List<ArtistAnalyticsDto>();
