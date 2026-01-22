@@ -22,12 +22,38 @@ public class SmtpEmailService : IEmailService
         _options = options?.Value ?? throw new ArgumentNullException(nameof(options));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-        // Validate that password is configured when email sending is enabled
-        if (_options.Enabled && string.IsNullOrWhiteSpace(_options.Password))
+        // Validate that required SMTP settings are configured when email sending is enabled
+        if (_options.Enabled)
         {
-            _logger.LogWarning(
-                "SMTP email sending is enabled but no password is configured. Email sending will fail. " +
-                "Configure the password using user secrets, environment variables, or a secure configuration provider.");
+            var missingSettings = new List<string>();
+
+            if (string.IsNullOrWhiteSpace(_options.Host))
+            {
+                missingSettings.Add("Host");
+            }
+
+            if (string.IsNullOrWhiteSpace(_options.FromAddress))
+            {
+                missingSettings.Add("FromAddress");
+            }
+
+            if (string.IsNullOrWhiteSpace(_options.Username))
+            {
+                missingSettings.Add("Username");
+            }
+
+            if (string.IsNullOrWhiteSpace(_options.Password))
+            {
+                missingSettings.Add("Password");
+            }
+
+            if (missingSettings.Count > 0)
+            {
+                _logger.LogWarning(
+                    "SMTP email sending is enabled but the following required settings are not configured: {MissingSettings}. " +
+                    "Email sending will fail. Configure these values using user secrets, environment variables, or a secure configuration provider.",
+                    string.Join(", ", missingSettings));
+            }
         }
     }
 
