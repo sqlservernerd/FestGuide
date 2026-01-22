@@ -94,55 +94,35 @@ public class SmtpEmailServiceTests
     }
 
     [Fact]
-    public async Task SendVerificationEmailAsync_WithMissingHost_DoesNotSendEmail()
+    public void CreateService_WithMissingHost_ThrowsInvalidOperationException()
     {
         // Arrange
         var options = CreateDefaultOptions();
         options.Enabled = true;
         options.Host = string.Empty;
-        var sut = CreateService(options);
-        var email = "user@example.com";
-        var displayName = "Test User";
-        var verificationToken = "abc123";
 
         // Act
-        await sut.SendVerificationEmailAsync(email, displayName, verificationToken);
+        var act = () => CreateService(options);
 
-        // Assert - Verify that a warning log was written indicating misconfiguration
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.IsAny<It.IsAnyType>(),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.AtLeastOnce);
+        // Assert
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*Host*");
     }
 
     [Fact]
-    public async Task SendVerificationEmailAsync_WithMissingUsername_DoesNotSendEmail()
+    public void CreateService_WithMissingUsername_ThrowsInvalidOperationException()
     {
         // Arrange
         var options = CreateDefaultOptions();
         options.Enabled = true;
         options.Username = string.Empty;
-        var sut = CreateService(options);
-        var email = "user@example.com";
-        var displayName = "Test User";
-        var verificationToken = "abc123";
 
         // Act
-        await sut.SendVerificationEmailAsync(email, displayName, verificationToken);
+        var act = () => CreateService(options);
 
-        // Assert - Verify that a warning log was written indicating misconfiguration
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.IsAny<It.IsAnyType>(),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.AtLeastOnce);
+        // Assert
+        act.Should().Throw<InvalidOperationException>()
+            .WithMessage("*Username*");
     }
 
     [Fact]
