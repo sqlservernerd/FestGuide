@@ -18,6 +18,9 @@ public static class DataAccessServiceExtensions
     {
         // Register IDbConnection factory
         services.AddScoped<IDbConnection>(_ => new SqlConnection(connectionString));
+        
+        // Register transaction provider
+        services.AddScoped<IDbTransactionProvider, DbTransactionProvider>();
 
         // Phase 1 Repositories - Authentication & User Management
         services.AddScoped<IUserRepository, SqlServerUserRepository>();

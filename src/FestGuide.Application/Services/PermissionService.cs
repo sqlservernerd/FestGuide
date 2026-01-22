@@ -21,6 +21,7 @@ public class PermissionService : IPermissionService
     private readonly IFestivalAuthorizationService _authorizationService;
     private readonly IEmailService _emailService;
     private readonly IDateTimeProvider _dateTimeProvider;
+    private readonly IDbTransactionProvider _transactionProvider;
     private readonly ILogger<PermissionService> _logger;
 
     public PermissionService(
@@ -30,6 +31,7 @@ public class PermissionService : IPermissionService
         IFestivalAuthorizationService authorizationService,
         IEmailService emailService,
         IDateTimeProvider dateTimeProvider,
+        IDbTransactionProvider transactionProvider,
         ILogger<PermissionService> logger)
     {
         _permissionRepository = permissionRepository ?? throw new ArgumentNullException(nameof(permissionRepository));
@@ -38,6 +40,7 @@ public class PermissionService : IPermissionService
         _authorizationService = authorizationService ?? throw new ArgumentNullException(nameof(authorizationService));
         _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
         _dateTimeProvider = dateTimeProvider ?? throw new ArgumentNullException(nameof(dateTimeProvider));
+        _transactionProvider = transactionProvider ?? throw new ArgumentNullException(nameof(transactionProvider));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
@@ -136,55 +139,73 @@ public class PermissionService : IPermissionService
 
         var now = _dateTimeProvider.UtcNow;
         
-        // Create the permission first
-        var permission = new FestivalPermission
-        {
-            FestivalPermissionId = Guid.NewGuid(),
-            FestivalId = festivalId,
-            UserId = invitedUserId,
-            Role = request.Role,
-            Scope = request.Role == FestivalRole.Administrator ? PermissionScope.All : request.Scope,
-            InvitedByUserId = invitingUserId,
-            IsPending = true,
-            IsRevoked = false,
-            CreatedAtUtc = now,
-            CreatedBy = invitingUserId,
-            ModifiedAtUtc = now,
-            ModifiedBy = invitingUserId
-        };
-
-        await _permissionRepository.CreateAsync(permission, ct);
-
         // Get festival and inviter details for the email
         var festival = await _festivalRepository.GetByIdAsync(festivalId, ct);
         var inviter = await _userRepository.GetByIdAsync(invitingUserId, ct);
+        
+        // Create the permission and send invitation email within a transaction
+        // If email sending fails, the permission creation will be rolled back
+        using var transaction = _transactionProvider.BeginTransaction();
+        
+        try
+        {
+            // Create the permission first
+            var permission = new FestivalPermission
+            {
+                FestivalPermissionId = Guid.NewGuid(),
+                FestivalId = festivalId,
+                UserId = invitedUserId,
+                Role = request.Role,
+                Scope = request.Role == FestivalRole.Administrator ? PermissionScope.All : request.Scope,
+                InvitedByUserId = invitingUserId,
+                IsPending = true,
+                IsRevoked = false,
+                CreatedAtUtc = now,
+                CreatedBy = invitingUserId,
+                ModifiedAtUtc = now,
+                ModifiedBy = invitingUserId
+            };
 
-        // Send invitation email after permission is created
-        // If email sending fails, the permission still exists but the user won't be notified
-        // The failure will propagate to the caller for appropriate handling
-        await _emailService.SendInvitationEmailAsync(
-            request.Email,
-            festival?.Name ?? "Unknown Festival",
-            inviter?.DisplayName ?? inviter?.Email ?? "A team member",
-            request.Role.ToString(),
-            isNewUser,
-            ct);
+            await _permissionRepository.CreateAsync(permission, transaction, ct);
 
-        _logger.LogInformation(
-            "User {InvitingUserId} invited {Email} to festival {FestivalId} with role {Role}",
-            invitingUserId, request.Email, festivalId, request.Role);
+            // Send invitation email - if this fails, the transaction will roll back
+            await _emailService.SendInvitationEmailAsync(
+                request.Email,
+                festival?.Name ?? "Unknown Festival",
+                inviter?.DisplayName ?? inviter?.Email ?? "A team member",
+                request.Role.ToString(),
+                isNewUser,
+                ct);
+            
+            // Commit the transaction only if both operations succeed
+            transaction.Commit();
 
-        var message = isNewUser
-            ? $"Invitation sent to {request.Email}. They will need to create an account to accept."
-            : $"Invitation sent to {request.Email}.";
+            _logger.LogInformation(
+                "User {InvitingUserId} invited {Email} to festival {FestivalId} with role {Role}",
+                invitingUserId, request.Email, festivalId, request.Role);
 
-        return new InvitationResultDto(
-            permission.FestivalPermissionId,
-            request.Email,
-            request.Role,
-            permission.Scope,
-            isNewUser,
-            message);
+            var message = isNewUser
+                ? $"Invitation sent to {request.Email}. They will need to create an account to accept."
+                : $"Invitation sent to {request.Email}.";
+
+            return new InvitationResultDto(
+                permission.FestivalPermissionId,
+                request.Email,
+                request.Role,
+                permission.Scope,
+                isNewUser,
+                message);
+        }
+        catch (Exception ex)
+        {
+            // Transaction will automatically roll back on dispose if not committed
+            _logger.LogError(
+                ex,
+                "Failed to invite user {Email} to festival {FestivalId}. Transaction rolled back.",
+                request.Email,
+                festivalId);
+            throw;
+        }
     }
 
     /// <inheritdoc />

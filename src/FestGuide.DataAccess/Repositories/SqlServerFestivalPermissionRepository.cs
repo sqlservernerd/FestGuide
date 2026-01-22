@@ -198,6 +198,32 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
 
         return permission.FestivalPermissionId;
     }
+    
+    /// <inheritdoc />
+    public async Task<Guid> CreateAsync(FestivalPermission permission, ITransactionScope transactionScope, CancellationToken ct = default)
+    {
+        if (transactionScope == null)
+        {
+            throw new ArgumentNullException(nameof(transactionScope));
+        }
+        
+        const string sql = """
+            INSERT INTO permissions.FestivalPermission (
+                FestivalPermissionId, FestivalId, UserId, Role, Scope,
+                InvitedByUserId, AcceptedAtUtc, IsPending, IsRevoked,
+                CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
+            ) VALUES (
+                @FestivalPermissionId, @FestivalId, @UserId, @Role, @Scope,
+                @InvitedByUserId, @AcceptedAtUtc, @IsPending, @IsRevoked,
+                @CreatedAtUtc, @CreatedBy, @ModifiedAtUtc, @ModifiedBy
+            )
+            """;
+
+        await _connection.ExecuteAsync(
+            new CommandDefinition(sql, permission, transaction: transactionScope.Transaction, cancellationToken: ct));
+
+        return permission.FestivalPermissionId;
+    }
 
     /// <inheritdoc />
     public async Task UpdateAsync(FestivalPermission permission, CancellationToken ct = default)

@@ -21,6 +21,8 @@ public class PermissionServiceTests
     private readonly Mock<IFestivalAuthorizationService> _mockAuthService;
     private readonly Mock<IEmailService> _mockEmailService;
     private readonly Mock<IDateTimeProvider> _mockDateTimeProvider;
+    private readonly Mock<IDbTransactionProvider> _mockTransactionProvider;
+    private readonly Mock<ITransactionScope> _mockTransactionScope;
     private readonly Mock<ILogger<PermissionService>> _mockLogger;
     private readonly PermissionService _sut;
     private readonly DateTime _now = new(2026, 1, 20, 12, 0, 0, DateTimeKind.Utc);
@@ -33,9 +35,12 @@ public class PermissionServiceTests
         _mockAuthService = new Mock<IFestivalAuthorizationService>();
         _mockEmailService = new Mock<IEmailService>();
         _mockDateTimeProvider = new Mock<IDateTimeProvider>();
+        _mockTransactionProvider = new Mock<IDbTransactionProvider>();
+        _mockTransactionScope = new Mock<ITransactionScope>();
         _mockLogger = new Mock<ILogger<PermissionService>>();
 
         _mockDateTimeProvider.Setup(x => x.UtcNow).Returns(_now);
+        _mockTransactionProvider.Setup(x => x.BeginTransaction()).Returns(_mockTransactionScope.Object);
 
         _sut = new PermissionService(
             _mockPermissionRepo.Object,
@@ -44,6 +49,7 @@ public class PermissionServiceTests
             _mockAuthService.Object,
             _mockEmailService.Object,
             _mockDateTimeProvider.Object,
+            _mockTransactionProvider.Object,
             _mockLogger.Object);
     }
 
@@ -324,7 +330,8 @@ public class PermissionServiceTests
         result.Role.Should().Be(FestivalRole.Manager);
         result.Scope.Should().Be(PermissionScope.Artists);
         result.IsNewUser.Should().BeFalse();
-        _mockPermissionRepo.Verify(x => x.CreateAsync(It.IsAny<FestivalPermission>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockPermissionRepo.Verify(x => x.CreateAsync(It.IsAny<FestivalPermission>(), It.IsAny<ITransactionScope>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockTransactionScope.Verify(x => x.Commit(), Times.Once);
     }
 
     [Fact]
@@ -355,7 +362,8 @@ public class PermissionServiceTests
         result.InvitedEmail.Should().Be(email);
         result.IsNewUser.Should().BeTrue();
         result.Message.Should().Contain("need to create an account");
-        _mockPermissionRepo.Verify(x => x.CreateAsync(It.IsAny<FestivalPermission>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockPermissionRepo.Verify(x => x.CreateAsync(It.IsAny<FestivalPermission>(), It.IsAny<ITransactionScope>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockTransactionScope.Verify(x => x.Commit(), Times.Once);
     }
 
     [Fact]
@@ -418,6 +426,56 @@ public class PermissionServiceTests
         // Assert
         await act.Should().ThrowAsync<ForbiddenException>()
             .WithMessage("You do not have permission to invite users to this festival.");
+    }
+
+    [Fact]
+    public async Task InviteUserAsync_WhenEmailSendingFails_RollsBackTransaction()
+    {
+        // Arrange
+        var festivalId = Guid.NewGuid();
+        var invitingUserId = Guid.NewGuid();
+        var invitedUserId = Guid.NewGuid();
+        var email = "invited@test.com";
+
+        var request = new InviteUserRequest(
+            Email: email,
+            Role: FestivalRole.Manager,
+            Scope: PermissionScope.Artists);
+
+        var invitedUser = new User { UserId = invitedUserId, Email = email, DisplayName = "Invited User" };
+        var festival = new Festival { FestivalId = festivalId, Name = "Test Festival" };
+        var inviter = new User { UserId = invitingUserId, Email = "inviter@test.com", DisplayName = "Inviter" };
+
+        _mockAuthService.Setup(x => x.CanManagePermissionsAsync(invitingUserId, festivalId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _mockFestivalRepo.Setup(x => x.ExistsAsync(festivalId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _mockUserRepo.Setup(x => x.GetByEmailAsync(email, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(invitedUser);
+        _mockPermissionRepo.Setup(x => x.GetByUserAndFestivalAsync(invitedUserId, festivalId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((FestivalPermission?)null);
+        _mockFestivalRepo.Setup(x => x.GetByIdAsync(festivalId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(festival);
+        _mockUserRepo.Setup(x => x.GetByIdAsync(invitingUserId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(inviter);
+        _mockEmailService.Setup(x => x.SendInvitationEmailAsync(
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new InvalidOperationException("Email service unavailable"));
+
+        // Act
+        var act = async () => await _sut.InviteUserAsync(festivalId, invitingUserId, request);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("Email service unavailable");
+        _mockPermissionRepo.Verify(x => x.CreateAsync(It.IsAny<FestivalPermission>(), It.IsAny<ITransactionScope>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockTransactionScope.Verify(x => x.Commit(), Times.Never);
+        _mockTransactionScope.Verify(x => x.Dispose(), Times.Once);
     }
 
     [Fact]
