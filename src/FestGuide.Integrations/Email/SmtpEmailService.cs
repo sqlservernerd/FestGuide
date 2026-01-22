@@ -59,6 +59,11 @@ public class SmtpEmailService : IEmailService
         {
             missingSettings.Add("BaseUrl");
         }
+        else if (!Uri.TryCreate(_options.BaseUrl, UriKind.Absolute, out _))
+        {
+            _logger.LogError("BaseUrl '{BaseUrl}' is not a valid absolute URI", _options.BaseUrl);
+            throw new InvalidOperationException($"BaseUrl '{_options.BaseUrl}' is not a valid absolute URI.");
+        }
 
         if (missingSettings.Count > 0)
         {
@@ -152,12 +157,6 @@ public class SmtpEmailService : IEmailService
         if (!_options.Enabled)
         {
             _logger.LogDebug("Email sending is disabled. Would have sent email to {ToAddress} with subject: {Subject}", toAddress, subject);
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(_options.Host) || string.IsNullOrWhiteSpace(_options.Username))
-        {
-            _logger.LogWarning("SMTP is not configured. Skipping email to {ToAddress}", toAddress);
             return;
         }
 

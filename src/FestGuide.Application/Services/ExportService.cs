@@ -144,7 +144,7 @@ public class ExportService : IExportService
         var sb = new StringBuilder();
         sb.AppendLine("EngagementId,ArtistName,StageName,StartTimeUtc,EndTimeUtc,SaveCount");
 
-        var topEngagements = await _analyticsRepository.GetTopSavedEngagementsAsync(editionId, 100, ct).ConfigureAwait(false);
+        var topEngagements = await _analyticsRepository.GetTopSavedEngagementsAsync(editionId, 100, ct);
 
         if (topEngagements.Count == 0)
         {
@@ -156,7 +156,7 @@ public class ExportService : IExportService
         // Batch fetch all engagements
         var engagementIds = topEngagements.Select(e => e.EngagementId).ToList();
         var engagementTasks = engagementIds.Select(id => _engagementRepository.GetByIdAsync(id, ct)).ToArray();
-        var engagements = await Task.WhenAll(engagementTasks).ConfigureAwait(false);
+        var engagements = await Task.WhenAll(engagementTasks);
         
         var engagementDictionary = new Dictionary<Guid, Domain.Entities.Engagement>();
         foreach (var engagement in engagements.Where(e => e != null))
@@ -185,7 +185,7 @@ public class ExportService : IExportService
         // Batch fetch all artists
         var artistIds = engagementDictionary.Values.Select(e => e.ArtistId).Distinct().ToList();
         var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();
-        var artists = await Task.WhenAll(artistTasks).ConfigureAwait(false);
+        var artists = await Task.WhenAll(artistTasks);
         
         var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
         foreach (var artist in artists.OfType<Domain.Entities.Artist>())
@@ -207,7 +207,7 @@ public class ExportService : IExportService
         // Batch fetch all time slots
         var timeSlotIds = engagementDictionary.Values.Select(e => e.TimeSlotId).Distinct().ToList();
         var timeSlotTasks = timeSlotIds.Select(id => _timeSlotRepository.GetByIdAsync(id, ct)).ToArray();
-        var timeSlots = await Task.WhenAll(timeSlotTasks).ConfigureAwait(false);
+        var timeSlots = await Task.WhenAll(timeSlotTasks);
         
         var timeSlotDictionary = new Dictionary<Guid, Domain.Entities.TimeSlot>();
         foreach (var timeSlot in timeSlots.Where(t => t != null))
@@ -233,7 +233,7 @@ public class ExportService : IExportService
             .ToHashSet();
         
         var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
-        var stages = await Task.WhenAll(stageTasks).ConfigureAwait(false);
+        var stages = await Task.WhenAll(stageTasks);
         
         var stageDictionary = new Dictionary<Guid, Domain.Entities.Stage>();
         foreach (var stage in stages.Where(s => s != null))
@@ -288,7 +288,7 @@ public class ExportService : IExportService
         var sb = new StringBuilder();
         sb.AppendLine("TimeSlotId,StageId,StageName,StartTimeUtc,EndTimeUtc,ArtistId,ArtistName");
 
-        var timeSlots = await _timeSlotRepository.GetByEditionAsync(editionId, ct).ConfigureAwait(false);
+        var timeSlots = await _timeSlotRepository.GetByEditionAsync(editionId, ct);
 
         if (timeSlots.Count == 0)
         {
@@ -300,7 +300,7 @@ public class ExportService : IExportService
         // Batch fetch all stages
         var stageIds = orderedTimeSlots.Select(t => t.StageId).Distinct().ToList();
         var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
-        var stages = await Task.WhenAll(stageTasks).ConfigureAwait(false);
+        var stages = await Task.WhenAll(stageTasks);
         
         var stageDictionary = new Dictionary<Guid, Domain.Entities.Stage>();
         foreach (var stage in stages.OfType<Domain.Entities.Stage>())
@@ -311,7 +311,7 @@ public class ExportService : IExportService
         // Batch fetch all engagements
         var timeSlotIds = orderedTimeSlots.Select(t => t.TimeSlotId).ToList();
         var engagementTasks = timeSlotIds.Select(id => _engagementRepository.GetByTimeSlotAsync(id, ct)).ToArray();
-        var engagements = await Task.WhenAll(engagementTasks).ConfigureAwait(false);
+        var engagements = await Task.WhenAll(engagementTasks);
         
         var engagementDictionary = new Dictionary<Guid, Domain.Entities.Engagement>();
         foreach (var engagement in engagements.Where(e => e != null))
@@ -326,7 +326,7 @@ public class ExportService : IExportService
             .ToHashSet();
         
         var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();
-        var artists = await Task.WhenAll(artistTasks).ConfigureAwait(false);
+        var artists = await Task.WhenAll(artistTasks);
         
         var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
         foreach (var artist in artists.Where(a => a != null))

@@ -170,17 +170,17 @@ public class AnalyticsService : IAnalyticsService
             var schedulesTask = _analyticsRepository.GetPersonalScheduleCountAsync(edition.EditionId, ct);
             var savesTask = _analyticsRepository.GetTotalEngagementSavesAsync(edition.EditionId, ct);
 
-            await Task.WhenAll(viewsTask, schedulesTask, savesTask).ConfigureAwait(false);
+            await Task.WhenAll(viewsTask, schedulesTask, savesTask);
 
             return new EditionMetricsSummaryDto(
                 edition.EditionId,
                 edition.Name,
-                await viewsTask.ConfigureAwait(false),
-                await schedulesTask.ConfigureAwait(false),
-                await savesTask.ConfigureAwait(false));
+                await viewsTask,
+                await schedulesTask,
+                await savesTask);
         });
 
-        var editionMetrics = await Task.WhenAll(editionMetricsTasks).ConfigureAwait(false);
+        var editionMetrics = await Task.WhenAll(editionMetricsTasks);
 
         var totalViews = editionMetrics.Sum(m => m.ScheduleViews);
         var totalSchedules = editionMetrics.Sum(m => m.PersonalSchedules);
@@ -210,7 +210,7 @@ public class AnalyticsService : IAnalyticsService
         // Batch fetch all artist details to avoid N+1 queries
         var artistIds = topArtists.Select(a => a.ArtistId).ToList();
         var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();
-        var artists = await Task.WhenAll(artistTasks).ConfigureAwait(false);
+        var artists = await Task.WhenAll(artistTasks);
         
         var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
         foreach (var artist in artists.OfType<Domain.Entities.Artist>())
@@ -249,7 +249,7 @@ public class AnalyticsService : IAnalyticsService
         // Batch fetch all engagements first
         var engagementIds = topEngagements.Select(e => e.EngagementId).ToList();
         var engagementTasks = engagementIds.Select(id => _engagementRepository.GetByIdAsync(id, ct)).ToArray();
-        var engagements = await Task.WhenAll(engagementTasks).ConfigureAwait(false);
+        var engagements = await Task.WhenAll(engagementTasks);
         
         var engagementDictionary = new Dictionary<Guid, Domain.Entities.Engagement>();
         foreach (var engagement in engagements.Where(e => e != null))
@@ -265,7 +265,7 @@ public class AnalyticsService : IAnalyticsService
         // Batch fetch artists
         var artistIds = engagementDictionary.Values.Select(e => e.ArtistId).Distinct().ToList();
         var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();
-        var artists = await Task.WhenAll(artistTasks).ConfigureAwait(false);
+        var artists = await Task.WhenAll(artistTasks);
         
         var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
         foreach (var artist in artists.Where(a => a != null))
@@ -276,7 +276,7 @@ public class AnalyticsService : IAnalyticsService
         // Batch fetch time slots
         var timeSlotIds = engagementDictionary.Values.Select(e => e.TimeSlotId).Distinct().ToList();
         var timeSlotTasks = timeSlotIds.Select(id => _timeSlotRepository.GetByIdAsync(id, ct)).ToArray();
-        var timeSlots = await Task.WhenAll(timeSlotTasks).ConfigureAwait(false);
+        var timeSlots = await Task.WhenAll(timeSlotTasks);
         
         var timeSlotDictionary = new Dictionary<Guid, Domain.Entities.TimeSlot>();
         foreach (var timeSlot in timeSlots.Where(t => t != null))
@@ -291,7 +291,7 @@ public class AnalyticsService : IAnalyticsService
             .ToHashSet();
         
         var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
-        var stages = await Task.WhenAll(stageTasks).ConfigureAwait(false);
+        var stages = await Task.WhenAll(stageTasks);
         
         var stageDictionary = new Dictionary<Guid, Domain.Entities.Stage>();
         foreach (var stage in stages.Where(s => s != null))
@@ -419,7 +419,7 @@ public class AnalyticsService : IAnalyticsService
         // Batch fetch all engagements
         var engagementIds = engagements.Select(e => e.EngagementId).ToList();
         var engagementTasks = engagementIds.Select(id => _engagementRepository.GetByIdAsync(id, ct)).ToArray();
-        var engagementsData = await Task.WhenAll(engagementTasks).ConfigureAwait(false);
+        var engagementsData = await Task.WhenAll(engagementTasks);
         
         var engagementDictionary = new Dictionary<Guid, Domain.Entities.Engagement>();
         foreach (var engagement in engagementsData.OfType<Domain.Entities.Engagement>())
@@ -435,7 +435,7 @@ public class AnalyticsService : IAnalyticsService
         // Batch fetch all artists
         var artistIds = engagementDictionary.Values.Select(e => e.ArtistId).Distinct().ToList();
         var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();
-        var artists = await Task.WhenAll(artistTasks).ConfigureAwait(false);
+        var artists = await Task.WhenAll(artistTasks);
         
         var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
         foreach (var artist in artists.Where(a => a != null))
@@ -446,7 +446,7 @@ public class AnalyticsService : IAnalyticsService
         // Batch fetch all time slots
         var timeSlotIds = engagementDictionary.Values.Select(e => e.TimeSlotId).Distinct().ToList();
         var timeSlotTasks = timeSlotIds.Select(id => _timeSlotRepository.GetByIdAsync(id, ct)).ToArray();
-        var timeSlots = await Task.WhenAll(timeSlotTasks).ConfigureAwait(false);
+        var timeSlots = await Task.WhenAll(timeSlotTasks);
         
         var timeSlotDictionary = new Dictionary<Guid, Domain.Entities.TimeSlot>();
         foreach (var timeSlot in timeSlots.Where(t => t != null))
@@ -461,7 +461,7 @@ public class AnalyticsService : IAnalyticsService
             .ToHashSet();
         
         var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
-        var stages = await Task.WhenAll(stageTasks).ConfigureAwait(false);
+        var stages = await Task.WhenAll(stageTasks);
         
         var stageDictionary = new Dictionary<Guid, Domain.Entities.Stage>();
         foreach (var stage in stages.Where(s => s != null))
