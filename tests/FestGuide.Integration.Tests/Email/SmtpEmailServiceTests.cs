@@ -138,7 +138,7 @@ public class SmtpEmailServiceTests
     }
 
     [Fact]
-    public async Task SendVerificationEmailAsync_WithMissingBaseUrl_UsesPlaceholder()
+    public async Task SendVerificationEmailAsync_WithMissingBaseUrl_ThrowsException()
     {
         // Arrange
         _options.BaseUrl = string.Empty;
@@ -146,18 +146,11 @@ public class SmtpEmailServiceTests
         var displayName = "Test User";
         var verificationToken = "abc123";
 
-        // Act
-        await _sut.SendVerificationEmailAsync(email, displayName, verificationToken);
+        // Act & Assert - Should throw InvalidOperationException
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => _sut.SendVerificationEmailAsync(email, displayName, verificationToken));
 
-        // Assert - Should log warning about missing BaseUrl
-        _mockLogger.Verify(
-            x => x.Log(
-                LogLevel.Warning,
-                It.IsAny<EventId>(),
-                It.Is<It.IsAnyType>((v, t) => v.ToString()!.Contains("BaseUrl is not configured")),
-                It.IsAny<Exception>(),
-                It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
-            Times.Once);
+        Assert.Contains("BaseUrl is not configured", exception.Message);
     }
 
     [Fact]

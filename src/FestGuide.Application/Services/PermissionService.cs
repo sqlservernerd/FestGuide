@@ -135,6 +135,22 @@ public class PermissionService : IPermissionService
         }
 
         var now = _dateTimeProvider.UtcNow;
+        
+        // Get festival and inviter details for the email
+        var festival = await _festivalRepository.GetByIdAsync(festivalId, ct);
+        var inviter = await _userRepository.GetByIdAsync(invitingUserId, ct);
+
+        // Send invitation email first - if this fails, no permission is created
+        // This ensures the user is notified before we grant access
+        await _emailService.SendInvitationEmailAsync(
+            request.Email,
+            festival?.Name ?? "Unknown Festival",
+            inviter?.DisplayName ?? inviter?.Email ?? "A team member",
+            request.Role.ToString(),
+            isNewUser,
+            ct);
+
+        // Create the permission after successful email sending
         var permission = new FestivalPermission
         {
             FestivalPermissionId = Guid.NewGuid(),
@@ -156,30 +172,6 @@ public class PermissionService : IPermissionService
         _logger.LogInformation(
             "User {InvitingUserId} invited {Email} to festival {FestivalId} with role {Role}",
             invitingUserId, request.Email, festivalId, request.Role);
-
-        // Get festival and inviter details for the email
-        var festival = await _festivalRepository.GetByIdAsync(festivalId, ct);
-        var inviter = await _userRepository.GetByIdAsync(invitingUserId, ct);
-
-        // Send invitation email
-        // Note: Email sending is best-effort. If email fails, the invitation is still created successfully
-        // and the user is granted permissions. The user can still access the festival if they know about it.
-        // Consider tracking email delivery status separately if notification reliability is critical.
-        try
-        {
-            await _emailService.SendInvitationEmailAsync(
-                request.Email,
-                festival?.Name ?? "Unknown Festival",
-                inviter?.DisplayName ?? inviter?.Email ?? "A team member",
-                request.Role.ToString(),
-                isNewUser,
-                ct);
-        }
-        catch (Exception ex)
-        {
-            // Log but don't fail the invitation - the permission has been granted regardless
-            _logger.LogWarning(ex, "Failed to send invitation email to {Email}", request.Email);
-        }
 
         var message = isNewUser
             ? $"Invitation sent to {request.Email}. They will need to create an account to accept."

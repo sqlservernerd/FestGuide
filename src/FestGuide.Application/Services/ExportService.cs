@@ -157,12 +157,9 @@ public class ExportService : IExportService
         var engagements = await Task.WhenAll(engagementTasks).ConfigureAwait(false);
         
         var engagementDictionary = new Dictionary<Guid, Domain.Entities.Engagement>();
-        foreach (var engagement in engagements)
+        foreach (var engagement in engagements.Where(e => e != null))
         {
-            if (engagement != null)
-            {
-                engagementDictionary[engagement.EngagementId] = engagement;
-            }
+            engagementDictionary[engagement!.EngagementId] = engagement;
         }
 
         if (engagementDictionary.Count == 0)
@@ -192,12 +189,9 @@ public class ExportService : IExportService
         var timeSlots = await Task.WhenAll(timeSlotTasks).ConfigureAwait(false);
         
         var timeSlotDictionary = new Dictionary<Guid, Domain.Entities.TimeSlot>();
-        foreach (var timeSlot in timeSlots)
+        foreach (var timeSlot in timeSlots.Where(t => t != null))
         {
-            if (timeSlot != null)
-            {
-                timeSlotDictionary[timeSlot.TimeSlotId] = timeSlot;
-            }
+            timeSlotDictionary[timeSlot!.TimeSlotId] = timeSlot;
         }
 
         // Batch fetch all stages
@@ -210,12 +204,9 @@ public class ExportService : IExportService
         var stages = await Task.WhenAll(stageTasks).ConfigureAwait(false);
         
         var stageDictionary = new Dictionary<Guid, Domain.Entities.Stage>();
-        foreach (var stage in stages)
+        foreach (var stage in stages.Where(s => s != null))
         {
-            if (stage != null)
-            {
-                stageDictionary[stage.StageId] = stage;
-            }
+            stageDictionary[stage!.StageId] = stage;
         }
 
         // Build CSV lines
@@ -283,12 +274,9 @@ public class ExportService : IExportService
         var engagements = await Task.WhenAll(engagementTasks).ConfigureAwait(false);
         
         var engagementDictionary = new Dictionary<Guid, Domain.Entities.Engagement>();
-        foreach (var engagement in engagements)
+        foreach (var engagement in engagements.Where(e => e != null))
         {
-            if (engagement != null)
-            {
-                engagementDictionary[engagement.TimeSlotId] = engagement;
-            }
+            engagementDictionary[engagement!.TimeSlotId] = engagement;
         }
 
         // Batch fetch all artists
@@ -301,12 +289,9 @@ public class ExportService : IExportService
         var artists = await Task.WhenAll(artistTasks).ConfigureAwait(false);
         
         var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
-        foreach (var artist in artists)
+        foreach (var artist in artists.Where(a => a != null))
         {
-            if (artist != null)
-            {
-                artistDictionary[artist.ArtistId] = artist;
-            }
+            artistDictionary[artist!.ArtistId] = artist;
         }
 
         // Build CSV lines

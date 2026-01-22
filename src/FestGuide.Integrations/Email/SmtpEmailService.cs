@@ -47,6 +47,11 @@ public class SmtpEmailService : IEmailService
                 missingSettings.Add("Password");
             }
 
+            if (string.IsNullOrWhiteSpace(_options.BaseUrl))
+            {
+                missingSettings.Add("BaseUrl");
+            }
+
             if (missingSettings.Count > 0)
             {
                 _logger.LogWarning(
@@ -71,7 +76,7 @@ public class SmtpEmailService : IEmailService
                <p>This link will expire in 24 hours.</p>
                <p>If you didn't create a FestGuide account, you can ignore this email.</p>");
 
-        await SendEmailAsync(email, subject, htmlBody, null, ct).ConfigureAwait(false);
+        await SendEmailAsync(email, subject, htmlBody, null, ct);
     }
 
     /// <inheritdoc />
@@ -88,7 +93,7 @@ public class SmtpEmailService : IEmailService
                <p>This link will expire in 1 hour.</p>
                <p>If you didn't request a password reset, you can ignore this email.</p>");
 
-        await SendEmailAsync(email, subject, htmlBody, null, ct).ConfigureAwait(false);
+        await SendEmailAsync(email, subject, htmlBody, null, ct);
     }
 
     /// <inheritdoc />
@@ -102,7 +107,7 @@ public class SmtpEmailService : IEmailService
                <p>Your password has been successfully changed.</p>
                <p>If you didn't make this change, please contact support immediately.</p>");
 
-        await SendEmailAsync(email, subject, htmlBody, null, ct).ConfigureAwait(false);
+        await SendEmailAsync(email, subject, htmlBody, null, ct);
     }
 
     /// <inheritdoc />
@@ -130,7 +135,7 @@ public class SmtpEmailService : IEmailService
                    <li>Track attendee engagement</li>
                </ul>");
 
-        await SendEmailAsync(toAddress, subject, htmlBody, null, ct).ConfigureAwait(false);
+        await SendEmailAsync(toAddress, subject, htmlBody, null, ct);
     }
 
     private async Task SendEmailAsync(string toAddress, string subject, string htmlBody, string? plainTextBody, CancellationToken ct)
@@ -169,15 +174,15 @@ public class SmtpEmailService : IEmailService
 
             using var client = new SmtpClient();
             
-            await client.ConnectAsync(_options.Host, _options.Port, _options.UseSsl, ct).ConfigureAwait(false);
+            await client.ConnectAsync(_options.Host, _options.Port, _options.UseSsl, ct);
             
             if (!string.IsNullOrWhiteSpace(_options.Username) && !string.IsNullOrWhiteSpace(_options.Password))
             {
-                await client.AuthenticateAsync(_options.Username, _options.Password, ct).ConfigureAwait(false);
+                await client.AuthenticateAsync(_options.Username, _options.Password, ct);
             }
 
-            await client.SendAsync(message, ct).ConfigureAwait(false);
-            await client.DisconnectAsync(true, ct).ConfigureAwait(false);
+            await client.SendAsync(message, ct);
+            await client.DisconnectAsync(true, ct);
 
             _logger.LogInformation("Email sent successfully to {ToAddress} with subject {Subject}", toAddress, subject);
         }
@@ -225,8 +230,8 @@ public class SmtpEmailService : IEmailService
         
         if (string.IsNullOrWhiteSpace(baseUrl))
         {
-            _logger.LogWarning("BaseUrl is not configured in SmtpOptions. Using placeholder URL.");
-            return "#";
+            throw new InvalidOperationException(
+                "BaseUrl is not configured in SmtpOptions. Email sending cannot proceed without a valid base URL for links.");
         }
 
         return $"{baseUrl}/{path.TrimStart('/')}";
