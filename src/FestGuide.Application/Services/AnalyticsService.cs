@@ -213,9 +213,9 @@ public class AnalyticsService : IAnalyticsService
         var artists = await Task.WhenAll(artistTasks).ConfigureAwait(false);
         
         var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
-        foreach (var artist in artists.Where(a => a != null))
+        foreach (var artist in artists.OfType<Domain.Entities.Artist>())
         {
-            artistDictionary[artist!.ArtistId] = artist;
+            artistDictionary[artist.ArtistId] = artist;
         }
 
         var result = new List<ArtistAnalyticsDto>();

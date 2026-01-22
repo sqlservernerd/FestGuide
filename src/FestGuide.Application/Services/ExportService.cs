@@ -392,18 +392,20 @@ public class ExportService : IExportService
             return "export";
         }
 
-        // Replace invalid filename characters with underscores
+        // Use Span<char> and string.Create for efficient character replacement
         var invalidChars = Path.GetInvalidFileNameChars();
-        var sanitized = name;
-        
-        foreach (var c in invalidChars)
+        var invalidCharSet = new HashSet<char>(invalidChars) { ' ' }; // Include space
+
+        return string.Create(name.Length, (name, invalidCharSet), (span, state) =>
         {
-            sanitized = sanitized.Replace(c, '_');
-        }
-
-        // Also replace spaces with underscores for consistency
-        sanitized = sanitized.Replace(' ', '_');
-
-        return sanitized;
+            state.name.AsSpan().CopyTo(span);
+            for (int i = 0; i < span.Length; i++)
+            {
+                if (state.invalidCharSet.Contains(span[i]))
+                {
+                    span[i] = '_';
+                }
+            }
+        });
     }
 }
