@@ -357,6 +357,7 @@ public class AnalyticsService : IAnalyticsService
     /// <inheritdoc />
     public async Task<IReadOnlyList<TimelineDataPointDto>> GetEventTimelineAsync(Guid editionId, Guid organizerId, TimelineRequest request, CancellationToken ct = default)
     {
+        ArgumentNullException.ThrowIfNull(request);
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
 
