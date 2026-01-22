@@ -161,7 +161,7 @@ public class PermissionService : IPermissionService
 
         // Send invitation email after permission is created
         // If email sending fails, the permission still exists but the user won't be notified
-        // The email service will throw EmailDeliveryException on failure, which will be propagated
+        // The failure will propagate to the caller for appropriate handling
         await _emailService.SendInvitationEmailAsync(
             request.Email,
             festival?.Name ?? "Unknown Festival",
