@@ -290,7 +290,13 @@ var count = festivals.Count;    // ✓ Materialized
 var first = festivals.First();  // ✓ Uses same collection
 
 // ✓ Good: Explicit filtering in foreach loops
-// Always use .Where() to filter explicitly rather than if statements inside the loop
+// Use .OfType<T>() to filter out nulls and cast to non-nullable type
+foreach (var artist in artists.OfType<Artist>())
+{
+    artistDictionary[artist.ArtistId] = artist;
+}
+
+// ✓ Also acceptable: .Where() with null-forgiving operator (when type is already non-nullable)
 foreach (var artist in artists.Where(a => a != null))
 {
     artistDictionary[artist!.ArtistId] = artist;

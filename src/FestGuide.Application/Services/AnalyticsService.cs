@@ -425,9 +425,9 @@ public class AnalyticsService : IAnalyticsService
         var engagementsData = await Task.WhenAll(engagementTasks).ConfigureAwait(false);
         
         var engagementDictionary = new Dictionary<Guid, Domain.Entities.Engagement>();
-        foreach (var engagement in engagementsData.Where(e => e != null))
+        foreach (var engagement in engagementsData.OfType<Domain.Entities.Engagement>())
         {
-            engagementDictionary[engagement!.EngagementId] = engagement;
+            engagementDictionary[engagement.EngagementId] = engagement;
         }
 
         if (engagementDictionary.Count == 0)

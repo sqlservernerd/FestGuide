@@ -175,9 +175,9 @@ public class ExportService : IExportService
         var artists = await Task.WhenAll(artistTasks).ConfigureAwait(false);
         
         var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
-        foreach (var artist in artists.Where(a => a != null))
+        foreach (var artist in artists.OfType<Domain.Entities.Artist>())
         {
-            artistDictionary[artist!.ArtistId] = artist;
+            artistDictionary[artist.ArtistId] = artist;
         }
 
         // Batch fetch all time slots
@@ -257,9 +257,9 @@ public class ExportService : IExportService
         var stages = await Task.WhenAll(stageTasks).ConfigureAwait(false);
         
         var stageDictionary = new Dictionary<Guid, Domain.Entities.Stage>();
-        foreach (var stage in stages.Where(s => s != null))
+        foreach (var stage in stages.OfType<Domain.Entities.Stage>())
         {
-            stageDictionary[stage!.StageId] = stage;
+            stageDictionary[stage.StageId] = stage;
         }
 
         // Batch fetch all engagements
