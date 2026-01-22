@@ -191,9 +191,6 @@ public class PermissionService : IPermissionService
             message);
     }
 
-
-
-
     /// <inheritdoc />
     public async Task<PermissionDto> UpdateAsync(Guid permissionId, Guid userId, UpdatePermissionRequest request, CancellationToken ct = default)
     {

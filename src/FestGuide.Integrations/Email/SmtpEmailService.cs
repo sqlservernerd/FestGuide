@@ -115,7 +115,7 @@ public class SmtpEmailService : IEmailService
                 ? _options.Username
                 : _options.FromAddress;
 
-            var message = new MailMessage
+            using var message = new MailMessage
             {
                 From = new MailAddress(fromAddress, _options.FromName),
                 Subject = subject,

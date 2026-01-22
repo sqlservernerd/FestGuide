@@ -184,7 +184,6 @@ public class ExportService : IExportService
         return sb.ToString();
     }
 
-
     private async Task<string> BuildArtistsCsvAsync(Guid editionId, CancellationToken ct)
     {
         var sb = new StringBuilder();

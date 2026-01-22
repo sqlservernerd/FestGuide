@@ -68,7 +68,6 @@ public class AnalyticsController : ControllerBase
         }
     }
 
-
     /// <summary>
     /// Gets festival-wide summary.
     /// </summary>
