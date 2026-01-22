@@ -80,7 +80,7 @@ public class ExportService : IExportService
             sb.AppendLine(analyticsCsv);
         }
 
-        var fileName = $"{SanitizeFilename(edition.Name)}_export.csv";
+        var fileName = $"{SanitizeFilename(edition.Name, "_export")}.csv";
         var data = Encoding.UTF8.GetBytes(sb.ToString());
 
         _logger.LogInformation("Export generated for edition {EditionId} by user {OrganizerId}", editionId, organizerId);
@@ -97,7 +97,7 @@ public class ExportService : IExportService
         await EnsureOrganizerAccessAsync(edition.FestivalId, organizerId, ct);
 
         var csv = await BuildScheduleCsvAsync(editionId, ct);
-        var fileName = $"{SanitizeFilename(edition.Name)}_schedule.csv";
+        var fileName = $"{SanitizeFilename(edition.Name, "_schedule")}.csv";
         var data = Encoding.UTF8.GetBytes(csv);
 
         return new ExportResultDto(fileName, "text/csv", data);
@@ -112,7 +112,7 @@ public class ExportService : IExportService
         await EnsureOrganizerAccessAsync(edition.FestivalId, organizerId, ct);
 
         var csv = await BuildArtistsCsvAsync(editionId, ct);
-        var fileName = $"{SanitizeFilename(edition.Name)}_artists.csv";
+        var fileName = $"{SanitizeFilename(edition.Name, "_artists")}.csv";
         var data = Encoding.UTF8.GetBytes(csv);
 
         return new ExportResultDto(fileName, "text/csv", data);
@@ -127,7 +127,7 @@ public class ExportService : IExportService
         await EnsureOrganizerAccessAsync(edition.FestivalId, organizerId, ct);
 
         var csv = await BuildAnalyticsCsvAsync(editionId, fromUtc, toUtc, ct);
-        var fileName = $"{SanitizeFilename(edition.Name)}_analytics.csv";
+        var fileName = $"{SanitizeFilename(edition.Name, "_analytics")}.csv";
         var data = Encoding.UTF8.GetBytes(csv);
 
         return new ExportResultDto(fileName, "text/csv", data);
@@ -148,7 +148,7 @@ public class ExportService : IExportService
 
         if (topEngagements.Count == 0)
         {
-            var emptyFileName = $"{SanitizeFilename(edition.Name)}_attendee_saves.csv";
+            var emptyFileName = $"{SanitizeFilename(edition.Name, "_attendee_saves")}.csv";
             var emptyData = Encoding.UTF8.GetBytes(sb.ToString());
             return new ExportResultDto(emptyFileName, "text/csv", emptyData);
         }
@@ -177,7 +177,7 @@ public class ExportService : IExportService
 
         if (engagementDictionary.Count == 0)
         {
-            var emptyFileName = $"{SanitizeFilename(edition.Name)}_attendee_saves.csv";
+            var emptyFileName = $"{SanitizeFilename(edition.Name, "_attendee_saves")}.csv";
             var emptyData = Encoding.UTF8.GetBytes(sb.ToString());
             return new ExportResultDto(emptyFileName, "text/csv", emptyData);
         }
@@ -277,7 +277,7 @@ public class ExportService : IExportService
             sb.AppendLine(line);
         }
 
-        var fileName = $"{SanitizeFilename(edition.Name)}_attendee_saves.csv";
+        var fileName = $"{SanitizeFilename(edition.Name, "_attendee_saves")}.csv";
         var data = Encoding.UTF8.GetBytes(sb.ToString());
 
         return new ExportResultDto(fileName, "text/csv", data);
@@ -427,20 +427,16 @@ public class ExportService : IExportService
     }
 
     /// <summary>
-    /// Sanitizes a string for use in a filename by replacing invalid characters.
-    /// </summary>
-    /// <param name="name">The name to sanitize.</param>
-    /// <returns>A sanitized filename-safe string.</returns>
-    /// <summary>
     /// Sanitizes a string for use in a filename by replacing invalid characters and appending a unique suffix.
     /// </summary>
     /// <param name="name">The string to sanitize.</param>
-    /// <returns>A safe filename with invalid characters replaced and a unique suffix appended.</returns>
-    private string SanitizeFilename(string name)
+    /// <param name="suffix">Optional suffix to append (e.g., "_export", "_schedule").</param>
+    /// <returns>A safe filename with invalid characters replaced and a unique timestamp suffix appended.</returns>
+    private string SanitizeFilename(string name, string suffix = "")
     {
         if (string.IsNullOrWhiteSpace(name))
         {
-            return $"export_{_dateTimeProvider.UtcNow:yyyyMMddHHmmss}";
+            return $"export{suffix}_{_dateTimeProvider.UtcNow:yyyyMMddHHmmss}";
         }
 
         // Use Span<char> and string.Create for efficient character replacement
@@ -456,7 +452,7 @@ public class ExportService : IExportService
             }
         });
 
-        // Append timestamp to prevent filename collisions
-        return $"{sanitized}_{_dateTimeProvider.UtcNow:yyyyMMddHHmmss}";
+        // Append suffix and timestamp to prevent filename collisions
+        return $"{sanitized}{suffix}_{_dateTimeProvider.UtcNow:yyyyMMddHHmmss}";
     }
 }
