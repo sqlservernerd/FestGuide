@@ -17,7 +17,7 @@ public interface IJwtTokenService
     /// <summary>
     /// Generates a new access token for the specified user.
     /// </summary>
-    string GenerateAccessToken(Guid userId, string email, string userType);
+    string GenerateAccessToken(long userId, string email, string userType);
 
     /// <summary>
     /// Generates a new refresh token (cryptographically random).
@@ -50,7 +50,7 @@ public interface IJwtTokenService
 /// </summary>
 public record TokenValidationResult(
     bool IsValid,
-    Guid? UserId = null,
+    long? UserId = null,
     string? Email = null,
     string? UserType = null,
     string? Error = null);

@@ -46,9 +46,9 @@ public class OrganizerVenuesController : ControllerBase
     /// <summary>
     /// Gets all venues for a festival.
     /// </summary>
-    [HttpGet("festivals/{festivalId:guid}/venues")]
+    [HttpGet("festivals/{festivalId:long}/venues")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<VenueSummaryDto>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetVenues(Guid festivalId, CancellationToken ct)
+    public async Task<IActionResult> GetVenues(long festivalId, CancellationToken ct)
     {
         var venues = await _venueService.GetByFestivalAsync(festivalId, ct);
         return Ok(ApiResponse<IReadOnlyList<VenueSummaryDto>>.Success(venues));
@@ -57,9 +57,9 @@ public class OrganizerVenuesController : ControllerBase
     /// <summary>
     /// Gets all venues for an edition.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/venues")]
+    [HttpGet("editions/{editionId:long}/venues")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<VenueSummaryDto>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetVenuesByEdition(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> GetVenuesByEdition(long editionId, CancellationToken ct)
     {
         var venues = await _venueService.GetByEditionAsync(editionId, ct);
         return Ok(ApiResponse<IReadOnlyList<VenueSummaryDto>>.Success(venues));
@@ -68,10 +68,10 @@ public class OrganizerVenuesController : ControllerBase
     /// <summary>
     /// Gets a venue by ID.
     /// </summary>
-    [HttpGet("venues/{venueId:guid}")]
+    [HttpGet("venues/{venueId:long}")]
     [ProducesResponseType(typeof(ApiResponse<VenueDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetVenue(Guid venueId, CancellationToken ct)
+    public async Task<IActionResult> GetVenue(long venueId, CancellationToken ct)
     {
         try
         {
@@ -87,12 +87,12 @@ public class OrganizerVenuesController : ControllerBase
     /// <summary>
     /// Creates a new venue for a festival.
     /// </summary>
-    [HttpPost("festivals/{festivalId:guid}/venues")]
+    [HttpPost("festivals/{festivalId:long}/venues")]
     [ProducesResponseType(typeof(ApiResponse<VenueDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> CreateVenue(Guid festivalId, [FromBody] CreateVenueRequest request, CancellationToken ct)
+    public async Task<IActionResult> CreateVenue(long festivalId, [FromBody] CreateVenueRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -121,12 +121,12 @@ public class OrganizerVenuesController : ControllerBase
     /// <summary>
     /// Updates a venue.
     /// </summary>
-    [HttpPut("venues/{venueId:guid}")]
+    [HttpPut("venues/{venueId:long}")]
     [ProducesResponseType(typeof(ApiResponse<VenueDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateVenue(Guid venueId, [FromBody] UpdateVenueRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateVenue(long venueId, [FromBody] UpdateVenueRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -155,11 +155,11 @@ public class OrganizerVenuesController : ControllerBase
     /// <summary>
     /// Deletes a venue.
     /// </summary>
-    [HttpDelete("venues/{venueId:guid}")]
+    [HttpDelete("venues/{venueId:long}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteVenue(Guid venueId, CancellationToken ct)
+    public async Task<IActionResult> DeleteVenue(long venueId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -182,11 +182,11 @@ public class OrganizerVenuesController : ControllerBase
     /// <summary>
     /// Associates a venue with an edition.
     /// </summary>
-    [HttpPost("editions/{editionId:guid}/venues/{venueId:guid}")]
+    [HttpPost("editions/{editionId:long}/venues/{venueId:long}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> AddVenueToEdition(Guid editionId, Guid venueId, CancellationToken ct)
+    public async Task<IActionResult> AddVenueToEdition(long editionId, long venueId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -213,11 +213,11 @@ public class OrganizerVenuesController : ControllerBase
     /// <summary>
     /// Removes a venue association from an edition.
     /// </summary>
-    [HttpDelete("editions/{editionId:guid}/venues/{venueId:guid}")]
+    [HttpDelete("editions/{editionId:long}/venues/{venueId:long}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> RemoveVenueFromEdition(Guid editionId, Guid venueId, CancellationToken ct)
+    public async Task<IActionResult> RemoveVenueFromEdition(long editionId, long venueId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -248,9 +248,9 @@ public class OrganizerVenuesController : ControllerBase
     /// <summary>
     /// Gets all stages for a venue.
     /// </summary>
-    [HttpGet("venues/{venueId:guid}/stages")]
+    [HttpGet("venues/{venueId:long}/stages")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<StageSummaryDto>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetStages(Guid venueId, CancellationToken ct)
+    public async Task<IActionResult> GetStages(long venueId, CancellationToken ct)
     {
         var stages = await _venueService.GetStagesByVenueAsync(venueId, ct);
         return Ok(ApiResponse<IReadOnlyList<StageSummaryDto>>.Success(stages));
@@ -259,10 +259,10 @@ public class OrganizerVenuesController : ControllerBase
     /// <summary>
     /// Gets a stage by ID.
     /// </summary>
-    [HttpGet("stages/{stageId:guid}")]
+    [HttpGet("stages/{stageId:long}")]
     [ProducesResponseType(typeof(ApiResponse<StageDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetStage(Guid stageId, CancellationToken ct)
+    public async Task<IActionResult> GetStage(long stageId, CancellationToken ct)
     {
         try
         {
@@ -278,12 +278,12 @@ public class OrganizerVenuesController : ControllerBase
     /// <summary>
     /// Creates a new stage for a venue.
     /// </summary>
-    [HttpPost("venues/{venueId:guid}/stages")]
+    [HttpPost("venues/{venueId:long}/stages")]
     [ProducesResponseType(typeof(ApiResponse<StageDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> CreateStage(Guid venueId, [FromBody] CreateStageRequest request, CancellationToken ct)
+    public async Task<IActionResult> CreateStage(long venueId, [FromBody] CreateStageRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -312,12 +312,12 @@ public class OrganizerVenuesController : ControllerBase
     /// <summary>
     /// Updates a stage.
     /// </summary>
-    [HttpPut("stages/{stageId:guid}")]
+    [HttpPut("stages/{stageId:long}")]
     [ProducesResponseType(typeof(ApiResponse<StageDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateStage(Guid stageId, [FromBody] UpdateStageRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateStage(long stageId, [FromBody] UpdateStageRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -346,11 +346,11 @@ public class OrganizerVenuesController : ControllerBase
     /// <summary>
     /// Deletes a stage.
     /// </summary>
-    [HttpDelete("stages/{stageId:guid}")]
+    [HttpDelete("stages/{stageId:long}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteStage(Guid stageId, CancellationToken ct)
+    public async Task<IActionResult> DeleteStage(long stageId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -372,10 +372,10 @@ public class OrganizerVenuesController : ControllerBase
 
     #endregion
 
-    private Guid? GetCurrentUserId()
+    private long? GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+        return long.TryParse(userIdClaim, out var userId) ? userId : null;
     }
 
     private static ApiErrorResponse CreateError(string code, string message) =>

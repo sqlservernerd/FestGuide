@@ -5,11 +5,11 @@ namespace FestGuide.Domain.Exceptions;
 /// </summary>
 public class EditionNotFoundException : DomainException
 {
-    public EditionNotFoundException(Guid editionId)
+    public EditionNotFoundException(long editionId)
         : base($"Edition with ID '{editionId}' was not found.")
     {
         EditionId = editionId;
     }
 
-    public Guid EditionId { get; }
+    public long EditionId { get; }
 }

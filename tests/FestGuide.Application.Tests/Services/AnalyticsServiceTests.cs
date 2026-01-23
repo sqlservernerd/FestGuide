@@ -60,9 +60,9 @@ public class AnalyticsServiceTests
     public async Task TrackEventAsync_WithValidRequest_RecordsEvent()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var userId = 1L;
+        var editionId = 2L;
+        var festivalId = 3L;
         var request = new TrackEventRequest(
             EventType: "schedule_view",
             EditionId: editionId,
@@ -77,7 +77,7 @@ public class AnalyticsServiceTests
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(edition);
         _mockAnalyticsRepo.Setup(r => r.RecordEventAsync(It.IsAny<AnalyticsEvent>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(101L);
 
         // Act
         await _sut.TrackEventAsync(userId, request);
@@ -97,15 +97,15 @@ public class AnalyticsServiceTests
     public async Task TrackScheduleViewAsync_RecordsScheduleViewEvent()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var userId = 4L;
+        var editionId = 5L;
+        var festivalId = 6L;
         var edition = new FestivalEdition { EditionId = editionId, FestivalId = festivalId };
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(edition);
         _mockAnalyticsRepo.Setup(r => r.RecordEventAsync(It.IsAny<AnalyticsEvent>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(102L);
 
         // Act
         await _sut.TrackScheduleViewAsync(userId, editionId, "android", "session-456");
@@ -120,16 +120,16 @@ public class AnalyticsServiceTests
     public async Task TrackEngagementSaveAsync_RecordsEngagementSaveEvent()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
-        var engagementId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var userId = 7L;
+        var editionId = 8L;
+        var engagementId = 9L;
+        var festivalId = 10L;
         var edition = new FestivalEdition { EditionId = editionId, FestivalId = festivalId };
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(edition);
         _mockAnalyticsRepo.Setup(r => r.RecordEventAsync(It.IsAny<AnalyticsEvent>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(103L);
 
         // Act
         await _sut.TrackEngagementSaveAsync(userId, editionId, engagementId);
@@ -151,9 +151,9 @@ public class AnalyticsServiceTests
     public async Task GetEditionDashboardAsync_WithValidPermission_ReturnsDashboard()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 11L;
+        var festivalId = 12L;
+        var organizerId = 13L;
 
         var edition = new FestivalEdition { EditionId = editionId, FestivalId = festivalId, Name = "2026 Edition" };
         var festival = new Festival { FestivalId = festivalId, Name = "Summer Festival" };
@@ -177,9 +177,9 @@ public class AnalyticsServiceTests
     public async Task GetEditionDashboardAsync_WithNoPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 14L;
+        var festivalId = 15L;
+        var organizerId = 16L;
 
         var edition = new FestivalEdition { EditionId = editionId, FestivalId = festivalId };
 
@@ -199,8 +199,8 @@ public class AnalyticsServiceTests
     public async Task GetEditionDashboardAsync_WithNonExistentEdition_ThrowsEditionNotFoundException()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 17L;
+        var organizerId = 18L;
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((FestivalEdition?)null);
@@ -216,9 +216,9 @@ public class AnalyticsServiceTests
     public async Task GetEditionDashboardAsync_WithAnalyticsData_ReturnsPopulatedDashboard()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 19L;
+        var festivalId = 20L;
+        var organizerId = 21L;
 
         var edition = new FestivalEdition { EditionId = editionId, FestivalId = festivalId, Name = "2026" };
         var festival = new Festival { FestivalId = festivalId, Name = "Festival" };
@@ -236,9 +236,9 @@ public class AnalyticsServiceTests
         _mockAnalyticsRepo.Setup(r => r.GetTotalEngagementSavesAsync(editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(800);
         _mockAnalyticsRepo.Setup(r => r.GetTopArtistsAsync(editionId, 5, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<(Guid, string, int)>());
+            .ReturnsAsync(new List<(long, string, int)>());
         _mockAnalyticsRepo.Setup(r => r.GetTopSavedEngagementsAsync(editionId, 5, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<(Guid, int)>());
+            .ReturnsAsync(new List<(long, int)>());
         _mockAnalyticsRepo.Setup(r => r.GetPlatformDistributionAsync(editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<(string, int)> { ("ios", 300), ("android", 200) });
 
@@ -261,8 +261,8 @@ public class AnalyticsServiceTests
     public async Task GetFestivalSummaryAsync_WithValidPermission_ReturnsSummary()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var festivalId = 22L;
+        var organizerId = 23L;
         var festival = new Festival { FestivalId = festivalId, Name = "Test Festival" };
 
         _mockAuthService.Setup(a => a.CanViewAnalyticsAsync(organizerId, festivalId, It.IsAny<CancellationToken>()))
@@ -285,10 +285,10 @@ public class AnalyticsServiceTests
     public async Task GetFestivalSummaryAsync_WithEditions_AggregatesMetrics()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
-        var edition1Id = Guid.NewGuid();
-        var edition2Id = Guid.NewGuid();
+        var festivalId = 24L;
+        var organizerId = 25L;
+        var edition1Id = 26L;
+        var edition2Id = 27L;
 
         var festival = new Festival { FestivalId = festivalId, Name = "Festival" };
         var editions = new List<FestivalEdition>
@@ -308,9 +308,9 @@ public class AnalyticsServiceTests
             .ReturnsAsync(100);
         _mockAnalyticsRepo.Setup(r => r.GetScheduleViewCountAsync(edition2Id, null, null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(200);
-        _mockAnalyticsRepo.Setup(r => r.GetPersonalScheduleCountAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+        _mockAnalyticsRepo.Setup(r => r.GetPersonalScheduleCountAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(50);
-        _mockAnalyticsRepo.Setup(r => r.GetTotalEngagementSavesAsync(It.IsAny<Guid>(), It.IsAny<CancellationToken>()))
+        _mockAnalyticsRepo.Setup(r => r.GetTotalEngagementSavesAsync(It.IsAny<long>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(25);
 
         // Act
@@ -330,10 +330,10 @@ public class AnalyticsServiceTests
     public async Task GetTopArtistsAsync_WithValidPermission_ReturnsTopArtists()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
-        var artistId = Guid.NewGuid();
+        var editionId = 28L;
+        var festivalId = 29L;
+        var organizerId = 30L;
+        var artistId = 31L;
 
         var edition = new FestivalEdition { EditionId = editionId, FestivalId = festivalId };
         var artist = new Artist { ArtistId = artistId, Name = "Top Artist", ImageUrl = "http://img.com/artist.jpg" };
@@ -343,7 +343,7 @@ public class AnalyticsServiceTests
         _mockAuthService.Setup(a => a.CanViewAnalyticsAsync(organizerId, festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         _mockAnalyticsRepo.Setup(r => r.GetTopArtistsAsync(editionId, 10, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<(Guid, string, int)> { (artistId, "Top Artist", 150) });
+            .ReturnsAsync(new List<(long, string, int)> { (1L, "Top Artist", 150) });
         _mockArtistRepo.Setup(r => r.GetByIdAsync(artistId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(artist);
 
@@ -365,9 +365,9 @@ public class AnalyticsServiceTests
     public async Task GetPlatformDistributionAsync_CalculatesPercentages()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 32L;
+        var festivalId = 33L;
+        var organizerId = 34L;
 
         var edition = new FestivalEdition { EditionId = editionId, FestivalId = festivalId };
 
@@ -399,7 +399,7 @@ public class AnalyticsServiceTests
             .ReturnsAsync(festival);
     }
 
-    private void SetupEmptyAnalyticsData(Guid editionId)
+    private void SetupEmptyAnalyticsData(long editionId)
     {
         _mockAnalyticsRepo.Setup(r => r.GetScheduleViewCountAsync(editionId, null, null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(0);
@@ -410,9 +410,9 @@ public class AnalyticsServiceTests
         _mockAnalyticsRepo.Setup(r => r.GetTotalEngagementSavesAsync(editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(0);
         _mockAnalyticsRepo.Setup(r => r.GetTopArtistsAsync(editionId, 5, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<(Guid, string, int)>());
+            .ReturnsAsync(new List<(long, string, int)>());
         _mockAnalyticsRepo.Setup(r => r.GetTopSavedEngagementsAsync(editionId, 5, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<(Guid, int)>());
+            .ReturnsAsync(new List<(long, int)>());
         _mockAnalyticsRepo.Setup(r => r.GetPlatformDistributionAsync(editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<(string, int)>());
     }

@@ -52,7 +52,7 @@ public class VenueServiceTests
     public async Task GetByIdAsync_WithValidId_ReturnsVenue()
     {
         // Arrange
-        var venueId = Guid.NewGuid();
+        var venueId = 1L;
         var venue = CreateTestVenue(venueId);
 
         _mockVenueRepo.Setup(r => r.GetByIdAsync(venueId, It.IsAny<CancellationToken>()))
@@ -71,7 +71,7 @@ public class VenueServiceTests
     public async Task GetByIdAsync_WithInvalidId_ThrowsVenueNotFoundException()
     {
         // Arrange
-        var venueId = Guid.NewGuid();
+        var venueId = 2L;
 
         _mockVenueRepo.Setup(r => r.GetByIdAsync(venueId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Venue?)null);
@@ -91,7 +91,7 @@ public class VenueServiceTests
     public async Task GetByFestivalAsync_WithValidFestivalId_ReturnsVenues()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
+        var festivalId = 3L;
         var venues = new List<Venue>
         {
             CreateTestVenue(festivalId: festivalId, name: "Main Grounds"),
@@ -116,8 +116,8 @@ public class VenueServiceTests
     public async Task CreateAsync_WithValidRequest_CreatesVenue()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 4L;
+        var userId = 5L;
         var request = new CreateVenueRequest(
             Name: "Main Stage Area",
             Description: "The main festival grounds",
@@ -130,7 +130,7 @@ public class VenueServiceTests
         _mockFestivalRepo.Setup(r => r.ExistsAsync(festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         _mockVenueRepo.Setup(r => r.CreateAsync(It.IsAny<Venue>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(101L);
 
         // Act
         var result = await _sut.CreateAsync(festivalId, userId, request);
@@ -149,8 +149,8 @@ public class VenueServiceTests
     public async Task CreateAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 6L;
+        var userId = 7L;
         var request = new CreateVenueRequest(Name: "Test", Description: null, Address: null, Latitude: null, Longitude: null);
 
         _mockAuthService.Setup(a => a.HasScopeAsync(userId, festivalId, PermissionScope.Venues, It.IsAny<CancellationToken>()))
@@ -167,8 +167,8 @@ public class VenueServiceTests
     public async Task CreateAsync_WithNonExistentFestival_ThrowsFestivalNotFoundException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 8L;
+        var userId = 9L;
         var request = new CreateVenueRequest(Name: "Test", Description: null, Address: null, Latitude: null, Longitude: null);
 
         _mockAuthService.Setup(a => a.HasScopeAsync(userId, festivalId, PermissionScope.Venues, It.IsAny<CancellationToken>()))
@@ -191,9 +191,9 @@ public class VenueServiceTests
     public async Task UpdateAsync_WithValidRequest_UpdatesVenue()
     {
         // Arrange
-        var venueId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var venueId = 10L;
+        var festivalId = 11L;
+        var userId = 12L;
         var venue = CreateTestVenue(venueId, festivalId);
         var request = new UpdateVenueRequest(
             Name: "Updated Venue Name",
@@ -219,8 +219,8 @@ public class VenueServiceTests
     public async Task UpdateAsync_WithNonExistentVenue_ThrowsVenueNotFoundException()
     {
         // Arrange
-        var venueId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var venueId = 13L;
+        var userId = 14L;
         var request = new UpdateVenueRequest(Name: "Updated", Description: null, Address: null, Latitude: null, Longitude: null);
 
         _mockVenueRepo.Setup(r => r.GetByIdAsync(venueId, It.IsAny<CancellationToken>()))
@@ -237,9 +237,9 @@ public class VenueServiceTests
     public async Task UpdateAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var venueId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var venueId = 15L;
+        var festivalId = 16L;
+        var userId = 17L;
         var venue = CreateTestVenue(venueId, festivalId);
         var request = new UpdateVenueRequest(Name: "Updated", Description: null, Address: null, Latitude: null, Longitude: null);
 
@@ -263,9 +263,9 @@ public class VenueServiceTests
     public async Task DeleteAsync_WithValidPermission_DeletesVenue()
     {
         // Arrange
-        var venueId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var venueId = 18L;
+        var festivalId = 19L;
+        var userId = 20L;
         var venue = CreateTestVenue(venueId, festivalId);
 
         _mockVenueRepo.Setup(r => r.GetByIdAsync(venueId, It.IsAny<CancellationToken>()))
@@ -284,8 +284,8 @@ public class VenueServiceTests
     public async Task DeleteAsync_WithNonExistentVenue_ThrowsVenueNotFoundException()
     {
         // Arrange
-        var venueId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var venueId = 21L;
+        var userId = 22L;
 
         _mockVenueRepo.Setup(r => r.GetByIdAsync(venueId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Venue?)null);
@@ -305,7 +305,7 @@ public class VenueServiceTests
     public async Task GetStageByIdAsync_WithValidId_ReturnsStage()
     {
         // Arrange
-        var stageId = Guid.NewGuid();
+        var stageId = 23L;
         var stage = CreateTestStage(stageId);
 
         _mockStageRepo.Setup(r => r.GetByIdAsync(stageId, It.IsAny<CancellationToken>()))
@@ -323,7 +323,7 @@ public class VenueServiceTests
     public async Task GetStageByIdAsync_WithInvalidId_ThrowsStageNotFoundException()
     {
         // Arrange
-        var stageId = Guid.NewGuid();
+        var stageId = 24L;
 
         _mockStageRepo.Setup(r => r.GetByIdAsync(stageId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Stage?)null);
@@ -339,7 +339,7 @@ public class VenueServiceTests
     public async Task GetStagesByVenueAsync_WithValidVenueId_ReturnsStages()
     {
         // Arrange
-        var venueId = Guid.NewGuid();
+        var venueId = 25L;
         var stages = new List<Stage>
         {
             CreateTestStage(venueId: venueId, name: "Main Stage"),
@@ -360,9 +360,9 @@ public class VenueServiceTests
     public async Task CreateStageAsync_WithValidRequest_CreatesStage()
     {
         // Arrange
-        var venueId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var venueId = 26L;
+        var festivalId = 27L;
+        var userId = 28L;
         var request = new CreateStageRequest(
             Name: "Main Stage",
             Description: "The biggest stage");
@@ -372,7 +372,7 @@ public class VenueServiceTests
         _mockAuthService.Setup(a => a.HasScopeAsync(userId, festivalId, PermissionScope.Venues, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         _mockStageRepo.Setup(r => r.CreateAsync(It.IsAny<Stage>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(102L);
 
         // Act
         var result = await _sut.CreateStageAsync(venueId, userId, request);
@@ -390,12 +390,12 @@ public class VenueServiceTests
     public async Task CreateStageAsync_WithNonExistentVenue_ThrowsVenueNotFoundException()
     {
         // Arrange
-        var venueId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var venueId = 29L;
+        var userId = 30L;
         var request = new CreateStageRequest(Name: "Test Stage", Description: null);
 
         _mockVenueRepo.Setup(r => r.GetFestivalIdAsync(venueId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Guid?)null);
+            .ReturnsAsync((long?)null);
 
         // Act
         var act = () => _sut.CreateStageAsync(venueId, userId, request);
@@ -408,9 +408,9 @@ public class VenueServiceTests
     public async Task CreateStageAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var venueId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var venueId = 31L;
+        var festivalId = 32L;
+        var userId = 33L;
         var request = new CreateStageRequest(Name: "Test Stage", Description: null);
 
         _mockVenueRepo.Setup(r => r.GetFestivalIdAsync(venueId, It.IsAny<CancellationToken>()))
@@ -429,12 +429,12 @@ public class VenueServiceTests
 
     #region Helper Methods
 
-    private Venue CreateTestVenue(Guid? venueId = null, Guid? festivalId = null, string? name = null)
+    private Venue CreateTestVenue(long? venueId = null, long? festivalId = null, string? name = null)
     {
         return new Venue
         {
-            VenueId = venueId ?? Guid.NewGuid(),
-            FestivalId = festivalId ?? Guid.NewGuid(),
+            VenueId = venueId ?? 0L,
+            FestivalId = festivalId ?? 0L,
             Name = name ?? "Test Venue",
             Description = "Test Description",
             Address = "123 Test Lane",
@@ -442,25 +442,25 @@ public class VenueServiceTests
             Longitude = -118.2437m,
             IsDeleted = false,
             CreatedAtUtc = _now,
-            CreatedBy = Guid.NewGuid(),
+            CreatedBy = 1L,
             ModifiedAtUtc = _now,
-            ModifiedBy = Guid.NewGuid()
+            ModifiedBy = 1L
         };
     }
 
-    private Stage CreateTestStage(Guid? stageId = null, Guid? venueId = null, string? name = null)
+    private Stage CreateTestStage(long? stageId = null, long? venueId = null, string? name = null)
     {
         return new Stage
         {
-            StageId = stageId ?? Guid.NewGuid(),
-            VenueId = venueId ?? Guid.NewGuid(),
+            StageId = stageId ?? 0L,
+            VenueId = venueId ?? 0L,
             Name = name ?? "Test Stage",
             Description = "Test Stage Description",
             IsDeleted = false,
             CreatedAtUtc = _now,
-            CreatedBy = Guid.NewGuid(),
+            CreatedBy = 1L,
             ModifiedAtUtc = _now,
-            ModifiedBy = Guid.NewGuid()
+            ModifiedBy = 1L
         };
     }
 

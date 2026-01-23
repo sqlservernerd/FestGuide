@@ -18,7 +18,7 @@ public class SqlServerScheduleRepository : IScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<Schedule?> GetByIdAsync(Guid scheduleId, CancellationToken ct = default)
+    public async Task<Schedule?> GetByIdAsync(long scheduleId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -33,7 +33,7 @@ public class SqlServerScheduleRepository : IScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<Schedule?> GetByEditionAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<Schedule?> GetByEditionAsync(long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -48,7 +48,7 @@ public class SqlServerScheduleRepository : IScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(Schedule schedule, CancellationToken ct = default)
+    public async Task<long> CreateAsync(Schedule schedule, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO schedule.Schedule (
@@ -66,7 +66,7 @@ public class SqlServerScheduleRepository : IScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task PublishAsync(Guid scheduleId, Guid publishedBy, CancellationToken ct = default)
+    public async Task PublishAsync(long scheduleId, long publishedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE schedule.Schedule
@@ -86,7 +86,7 @@ public class SqlServerScheduleRepository : IScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<bool> ExistsForEditionAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<bool> ExistsForEditionAsync(long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(1) FROM schedule.Schedule
@@ -100,7 +100,7 @@ public class SqlServerScheduleRepository : IScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<Schedule> GetOrCreateAsync(Guid editionId, Guid createdBy, CancellationToken ct = default)
+    public async Task<Schedule> GetOrCreateAsync(long editionId, long createdBy, CancellationToken ct = default)
     {
         var existing = await GetByEditionAsync(editionId, ct);
         if (existing != null)
@@ -111,7 +111,7 @@ public class SqlServerScheduleRepository : IScheduleRepository
         var now = DateTime.UtcNow;
         var schedule = new Schedule
         {
-            ScheduleId = Guid.NewGuid(),
+            ScheduleId = 0L,
             EditionId = editionId,
             Version = 1,
             CreatedAtUtc = now,

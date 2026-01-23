@@ -5,11 +5,11 @@ namespace FestGuide.Domain.Exceptions;
 /// </summary>
 public class ArtistNotFoundException : DomainException
 {
-    public ArtistNotFoundException(Guid artistId)
+    public ArtistNotFoundException(long artistId)
         : base($"Artist with ID '{artistId}' was not found.")
     {
         ArtistId = artistId;
     }
 
-    public Guid ArtistId { get; }
+    public long ArtistId { get; }
 }

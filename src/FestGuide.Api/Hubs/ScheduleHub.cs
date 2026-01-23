@@ -28,7 +28,7 @@ public class ScheduleHub : Hub
     /// <summary>
     /// Joins a group for an edition to receive schedule updates.
     /// </summary>
-    public async Task JoinEdition(Guid editionId)
+    public async Task JoinEdition(long editionId)
     {
         // Verify that the edition exists before allowing access
         var edition = await _editionRepository.GetByIdAsync(editionId, Context.ConnectionAborted).ConfigureAwait(false);
@@ -49,7 +49,7 @@ public class ScheduleHub : Hub
     /// <summary>
     /// Leaves a group for an edition.
     /// </summary>
-    public async Task LeaveEdition(Guid editionId)
+    public async Task LeaveEdition(long editionId)
     {
         var groupName = GetEditionGroupName(editionId);
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName, Context.ConnectionAborted).ConfigureAwait(false);
@@ -61,7 +61,7 @@ public class ScheduleHub : Hub
     /// <summary>
     /// Joins a group for a specific personal schedule.
     /// </summary>
-    public async Task JoinPersonalSchedule(Guid scheduleId)
+    public async Task JoinPersonalSchedule(long scheduleId)
     {
         var userId = GetCurrentUserId();
 
@@ -83,7 +83,7 @@ public class ScheduleHub : Hub
     /// <summary>
     /// Leaves a personal schedule group.
     /// </summary>
-    public async Task LeavePersonalSchedule(Guid scheduleId)
+    public async Task LeavePersonalSchedule(long scheduleId)
     {
         var groupName = GetPersonalScheduleGroupName(scheduleId);
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName, Context.ConnectionAborted).ConfigureAwait(false);
@@ -101,7 +101,7 @@ public class ScheduleHub : Hub
         await base.OnDisconnectedAsync(exception).ConfigureAwait(false);
     }
 
-    private Guid GetCurrentUserId()
+    private long GetCurrentUserId()
     {
         var user = Context.User;
         if (user == null)
@@ -113,7 +113,7 @@ public class ScheduleHub : Hub
         }
 
         var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (!Guid.TryParse(userIdClaim, out var userId))
+        if (!long.TryParse(userIdClaim, out var userId))
         {
             _logger.LogError(
                 "Failed to parse user id claim for connection {ConnectionId}. Claim value: {ClaimValue}",
@@ -125,6 +125,6 @@ public class ScheduleHub : Hub
         return userId;
     }
 
-    public static string GetEditionGroupName(Guid editionId) => $"edition-{editionId}";
-    public static string GetPersonalScheduleGroupName(Guid scheduleId) => $"personal-schedule-{scheduleId}";
+    public static string GetEditionGroupName(long editionId) => $"edition-{editionId}";
+    public static string GetPersonalScheduleGroupName(long scheduleId) => $"personal-schedule-{scheduleId}";
 }

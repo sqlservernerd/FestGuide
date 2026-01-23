@@ -45,7 +45,7 @@ public class PermissionService : IPermissionService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<PermissionSummaryDto>> GetByFestivalAsync(Guid festivalId, Guid userId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<PermissionSummaryDto>> GetByFestivalAsync(long festivalId, long userId, CancellationToken ct = default)
     {
         // Verify user can view permissions
         if (!await _authorizationService.CanViewFestivalAsync(userId, festivalId, ct))
@@ -84,7 +84,7 @@ public class PermissionService : IPermissionService
     }
 
     /// <inheritdoc />
-    public async Task<PermissionDto> GetByIdAsync(Guid permissionId, Guid userId, CancellationToken ct = default)
+    public async Task<PermissionDto> GetByIdAsync(long permissionId, long userId, CancellationToken ct = default)
     {
         var permission = await _permissionRepository.GetByIdAsync(permissionId, ct)
             ?? throw new PermissionNotFoundException(permissionId);
@@ -100,7 +100,7 @@ public class PermissionService : IPermissionService
     }
 
     /// <inheritdoc />
-    public async Task<InvitationResultDto> InviteUserAsync(Guid festivalId, Guid invitingUserId, InviteUserRequest request, CancellationToken ct = default)
+    public async Task<InvitationResultDto> InviteUserAsync(long festivalId, long invitingUserId, InviteUserRequest request, CancellationToken ct = default)
     {
         // Verify inviting user can manage permissions
         if (!await _authorizationService.CanManagePermissionsAsync(invitingUserId, festivalId, ct))
@@ -118,7 +118,7 @@ public class PermissionService : IPermissionService
         var invitedUser = await _userRepository.GetByEmailAsync(request.Email, ct);
         var isNewUser = invitedUser == null;
 
-        Guid invitedUserId;
+        long invitedUserId;
         if (invitedUser != null)
         {
             invitedUserId = invitedUser.UserId;
@@ -134,7 +134,7 @@ public class PermissionService : IPermissionService
         {
             // Create a placeholder user ID for pending invitation
             // The actual user will be linked when they register and accept
-            invitedUserId = Guid.NewGuid();
+            invitedUserId = 0;
         }
 
         var now = _dateTimeProvider.UtcNow;
@@ -152,7 +152,7 @@ public class PermissionService : IPermissionService
             // Create the permission first
             var permission = new FestivalPermission
             {
-                FestivalPermissionId = Guid.NewGuid(),
+                FestivalPermissionId = 0,
                 FestivalId = festivalId,
                 UserId = invitedUserId,
                 Role = request.Role,
@@ -209,7 +209,7 @@ public class PermissionService : IPermissionService
     }
 
     /// <inheritdoc />
-    public async Task<PermissionDto> UpdateAsync(Guid permissionId, Guid userId, UpdatePermissionRequest request, CancellationToken ct = default)
+    public async Task<PermissionDto> UpdateAsync(long permissionId, long userId, UpdatePermissionRequest request, CancellationToken ct = default)
     {
         var permission = await _permissionRepository.GetByIdAsync(permissionId, ct)
             ?? throw new PermissionNotFoundException(permissionId);
@@ -263,7 +263,7 @@ public class PermissionService : IPermissionService
     }
 
     /// <inheritdoc />
-    public async Task RevokeAsync(Guid permissionId, Guid userId, CancellationToken ct = default)
+    public async Task RevokeAsync(long permissionId, long userId, CancellationToken ct = default)
     {
         var permission = await _permissionRepository.GetByIdAsync(permissionId, ct)
             ?? throw new PermissionNotFoundException(permissionId);
@@ -294,7 +294,7 @@ public class PermissionService : IPermissionService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<PendingInvitationDto>> GetPendingInvitationsAsync(Guid userId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<PendingInvitationDto>> GetPendingInvitationsAsync(long userId, CancellationToken ct = default)
     {
         var permissions = await _permissionRepository.GetByUserAsync(userId, ct);
         var pendingPermissions = permissions.Where(p => p.IsPending && !p.IsRevoked).ToList();
@@ -343,7 +343,7 @@ public class PermissionService : IPermissionService
     }
 
     /// <inheritdoc />
-    public async Task<PermissionDto> AcceptInvitationAsync(Guid permissionId, Guid userId, CancellationToken ct = default)
+    public async Task<PermissionDto> AcceptInvitationAsync(long permissionId, long userId, CancellationToken ct = default)
     {
         var permission = await _permissionRepository.GetByIdAsync(permissionId, ct)
             ?? throw new PermissionNotFoundException(permissionId);
@@ -379,7 +379,7 @@ public class PermissionService : IPermissionService
     }
 
     /// <inheritdoc />
-    public async Task DeclineInvitationAsync(Guid permissionId, Guid userId, CancellationToken ct = default)
+    public async Task DeclineInvitationAsync(long permissionId, long userId, CancellationToken ct = default)
     {
         var permission = await _permissionRepository.GetByIdAsync(permissionId, ct)
             ?? throw new PermissionNotFoundException(permissionId);

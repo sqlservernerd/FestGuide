@@ -18,7 +18,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
     }
 
     /// <inheritdoc />
-    public async Task<NotificationLog?> GetByIdAsync(Guid notificationLogId, CancellationToken ct = default)
+    public async Task<NotificationLog?> GetByIdAsync(long notificationLogId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -35,7 +35,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<NotificationLog>> GetByUserAsync(Guid userId, int limit = 50, int offset = 0, CancellationToken ct = default)
+    public async Task<IReadOnlyList<NotificationLog>> GetByUserAsync(long userId, int limit = 50, int offset = 0, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -56,7 +56,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<NotificationLog>> GetUnreadByUserAsync(Guid userId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<NotificationLog>> GetUnreadByUserAsync(long userId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -76,7 +76,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
     }
 
     /// <inheritdoc />
-    public async Task<int> GetUnreadCountAsync(Guid userId, CancellationToken ct = default)
+    public async Task<int> GetUnreadCountAsync(long userId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(*)
@@ -89,7 +89,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(NotificationLog notificationLog, CancellationToken ct = default)
+    public async Task<long> CreateAsync(NotificationLog notificationLog, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO notifications.NotificationLog (
@@ -133,7 +133,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
     }
 
     /// <inheritdoc />
-    public async Task MarkAsReadAsync(Guid notificationLogId, Guid modifiedBy, CancellationToken ct = default)
+    public async Task MarkAsReadAsync(long notificationLogId, long modifiedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE notifications.NotificationLog SET
@@ -148,7 +148,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
     }
 
     /// <inheritdoc />
-    public async Task MarkAllAsReadAsync(Guid userId, Guid modifiedBy, CancellationToken ct = default)
+    public async Task MarkAllAsReadAsync(long userId, long modifiedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE notifications.NotificationLog SET
@@ -163,7 +163,7 @@ public class SqlServerNotificationLogRepository : INotificationLogRepository
     }
 
     /// <inheritdoc />
-    public async Task UpdateDeliveryStatusAsync(Guid notificationLogId, bool isDelivered, string? errorMessage, CancellationToken ct = default)
+    public async Task UpdateDeliveryStatusAsync(long notificationLogId, bool isDelivered, string? errorMessage, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE notifications.NotificationLog SET

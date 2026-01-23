@@ -18,7 +18,7 @@ public class SqlServerUserRepository : IUserRepository
     }
 
     /// <inheritdoc />
-    public async Task<User?> GetByIdAsync(Guid userId, CancellationToken ct = default)
+    public async Task<User?> GetByIdAsync(long userId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -52,7 +52,7 @@ public class SqlServerUserRepository : IUserRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<User>> GetByIdsAsync(IEnumerable<Guid> userIds, CancellationToken ct = default)
+    public async Task<IReadOnlyList<User>> GetByIdsAsync(IEnumerable<long> userIds, CancellationToken ct = default)
     {
         var userIdsList = userIds?.ToList();
         if (userIdsList == null || !userIdsList.Any())
@@ -91,7 +91,7 @@ public class SqlServerUserRepository : IUserRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(User user, CancellationToken ct = default)
+    public async Task<long> CreateAsync(User user, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO identity.[User] (
@@ -127,7 +127,7 @@ public class SqlServerUserRepository : IUserRepository
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid userId, CancellationToken ct = default)
+    public async Task DeleteAsync(long userId, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE identity.[User]
@@ -145,7 +145,7 @@ public class SqlServerUserRepository : IUserRepository
     }
 
     /// <inheritdoc />
-    public async Task UpdateLoginAttemptsAsync(Guid userId, int failedAttempts, DateTime? lockoutEndUtc, CancellationToken ct = default)
+    public async Task UpdateLoginAttemptsAsync(long userId, int failedAttempts, DateTime? lockoutEndUtc, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE identity.[User]
@@ -162,7 +162,7 @@ public class SqlServerUserRepository : IUserRepository
     }
 
     /// <inheritdoc />
-    public async Task ResetLoginAttemptsAsync(Guid userId, CancellationToken ct = default)
+    public async Task ResetLoginAttemptsAsync(long userId, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE identity.[User]

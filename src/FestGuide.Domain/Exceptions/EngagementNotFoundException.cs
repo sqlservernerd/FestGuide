@@ -5,11 +5,11 @@ namespace FestGuide.Domain.Exceptions;
 /// </summary>
 public class EngagementNotFoundException : DomainException
 {
-    public EngagementNotFoundException(Guid engagementId)
+    public EngagementNotFoundException(long engagementId)
         : base($"Engagement with ID '{engagementId}' was not found.")
     {
         EngagementId = engagementId;
     }
 
-    public Guid EngagementId { get; }
+    public long EngagementId { get; }
 }

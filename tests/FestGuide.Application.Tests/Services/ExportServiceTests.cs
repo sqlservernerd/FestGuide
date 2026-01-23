@@ -82,9 +82,9 @@ public class ExportServiceTests
     public async Task ExportEditionDataAsync_WithValidEdition_ReturnsExportResult()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 1L;
+        var festivalId = 2L;
+        var organizerId = 3L;
         var edition = CreateTestEdition(editionId, festivalId);
         var request = new ExportRequest("csv", true, true, true, null, null);
 
@@ -113,8 +113,8 @@ public class ExportServiceTests
     public async Task ExportEditionDataAsync_WithNonExistentEdition_ThrowsEditionNotFoundException()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 4L;
+        var organizerId = 5L;
         var request = new ExportRequest("csv", true, true, true, null, null);
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
@@ -131,9 +131,9 @@ public class ExportServiceTests
     public async Task ExportEditionDataAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 6L;
+        var festivalId = 7L;
+        var organizerId = 8L;
         var edition = CreateTestEdition(editionId, festivalId);
         var request = new ExportRequest("csv", true, true, true, null, null);
 
@@ -153,9 +153,9 @@ public class ExportServiceTests
     public async Task ExportEditionDataAsync_WithOnlySchedule_ExportsOnlySchedule()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 9L;
+        var festivalId = 10L;
+        var organizerId = 11L;
         var edition = CreateTestEdition(editionId, festivalId);
         var request = new ExportRequest("csv", false, true, false, null, null);
 
@@ -184,9 +184,9 @@ public class ExportServiceTests
     public async Task ExportScheduleCsvAsync_WithValidEdition_ReturnsCsvData()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 12L;
+        var festivalId = 13L;
+        var organizerId = 14L;
         var edition = CreateTestEdition(editionId, festivalId);
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
@@ -211,9 +211,9 @@ public class ExportServiceTests
     public async Task ExportScheduleCsvAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 15L;
+        var festivalId = 16L;
+        var organizerId = 17L;
         var edition = CreateTestEdition(editionId, festivalId);
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
@@ -236,14 +236,14 @@ public class ExportServiceTests
     public async Task ExportArtistsCsvAsync_WithValidEdition_ReturnsCsvData()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 18L;
+        var festivalId = 19L;
+        var organizerId = 20L;
         var edition = CreateTestEdition(editionId, festivalId);
         var artists = new List<Artist>
         {
-            CreateTestArtist(festivalId, "Artist One"),
-            CreateTestArtist(festivalId, "Artist Two")
+            CreateTestArtist(1L, "Artist One"),
+            CreateTestArtist(1L, "Artist Two")
         };
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
@@ -270,13 +270,13 @@ public class ExportServiceTests
     public async Task ExportArtistsCsvAsync_WithSpecialCharactersInData_EscapesCsv()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 21L;
+        var festivalId = 22L;
+        var organizerId = 23L;
         var edition = CreateTestEdition(editionId, festivalId);
         var artists = new List<Artist>
         {
-            CreateTestArtist(festivalId, "Artist, with comma")
+            CreateTestArtist(1L, "Artist, with comma")
         };
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
@@ -302,9 +302,9 @@ public class ExportServiceTests
     public async Task ExportAnalyticsCsvAsync_WithValidEdition_ReturnsCsvData()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 24L;
+        var festivalId = 25L;
+        var organizerId = 26L;
         var edition = CreateTestEdition(editionId, festivalId);
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
@@ -331,9 +331,9 @@ public class ExportServiceTests
     public async Task ExportAnalyticsCsvAsync_WithDateRange_PassesDateRangeToRepository()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 27L;
+        var festivalId = 28L;
+        var organizerId = 29L;
         var edition = CreateTestEdition(editionId, festivalId);
         var fromUtc = new DateTime(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         var toUtc = new DateTime(2026, 1, 31, 23, 59, 59, DateTimeKind.Utc);
@@ -360,14 +360,14 @@ public class ExportServiceTests
     public async Task ExportAttendeeSavesCsvAsync_WithValidEdition_ReturnsCsvData()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 30L;
+        var festivalId = 31L;
+        var organizerId = 32L;
         var edition = CreateTestEdition(editionId, festivalId);
-        var engagementId = Guid.NewGuid();
-        var artistId = Guid.NewGuid();
-        var timeSlotId = Guid.NewGuid();
-        var stageId = Guid.NewGuid();
+        var engagementId = 33L;
+        var artistId = 34L;
+        var timeSlotId = 35L;
+        var stageId = 36L;
 
         var artist = new Artist
         {
@@ -381,23 +381,23 @@ public class ExportServiceTests
             SpotifyUrl = "https://spotify.com/artist/test",
             IsDeleted = false,
             CreatedAtUtc = _now,
-            CreatedBy = Guid.NewGuid(),
+            CreatedBy = 1L,
             ModifiedAtUtc = _now,
-            ModifiedBy = Guid.NewGuid()
+            ModifiedBy = 1L
         };
 
         var stage = new Stage
         {
             StageId = stageId,
-            VenueId = Guid.NewGuid(),
+            VenueId = 1L,
             Name = "Main Stage",
             Description = "Main performance stage",
             SortOrder = 1,
             IsDeleted = false,
             CreatedAtUtc = _now,
-            CreatedBy = Guid.NewGuid(),
+            CreatedBy = 1L,
             ModifiedAtUtc = _now,
-            ModifiedBy = Guid.NewGuid()
+            ModifiedBy = 1L
         };
 
         var timeSlot = new TimeSlot
@@ -409,9 +409,9 @@ public class ExportServiceTests
             EndTimeUtc = _now.AddDays(1).AddHours(1),
             IsDeleted = false,
             CreatedAtUtc = _now,
-            CreatedBy = Guid.NewGuid(),
+            CreatedBy = 1L,
             ModifiedAtUtc = _now,
-            ModifiedBy = Guid.NewGuid()
+            ModifiedBy = 1L
         };
 
         var engagement = new Engagement
@@ -422,9 +422,9 @@ public class ExportServiceTests
             Notes = null,
             IsDeleted = false,
             CreatedAtUtc = _now,
-            CreatedBy = Guid.NewGuid(),
+            CreatedBy = 1L,
             ModifiedAtUtc = _now,
-            ModifiedBy = Guid.NewGuid()
+            ModifiedBy = 1L
         };
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
@@ -432,7 +432,7 @@ public class ExportServiceTests
         _mockAuthService.Setup(a => a.CanViewAnalyticsAsync(organizerId, festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         _mockAnalyticsRepo.Setup(r => r.GetTopSavedEngagementsAsync(editionId, 100, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<(Guid, int)> { (engagementId, 42) });
+            .ReturnsAsync(new List<(long, int)> { (engagementId, 42) });
         _mockEngagementRepo.Setup(r => r.GetByIdAsync(engagementId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(engagement);
         _mockArtistRepo.Setup(r => r.GetByIdAsync(artistId, It.IsAny<CancellationToken>()))
@@ -459,9 +459,9 @@ public class ExportServiceTests
     public async Task ExportAttendeeSavesCsvAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var organizerId = Guid.NewGuid();
+        var editionId = 37L;
+        var festivalId = 38L;
+        var organizerId = 39L;
         var edition = CreateTestEdition(editionId, festivalId);
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
@@ -480,7 +480,7 @@ public class ExportServiceTests
 
     #region Helper Methods
 
-    private FestivalEdition CreateTestEdition(Guid editionId, Guid festivalId, string? name = null)
+    private FestivalEdition CreateTestEdition(long editionId, long festivalId, string? name = null)
     {
         return new FestivalEdition
         {
@@ -493,17 +493,17 @@ public class ExportServiceTests
             Status = EditionStatus.Published,
             IsDeleted = false,
             CreatedAtUtc = _now,
-            CreatedBy = Guid.NewGuid(),
+            CreatedBy = 1L,
             ModifiedAtUtc = _now,
-            ModifiedBy = Guid.NewGuid()
+            ModifiedBy = 1L
         };
     }
 
-    private Artist CreateTestArtist(Guid festivalId, string? name = null)
+    private Artist CreateTestArtist(long festivalId, string? name = null)
     {
         return new Artist
         {
-            ArtistId = Guid.NewGuid(),
+            ArtistId = 1L,
             FestivalId = festivalId,
             Name = name ?? "Test Artist",
             Genre = "Rock",
@@ -513,13 +513,13 @@ public class ExportServiceTests
             SpotifyUrl = "https://spotify.com/artist/test",
             IsDeleted = false,
             CreatedAtUtc = _now,
-            CreatedBy = Guid.NewGuid(),
+            CreatedBy = 1L,
             ModifiedAtUtc = _now,
-            ModifiedBy = Guid.NewGuid()
+            ModifiedBy = 1L
         };
     }
 
-    private void SetupAnalyticsMocks(Guid editionId)
+    private void SetupAnalyticsMocks(long editionId)
     {
         _mockAnalyticsRepo.Setup(r => r.GetScheduleViewCountAsync(editionId, It.IsAny<DateTime?>(), It.IsAny<DateTime?>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(100);
@@ -532,7 +532,7 @@ public class ExportServiceTests
         _mockAnalyticsRepo.Setup(r => r.GetPlatformDistributionAsync(editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<(string, int)> { ("iOS", 30), ("Android", 20) });
         _mockAnalyticsRepo.Setup(r => r.GetTopArtistsAsync(editionId, It.IsAny<int>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<(Guid, string, int)> { (Guid.NewGuid(), "Artist One", 10) });
+            .ReturnsAsync(new List<(long, string, int)> { (1L, "Artist One", 10) });
     }
 
     #endregion

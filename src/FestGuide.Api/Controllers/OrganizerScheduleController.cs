@@ -46,10 +46,10 @@ public class OrganizerScheduleController : ControllerBase
     /// <summary>
     /// Gets the schedule for an edition.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/schedule")]
+    [HttpGet("editions/{editionId:long}/schedule")]
     [ProducesResponseType(typeof(ApiResponse<ScheduleDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetSchedule(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> GetSchedule(long editionId, CancellationToken ct)
     {
         try
         {
@@ -65,10 +65,10 @@ public class OrganizerScheduleController : ControllerBase
     /// <summary>
     /// Gets the detailed schedule for an edition including all time slots and engagements.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/schedule/detail")]
+    [HttpGet("editions/{editionId:long}/schedule/detail")]
     [ProducesResponseType(typeof(ApiResponse<ScheduleDetailDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetScheduleDetail(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> GetScheduleDetail(long editionId, CancellationToken ct)
     {
         try
         {
@@ -84,11 +84,11 @@ public class OrganizerScheduleController : ControllerBase
     /// <summary>
     /// Publishes a schedule, making it visible to attendees.
     /// </summary>
-    [HttpPost("editions/{editionId:guid}/schedule/publish")]
+    [HttpPost("editions/{editionId:long}/schedule/publish")]
     [ProducesResponseType(typeof(ApiResponse<ScheduleDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> PublishSchedule(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> PublishSchedule(long editionId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -115,9 +115,9 @@ public class OrganizerScheduleController : ControllerBase
     /// <summary>
     /// Gets all time slots for a stage within an edition.
     /// </summary>
-    [HttpGet("stages/{stageId:guid}/editions/{editionId:guid}/timeslots")]
+    [HttpGet("stages/{stageId:long}/editions/{editionId:long}/timeslots")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<TimeSlotDto>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetTimeSlots(Guid stageId, Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> GetTimeSlots(long stageId, long editionId, CancellationToken ct)
     {
         var timeSlots = await _scheduleService.GetTimeSlotsByStageAsync(stageId, editionId, ct);
         return Ok(ApiResponse<IReadOnlyList<TimeSlotDto>>.Success(timeSlots));
@@ -126,10 +126,10 @@ public class OrganizerScheduleController : ControllerBase
     /// <summary>
     /// Gets a time slot by ID.
     /// </summary>
-    [HttpGet("timeslots/{timeSlotId:guid}")]
+    [HttpGet("timeslots/{timeSlotId:long}")]
     [ProducesResponseType(typeof(ApiResponse<TimeSlotDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetTimeSlot(Guid timeSlotId, CancellationToken ct)
+    public async Task<IActionResult> GetTimeSlot(long timeSlotId, CancellationToken ct)
     {
         try
         {
@@ -145,12 +145,12 @@ public class OrganizerScheduleController : ControllerBase
     /// <summary>
     /// Creates a new time slot for a stage.
     /// </summary>
-    [HttpPost("stages/{stageId:guid}/timeslots")]
+    [HttpPost("stages/{stageId:long}/timeslots")]
     [ProducesResponseType(typeof(ApiResponse<TimeSlotDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> CreateTimeSlot(Guid stageId, [FromBody] CreateTimeSlotRequest request, CancellationToken ct)
+    public async Task<IActionResult> CreateTimeSlot(long stageId, [FromBody] CreateTimeSlotRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -179,12 +179,12 @@ public class OrganizerScheduleController : ControllerBase
     /// <summary>
     /// Updates a time slot.
     /// </summary>
-    [HttpPut("timeslots/{timeSlotId:guid}")]
+    [HttpPut("timeslots/{timeSlotId:long}")]
     [ProducesResponseType(typeof(ApiResponse<TimeSlotDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateTimeSlot(Guid timeSlotId, [FromBody] UpdateTimeSlotRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateTimeSlot(long timeSlotId, [FromBody] UpdateTimeSlotRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -213,11 +213,11 @@ public class OrganizerScheduleController : ControllerBase
     /// <summary>
     /// Deletes a time slot.
     /// </summary>
-    [HttpDelete("timeslots/{timeSlotId:guid}")]
+    [HttpDelete("timeslots/{timeSlotId:long}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteTimeSlot(Guid timeSlotId, CancellationToken ct)
+    public async Task<IActionResult> DeleteTimeSlot(long timeSlotId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -244,10 +244,10 @@ public class OrganizerScheduleController : ControllerBase
     /// <summary>
     /// Gets an engagement by ID.
     /// </summary>
-    [HttpGet("engagements/{engagementId:guid}")]
+    [HttpGet("engagements/{engagementId:long}")]
     [ProducesResponseType(typeof(ApiResponse<EngagementDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetEngagement(Guid engagementId, CancellationToken ct)
+    public async Task<IActionResult> GetEngagement(long engagementId, CancellationToken ct)
     {
         try
         {
@@ -263,12 +263,12 @@ public class OrganizerScheduleController : ControllerBase
     /// <summary>
     /// Creates an engagement (assigns artist to time slot).
     /// </summary>
-    [HttpPost("timeslots/{timeSlotId:guid}/engagement")]
+    [HttpPost("timeslots/{timeSlotId:long}/engagement")]
     [ProducesResponseType(typeof(ApiResponse<EngagementDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> CreateEngagement(Guid timeSlotId, [FromBody] CreateEngagementRequest request, CancellationToken ct)
+    public async Task<IActionResult> CreateEngagement(long timeSlotId, [FromBody] CreateEngagementRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -301,12 +301,12 @@ public class OrganizerScheduleController : ControllerBase
     /// <summary>
     /// Updates an engagement.
     /// </summary>
-    [HttpPut("engagements/{engagementId:guid}")]
+    [HttpPut("engagements/{engagementId:long}")]
     [ProducesResponseType(typeof(ApiResponse<EngagementDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateEngagement(Guid engagementId, [FromBody] UpdateEngagementRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateEngagement(long engagementId, [FromBody] UpdateEngagementRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -335,11 +335,11 @@ public class OrganizerScheduleController : ControllerBase
     /// <summary>
     /// Deletes an engagement.
     /// </summary>
-    [HttpDelete("engagements/{engagementId:guid}")]
+    [HttpDelete("engagements/{engagementId:long}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteEngagement(Guid engagementId, CancellationToken ct)
+    public async Task<IActionResult> DeleteEngagement(long engagementId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -361,10 +361,10 @@ public class OrganizerScheduleController : ControllerBase
 
     #endregion
 
-    private Guid? GetCurrentUserId()
+    private long? GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+        return long.TryParse(userIdClaim, out var userId) ? userId : null;
     }
 
     private static ApiErrorResponse CreateError(string code, string message) =>

@@ -36,11 +36,11 @@ public class PermissionServiceIntegrationTests : IClassFixture<FestGuideWebAppli
         var permissionRepository = scope.ServiceProvider.GetRequiredService<IFestivalPermissionRepository>();
 
         // Create test festival and users in the database
-        var organizerId = Guid.NewGuid();
+        var organizerId = 1L;
         var organizer = new Domain.Entities.User
         {
             UserId = organizerId,
-            Email = $"organizer-{Guid.NewGuid()}@test.com",
+            Email = $"organizer-{100L}@test.com",
             DisplayName = "Test Organizer",
             UserType = UserType.Organizer,
             PasswordHash = "test-hash",
@@ -48,21 +48,21 @@ public class PermissionServiceIntegrationTests : IClassFixture<FestGuideWebAppli
         };
         await userRepository.CreateAsync(organizer, CancellationToken.None);
 
-        var festivalId = Guid.NewGuid();
+        var festivalId = 2L;
         var festival = new Domain.Entities.Festival
         {
             FestivalId = festivalId,
-            Name = $"Test Festival {Guid.NewGuid()}",
+            Name = $"Test Festival {101L}",
             OwnerUserId = organizerId,
             CreatedAtUtc = DateTime.UtcNow
         };
         await festivalRepository.CreateAsync(festival, CancellationToken.None);
 
-        var invitedUserId = Guid.NewGuid();
+        var invitedUserId = 3L;
         var invitedUser = new Domain.Entities.User
         {
             UserId = invitedUserId,
-            Email = $"invited-{Guid.NewGuid()}@test.com",
+            Email = $"invited-{102L}@test.com",
             DisplayName = "Invited User",
             UserType = UserType.Organizer,
             PasswordHash = "test-hash",

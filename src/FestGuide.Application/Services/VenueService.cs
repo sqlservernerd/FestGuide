@@ -41,7 +41,7 @@ public class VenueService : IVenueService
     }
 
     /// <inheritdoc />
-    public async Task<VenueDto> GetByIdAsync(Guid venueId, CancellationToken ct = default)
+    public async Task<VenueDto> GetByIdAsync(long venueId, CancellationToken ct = default)
     {
         var venue = await _venueRepository.GetByIdAsync(venueId, ct)
             ?? throw new VenueNotFoundException(venueId);
@@ -50,21 +50,21 @@ public class VenueService : IVenueService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<VenueSummaryDto>> GetByFestivalAsync(Guid festivalId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<VenueSummaryDto>> GetByFestivalAsync(long festivalId, CancellationToken ct = default)
     {
         var venues = await _venueRepository.GetByFestivalAsync(festivalId, ct);
         return venues.Select(VenueSummaryDto.FromEntity).ToList();
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<VenueSummaryDto>> GetByEditionAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<VenueSummaryDto>> GetByEditionAsync(long editionId, CancellationToken ct = default)
     {
         var venues = await _venueRepository.GetByEditionAsync(editionId, ct);
         return venues.Select(VenueSummaryDto.FromEntity).ToList();
     }
 
     /// <inheritdoc />
-    public async Task<VenueDto> CreateAsync(Guid festivalId, Guid userId, CreateVenueRequest request, CancellationToken ct = default)
+    public async Task<VenueDto> CreateAsync(long festivalId, long userId, CreateVenueRequest request, CancellationToken ct = default)
     {
         if (!await _authorizationService.HasScopeAsync(userId, festivalId, PermissionScope.Venues, ct))
         {
@@ -79,7 +79,7 @@ public class VenueService : IVenueService
         var now = _dateTimeProvider.UtcNow;
         var venue = new Venue
         {
-            VenueId = Guid.NewGuid(),
+            VenueId = 0,
             FestivalId = festivalId,
             Name = request.Name,
             Description = request.Description,
@@ -102,7 +102,7 @@ public class VenueService : IVenueService
     }
 
     /// <inheritdoc />
-    public async Task<VenueDto> UpdateAsync(Guid venueId, Guid userId, UpdateVenueRequest request, CancellationToken ct = default)
+    public async Task<VenueDto> UpdateAsync(long venueId, long userId, UpdateVenueRequest request, CancellationToken ct = default)
     {
         var venue = await _venueRepository.GetByIdAsync(venueId, ct)
             ?? throw new VenueNotFoundException(venueId);
@@ -148,7 +148,7 @@ public class VenueService : IVenueService
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid venueId, Guid userId, CancellationToken ct = default)
+    public async Task DeleteAsync(long venueId, long userId, CancellationToken ct = default)
     {
         var venue = await _venueRepository.GetByIdAsync(venueId, ct)
             ?? throw new VenueNotFoundException(venueId);
@@ -164,7 +164,7 @@ public class VenueService : IVenueService
     }
 
     /// <inheritdoc />
-    public async Task AddVenueToEditionAsync(Guid editionId, Guid venueId, Guid userId, CancellationToken ct = default)
+    public async Task AddVenueToEditionAsync(long editionId, long venueId, long userId, CancellationToken ct = default)
     {
         var festivalId = await _editionRepository.GetFestivalIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -186,7 +186,7 @@ public class VenueService : IVenueService
     }
 
     /// <inheritdoc />
-    public async Task RemoveVenueFromEditionAsync(Guid editionId, Guid venueId, Guid userId, CancellationToken ct = default)
+    public async Task RemoveVenueFromEditionAsync(long editionId, long venueId, long userId, CancellationToken ct = default)
     {
         var festivalId = await _editionRepository.GetFestivalIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -203,7 +203,7 @@ public class VenueService : IVenueService
     }
 
     /// <inheritdoc />
-    public async Task<StageDto> GetStageByIdAsync(Guid stageId, CancellationToken ct = default)
+    public async Task<StageDto> GetStageByIdAsync(long stageId, CancellationToken ct = default)
     {
         var stage = await _stageRepository.GetByIdAsync(stageId, ct)
             ?? throw new StageNotFoundException(stageId);
@@ -212,14 +212,14 @@ public class VenueService : IVenueService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<StageSummaryDto>> GetStagesByVenueAsync(Guid venueId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<StageSummaryDto>> GetStagesByVenueAsync(long venueId, CancellationToken ct = default)
     {
         var stages = await _stageRepository.GetByVenueAsync(venueId, ct);
         return stages.Select(StageSummaryDto.FromEntity).ToList();
     }
 
     /// <inheritdoc />
-    public async Task<StageDto> CreateStageAsync(Guid venueId, Guid userId, CreateStageRequest request, CancellationToken ct = default)
+    public async Task<StageDto> CreateStageAsync(long venueId, long userId, CreateStageRequest request, CancellationToken ct = default)
     {
         var festivalId = await _venueRepository.GetFestivalIdAsync(venueId, ct)
             ?? throw new VenueNotFoundException(venueId);
@@ -232,7 +232,7 @@ public class VenueService : IVenueService
         var now = _dateTimeProvider.UtcNow;
         var stage = new Stage
         {
-            StageId = Guid.NewGuid(),
+            StageId = 0,
             VenueId = venueId,
             Name = request.Name,
             Description = request.Description,
@@ -253,7 +253,7 @@ public class VenueService : IVenueService
     }
 
     /// <inheritdoc />
-    public async Task<StageDto> UpdateStageAsync(Guid stageId, Guid userId, UpdateStageRequest request, CancellationToken ct = default)
+    public async Task<StageDto> UpdateStageAsync(long stageId, long userId, UpdateStageRequest request, CancellationToken ct = default)
     {
         var stage = await _stageRepository.GetByIdAsync(stageId, ct)
             ?? throw new StageNotFoundException(stageId);
@@ -290,7 +290,7 @@ public class VenueService : IVenueService
     }
 
     /// <inheritdoc />
-    public async Task DeleteStageAsync(Guid stageId, Guid userId, CancellationToken ct = default)
+    public async Task DeleteStageAsync(long stageId, long userId, CancellationToken ct = default)
     {
         var festivalId = await _stageRepository.GetFestivalIdAsync(stageId, ct)
             ?? throw new StageNotFoundException(stageId);

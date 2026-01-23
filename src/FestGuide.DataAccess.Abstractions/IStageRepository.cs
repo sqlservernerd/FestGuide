@@ -10,27 +10,27 @@ public interface IStageRepository
     /// <summary>
     /// Gets a stage by its unique identifier.
     /// </summary>
-    Task<Stage?> GetByIdAsync(Guid stageId, CancellationToken ct = default);
+    Task<Stage?> GetByIdAsync(long stageId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets multiple stages by their unique identifiers.
     /// </summary>
-    Task<IReadOnlyList<Stage>> GetByIdsAsync(IEnumerable<Guid> stageIds, CancellationToken ct = default);
+    Task<IReadOnlyList<Stage>> GetByIdsAsync(IEnumerable<long> stageIds, CancellationToken ct = default);
 
     /// <summary>
     /// Gets all stages for a venue.
     /// </summary>
-    Task<IReadOnlyList<Stage>> GetByVenueAsync(Guid venueId, CancellationToken ct = default);
+    Task<IReadOnlyList<Stage>> GetByVenueAsync(long venueId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets all stages for an edition (through venue associations).
     /// </summary>
-    Task<IReadOnlyList<Stage>> GetByEditionAsync(Guid editionId, CancellationToken ct = default);
+    Task<IReadOnlyList<Stage>> GetByEditionAsync(long editionId, CancellationToken ct = default);
 
     /// <summary>
     /// Creates a new stage.
     /// </summary>
-    Task<Guid> CreateAsync(Stage stage, CancellationToken ct = default);
+    Task<long> CreateAsync(Stage stage, CancellationToken ct = default);
 
     /// <summary>
     /// Updates an existing stage.
@@ -40,20 +40,20 @@ public interface IStageRepository
     /// <summary>
     /// Soft-deletes a stage.
     /// </summary>
-    Task DeleteAsync(Guid stageId, Guid deletedBy, CancellationToken ct = default);
+    Task DeleteAsync(long stageId, long deletedBy, CancellationToken ct = default);
 
     /// <summary>
     /// Checks if a stage exists.
     /// </summary>
-    Task<bool> ExistsAsync(Guid stageId, CancellationToken ct = default);
+    Task<bool> ExistsAsync(long stageId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets the venue ID for a stage.
     /// </summary>
-    Task<Guid?> GetVenueIdAsync(Guid stageId, CancellationToken ct = default);
+    Task<long?> GetVenueIdAsync(long stageId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets the festival ID for a stage (through venue).
     /// </summary>
-    Task<Guid?> GetFestivalIdAsync(Guid stageId, CancellationToken ct = default);
+    Task<long?> GetFestivalIdAsync(long stageId, CancellationToken ct = default);
 }

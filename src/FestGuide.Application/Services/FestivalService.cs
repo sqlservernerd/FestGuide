@@ -35,7 +35,7 @@ public class FestivalService : IFestivalService
     }
 
     /// <inheritdoc />
-    public async Task<FestivalDto> GetByIdAsync(Guid festivalId, CancellationToken ct = default)
+    public async Task<FestivalDto> GetByIdAsync(long festivalId, CancellationToken ct = default)
     {
         var festival = await _festivalRepository.GetByIdAsync(festivalId, ct)
             ?? throw new FestivalNotFoundException(festivalId);
@@ -44,26 +44,26 @@ public class FestivalService : IFestivalService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<FestivalSummaryDto>> GetMyFestivalsAsync(Guid userId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<FestivalSummaryDto>> GetMyFestivalsAsync(long userId, CancellationToken ct = default)
     {
         var festivals = await _festivalRepository.GetByUserAccessAsync(userId, ct);
         return festivals.Select(f => FestivalSummaryDto.FromEntity(f, userId)).ToList();
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<FestivalSummaryDto>> SearchAsync(string searchTerm, Guid? userId = null, int limit = 20, CancellationToken ct = default)
+    public async Task<IReadOnlyList<FestivalSummaryDto>> SearchAsync(string searchTerm, long? userId = null, int limit = 20, CancellationToken ct = default)
     {
         var festivals = await _festivalRepository.SearchByNameAsync(searchTerm, limit, ct);
-        return festivals.Select(f => FestivalSummaryDto.FromEntity(f, userId ?? Guid.Empty)).ToList();
+        return festivals.Select(f => FestivalSummaryDto.FromEntity(f, userId ?? 0)).ToList();
     }
 
     /// <inheritdoc />
-    public async Task<FestivalDto> CreateAsync(Guid userId, CreateFestivalRequest request, CancellationToken ct = default)
+    public async Task<FestivalDto> CreateAsync(long userId, CreateFestivalRequest request, CancellationToken ct = default)
     {
         var now = _dateTimeProvider.UtcNow;
         var festival = new Festival
         {
-            FestivalId = Guid.NewGuid(),
+            FestivalId = 0,
             Name = request.Name,
             Description = request.Description,
             ImageUrl = request.ImageUrl,
@@ -81,7 +81,7 @@ public class FestivalService : IFestivalService
         // Create owner permission
         var permission = new FestivalPermission
         {
-            FestivalPermissionId = Guid.NewGuid(),
+            FestivalPermissionId = 0,
             FestivalId = festival.FestivalId,
             UserId = userId,
             Role = FestivalRole.Owner,
@@ -103,7 +103,7 @@ public class FestivalService : IFestivalService
     }
 
     /// <inheritdoc />
-    public async Task<FestivalDto> UpdateAsync(Guid festivalId, Guid userId, UpdateFestivalRequest request, CancellationToken ct = default)
+    public async Task<FestivalDto> UpdateAsync(long festivalId, long userId, UpdateFestivalRequest request, CancellationToken ct = default)
     {
         if (!await _authorizationService.CanEditFestivalAsync(userId, festivalId, ct))
         {
@@ -144,7 +144,7 @@ public class FestivalService : IFestivalService
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid festivalId, Guid userId, CancellationToken ct = default)
+    public async Task DeleteAsync(long festivalId, long userId, CancellationToken ct = default)
     {
         if (!await _authorizationService.CanDeleteFestivalAsync(userId, festivalId, ct))
         {
@@ -162,7 +162,7 @@ public class FestivalService : IFestivalService
     }
 
     /// <inheritdoc />
-    public async Task TransferOwnershipAsync(Guid festivalId, Guid currentUserId, TransferOwnershipRequest request, CancellationToken ct = default)
+    public async Task TransferOwnershipAsync(long festivalId, long currentUserId, TransferOwnershipRequest request, CancellationToken ct = default)
     {
         var festival = await _festivalRepository.GetByIdAsync(festivalId, ct)
             ?? throw new FestivalNotFoundException(festivalId);

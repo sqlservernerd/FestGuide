@@ -38,9 +38,9 @@ public class OrganizerEditionsController : ControllerBase
     /// <summary>
     /// Gets all editions for a festival.
     /// </summary>
-    [HttpGet("festivals/{festivalId:guid}/editions")]
+    [HttpGet("festivals/{festivalId:long}/editions")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<EditionSummaryDto>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetEditions(Guid festivalId, CancellationToken ct)
+    public async Task<IActionResult> GetEditions(long festivalId, CancellationToken ct)
     {
         var editions = await _editionService.GetByFestivalAsync(festivalId, ct);
         return Ok(ApiResponse<IReadOnlyList<EditionSummaryDto>>.Success(editions));
@@ -49,10 +49,10 @@ public class OrganizerEditionsController : ControllerBase
     /// <summary>
     /// Gets an edition by ID.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}")]
+    [HttpGet("editions/{editionId:long}")]
     [ProducesResponseType(typeof(ApiResponse<EditionDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetEdition(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> GetEdition(long editionId, CancellationToken ct)
     {
         try
         {
@@ -68,12 +68,12 @@ public class OrganizerEditionsController : ControllerBase
     /// <summary>
     /// Creates a new edition for a festival.
     /// </summary>
-    [HttpPost("festivals/{festivalId:guid}/editions")]
+    [HttpPost("festivals/{festivalId:long}/editions")]
     [ProducesResponseType(typeof(ApiResponse<EditionDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> CreateEdition(Guid festivalId, [FromBody] CreateEditionRequest request, CancellationToken ct)
+    public async Task<IActionResult> CreateEdition(long festivalId, [FromBody] CreateEditionRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -102,12 +102,12 @@ public class OrganizerEditionsController : ControllerBase
     /// <summary>
     /// Updates an edition.
     /// </summary>
-    [HttpPut("editions/{editionId:guid}")]
+    [HttpPut("editions/{editionId:long}")]
     [ProducesResponseType(typeof(ApiResponse<EditionDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateEdition(Guid editionId, [FromBody] UpdateEditionRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateEdition(long editionId, [FromBody] UpdateEditionRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -136,11 +136,11 @@ public class OrganizerEditionsController : ControllerBase
     /// <summary>
     /// Deletes an edition.
     /// </summary>
-    [HttpDelete("editions/{editionId:guid}")]
+    [HttpDelete("editions/{editionId:long}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteEdition(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> DeleteEdition(long editionId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -160,10 +160,10 @@ public class OrganizerEditionsController : ControllerBase
         }
     }
 
-    private Guid? GetCurrentUserId()
+    private long? GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+        return long.TryParse(userIdClaim, out var userId) ? userId : null;
     }
 
     private static ApiErrorResponse CreateError(string code, string message) =>

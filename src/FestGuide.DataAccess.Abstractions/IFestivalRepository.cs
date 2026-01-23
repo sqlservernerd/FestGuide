@@ -10,22 +10,22 @@ public interface IFestivalRepository
     /// <summary>
     /// Gets a festival by its unique identifier.
     /// </summary>
-    Task<Festival?> GetByIdAsync(Guid festivalId, CancellationToken ct = default);
+    Task<Festival?> GetByIdAsync(long festivalId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets multiple festivals by their unique identifiers.
     /// </summary>
-    Task<IReadOnlyList<Festival>> GetByIdsAsync(IEnumerable<Guid> festivalIds, CancellationToken ct = default);
+    Task<IReadOnlyList<Festival>> GetByIdsAsync(IEnumerable<long> festivalIds, CancellationToken ct = default);
 
     /// <summary>
     /// Gets all festivals owned by a user.
     /// </summary>
-    Task<IReadOnlyList<Festival>> GetByOwnerAsync(Guid ownerUserId, CancellationToken ct = default);
+    Task<IReadOnlyList<Festival>> GetByOwnerAsync(long ownerUserId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets all festivals a user has access to (through permissions).
     /// </summary>
-    Task<IReadOnlyList<Festival>> GetByUserAccessAsync(Guid userId, CancellationToken ct = default);
+    Task<IReadOnlyList<Festival>> GetByUserAccessAsync(long userId, CancellationToken ct = default);
 
     /// <summary>
     /// Searches festivals by name.
@@ -35,7 +35,7 @@ public interface IFestivalRepository
     /// <summary>
     /// Creates a new festival.
     /// </summary>
-    Task<Guid> CreateAsync(Festival festival, CancellationToken ct = default);
+    Task<long> CreateAsync(Festival festival, CancellationToken ct = default);
 
     /// <summary>
     /// Updates an existing festival.
@@ -45,15 +45,15 @@ public interface IFestivalRepository
     /// <summary>
     /// Soft-deletes a festival.
     /// </summary>
-    Task DeleteAsync(Guid festivalId, Guid deletedBy, CancellationToken ct = default);
+    Task DeleteAsync(long festivalId, long deletedBy, CancellationToken ct = default);
 
     /// <summary>
     /// Checks if a festival exists.
     /// </summary>
-    Task<bool> ExistsAsync(Guid festivalId, CancellationToken ct = default);
+    Task<bool> ExistsAsync(long festivalId, CancellationToken ct = default);
 
     /// <summary>
     /// Transfers ownership of a festival to another user.
     /// </summary>
-    Task TransferOwnershipAsync(Guid festivalId, Guid newOwnerUserId, Guid modifiedBy, CancellationToken ct = default);
+    Task TransferOwnershipAsync(long festivalId, long newOwnerUserId, long modifiedBy, CancellationToken ct = default);
 }

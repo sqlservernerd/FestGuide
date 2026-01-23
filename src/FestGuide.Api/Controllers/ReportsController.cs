@@ -31,12 +31,12 @@ public class ReportsController : ControllerBase
     /// <summary>
     /// Exports edition data in CSV format.
     /// </summary>
-    [HttpPost("editions/{editionId:guid}/export")]
+    [HttpPost("editions/{editionId:long}/export")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ExportEditionData(
-        Guid editionId,
+        long editionId,
         [FromBody] ExportRequest request,
         CancellationToken ct)
     {
@@ -61,11 +61,11 @@ public class ReportsController : ControllerBase
     /// <summary>
     /// Exports schedule as CSV.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/schedule.csv")]
+    [HttpGet("editions/{editionId:long}/schedule.csv")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ExportScheduleCsv(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> ExportScheduleCsv(long editionId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -88,11 +88,11 @@ public class ReportsController : ControllerBase
     /// <summary>
     /// Exports artist list as CSV.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/artists.csv")]
+    [HttpGet("editions/{editionId:long}/artists.csv")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ExportArtistsCsv(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> ExportArtistsCsv(long editionId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -115,12 +115,12 @@ public class ReportsController : ControllerBase
     /// <summary>
     /// Exports analytics summary as CSV.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/analytics.csv")]
+    [HttpGet("editions/{editionId:long}/analytics.csv")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ExportAnalyticsCsv(
-        Guid editionId,
+        long editionId,
         [FromQuery] DateTime? fromUtc = null,
         [FromQuery] DateTime? toUtc = null,
         CancellationToken ct = default)
@@ -146,11 +146,11 @@ public class ReportsController : ControllerBase
     /// <summary>
     /// Exports attendee saves (which engagements users have saved) as CSV.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/attendee-saves.csv")]
+    [HttpGet("editions/{editionId:long}/attendee-saves.csv")]
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> ExportAttendeeSavesCsv(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> ExportAttendeeSavesCsv(long editionId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -170,10 +170,10 @@ public class ReportsController : ControllerBase
         }
     }
 
-    private Guid? GetCurrentUserId()
+    private long? GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+        return long.TryParse(userIdClaim, out var userId) ? userId : null;
     }
 
     private static ApiErrorResponse CreateError(string code, string message) =>

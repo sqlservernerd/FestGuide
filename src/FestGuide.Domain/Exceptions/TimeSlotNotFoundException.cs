@@ -5,11 +5,11 @@ namespace FestGuide.Domain.Exceptions;
 /// </summary>
 public class TimeSlotNotFoundException : DomainException
 {
-    public TimeSlotNotFoundException(Guid timeSlotId)
+    public TimeSlotNotFoundException(long timeSlotId)
         : base($"Time slot with ID '{timeSlotId}' was not found.")
     {
         TimeSlotId = timeSlotId;
     }
 
-    public Guid TimeSlotId { get; }
+    public long TimeSlotId { get; }
 }

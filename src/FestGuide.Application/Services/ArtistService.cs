@@ -35,7 +35,7 @@ public class ArtistService : IArtistService
     }
 
     /// <inheritdoc />
-    public async Task<ArtistDto> GetByIdAsync(Guid artistId, CancellationToken ct = default)
+    public async Task<ArtistDto> GetByIdAsync(long artistId, CancellationToken ct = default)
     {
         var artist = await _artistRepository.GetByIdAsync(artistId, ct)
             ?? throw new ArtistNotFoundException(artistId);
@@ -44,21 +44,21 @@ public class ArtistService : IArtistService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<ArtistSummaryDto>> GetByFestivalAsync(Guid festivalId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<ArtistSummaryDto>> GetByFestivalAsync(long festivalId, CancellationToken ct = default)
     {
         var artists = await _artistRepository.GetByFestivalAsync(festivalId, ct);
         return artists.Select(ArtistSummaryDto.FromEntity).ToList();
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<ArtistSummaryDto>> SearchAsync(Guid festivalId, string searchTerm, int limit = 20, CancellationToken ct = default)
+    public async Task<IReadOnlyList<ArtistSummaryDto>> SearchAsync(long festivalId, string searchTerm, int limit = 20, CancellationToken ct = default)
     {
         var artists = await _artistRepository.SearchByNameAsync(festivalId, searchTerm, limit, ct);
         return artists.Select(ArtistSummaryDto.FromEntity).ToList();
     }
 
     /// <inheritdoc />
-    public async Task<ArtistDto> CreateAsync(Guid festivalId, Guid userId, CreateArtistRequest request, CancellationToken ct = default)
+    public async Task<ArtistDto> CreateAsync(long festivalId, long userId, CreateArtistRequest request, CancellationToken ct = default)
     {
         if (!await _authorizationService.HasScopeAsync(userId, festivalId, PermissionScope.Artists, ct))
         {
@@ -73,7 +73,7 @@ public class ArtistService : IArtistService
         var now = _dateTimeProvider.UtcNow;
         var artist = new Artist
         {
-            ArtistId = Guid.NewGuid(),
+            ArtistId = 0,
             FestivalId = festivalId,
             Name = request.Name,
             Genre = request.Genre,
@@ -97,7 +97,7 @@ public class ArtistService : IArtistService
     }
 
     /// <inheritdoc />
-    public async Task<ArtistDto> UpdateAsync(Guid artistId, Guid userId, UpdateArtistRequest request, CancellationToken ct = default)
+    public async Task<ArtistDto> UpdateAsync(long artistId, long userId, UpdateArtistRequest request, CancellationToken ct = default)
     {
         var artist = await _artistRepository.GetByIdAsync(artistId, ct)
             ?? throw new ArtistNotFoundException(artistId);
@@ -148,7 +148,7 @@ public class ArtistService : IArtistService
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid artistId, Guid userId, CancellationToken ct = default)
+    public async Task DeleteAsync(long artistId, long userId, CancellationToken ct = default)
     {
         var artist = await _artistRepository.GetByIdAsync(artistId, ct)
             ?? throw new ArtistNotFoundException(artistId);

@@ -35,7 +35,7 @@ public class EditionService : IEditionService
     }
 
     /// <inheritdoc />
-    public async Task<EditionDto> GetByIdAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<EditionDto> GetByIdAsync(long editionId, CancellationToken ct = default)
     {
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -44,21 +44,21 @@ public class EditionService : IEditionService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<EditionSummaryDto>> GetByFestivalAsync(Guid festivalId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<EditionSummaryDto>> GetByFestivalAsync(long festivalId, CancellationToken ct = default)
     {
         var editions = await _editionRepository.GetByFestivalAsync(festivalId, ct);
         return editions.Select(EditionSummaryDto.FromEntity).ToList();
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<EditionSummaryDto>> GetPublishedByFestivalAsync(Guid festivalId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<EditionSummaryDto>> GetPublishedByFestivalAsync(long festivalId, CancellationToken ct = default)
     {
         var editions = await _editionRepository.GetPublishedByFestivalAsync(festivalId, ct);
         return editions.Select(EditionSummaryDto.FromEntity).ToList();
     }
 
     /// <inheritdoc />
-    public async Task<EditionDto> CreateAsync(Guid festivalId, Guid userId, CreateEditionRequest request, CancellationToken ct = default)
+    public async Task<EditionDto> CreateAsync(long festivalId, long userId, CreateEditionRequest request, CancellationToken ct = default)
     {
         if (!await _authorizationService.HasScopeAsync(userId, festivalId, PermissionScope.Editions, ct))
         {
@@ -73,7 +73,7 @@ public class EditionService : IEditionService
         var now = _dateTimeProvider.UtcNow;
         var edition = new FestivalEdition
         {
-            EditionId = Guid.NewGuid(),
+            EditionId = 0,
             FestivalId = festivalId,
             Name = request.Name,
             StartDateUtc = request.StartDateUtc,
@@ -97,7 +97,7 @@ public class EditionService : IEditionService
     }
 
     /// <inheritdoc />
-    public async Task<EditionDto> UpdateAsync(Guid editionId, Guid userId, UpdateEditionRequest request, CancellationToken ct = default)
+    public async Task<EditionDto> UpdateAsync(long editionId, long userId, UpdateEditionRequest request, CancellationToken ct = default)
     {
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -143,7 +143,7 @@ public class EditionService : IEditionService
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid editionId, Guid userId, CancellationToken ct = default)
+    public async Task DeleteAsync(long editionId, long userId, CancellationToken ct = default)
     {
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);

@@ -59,14 +59,14 @@ public class ScheduleServiceTests
     public async Task GetScheduleDetailAsync_WithValidEdition_ReturnsScheduleDetail()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var scheduleId = Guid.NewGuid();
-        var stage1Id = Guid.NewGuid();
-        var stage2Id = Guid.NewGuid();
-        var artist1Id = Guid.NewGuid();
-        var artist2Id = Guid.NewGuid();
-        var timeSlot1Id = Guid.NewGuid();
-        var timeSlot2Id = Guid.NewGuid();
+        var editionId = 1L;
+        var scheduleId = 2L;
+        var stage1Id = 3L;
+        var stage2Id = 4L;
+        var artist1Id = 5L;
+        var artist2Id = 6L;
+        var timeSlot1Id = 7L;
+        var timeSlot2Id = 8L;
 
         var schedule = new Schedule
         {
@@ -98,14 +98,14 @@ public class ScheduleServiceTests
         {
             new()
             {
-                EngagementId = Guid.NewGuid(),
+                EngagementId = 1L,
                 TimeSlotId = timeSlot1Id,
                 ArtistId = artist1Id,
                 Notes = "Great performance"
             },
             new()
             {
-                EngagementId = Guid.NewGuid(),
+                EngagementId = 1L,
                 TimeSlotId = timeSlot2Id,
                 ArtistId = artist2Id,
                 Notes = "Acoustic set"
@@ -114,14 +114,14 @@ public class ScheduleServiceTests
 
         var stages = new List<Stage>
         {
-            new() { StageId = stage1Id, Name = "Main Stage", VenueId = Guid.NewGuid() },
-            new() { StageId = stage2Id, Name = "Acoustic Stage", VenueId = Guid.NewGuid() }
+            new() { StageId = stage1Id, Name = "Main Stage", VenueId = 1L },
+            new() { StageId = stage2Id, Name = "Acoustic Stage", VenueId = 1L }
         };
 
         var artists = new List<Artist>
         {
-            new() { ArtistId = artist1Id, Name = "Artist 1", FestivalId = Guid.NewGuid() },
-            new() { ArtistId = artist2Id, Name = "Artist 2", FestivalId = Guid.NewGuid() }
+            new() { ArtistId = artist1Id, Name = "Artist 1", FestivalId = 1L },
+            new() { ArtistId = artist2Id, Name = "Artist 2", FestivalId = 1L }
         };
 
         _mockEditionRepo.Setup(x => x.ExistsAsync(editionId, It.IsAny<CancellationToken>()))
@@ -132,9 +132,9 @@ public class ScheduleServiceTests
             .ReturnsAsync(timeSlots);
         _mockEngagementRepo.Setup(x => x.GetByEditionAsync(editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(engagements);
-        _mockStageRepo.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+        _mockStageRepo.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(stages);
-        _mockArtistRepo.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+        _mockArtistRepo.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(artists);
 
         // Act
@@ -151,15 +151,15 @@ public class ScheduleServiceTests
         result.Items[1].ArtistName.Should().Be("Artist 2");
         
         // Verify batch fetches were used
-        _mockStageRepo.Verify(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()), Times.Once);
-        _mockArtistRepo.Verify(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockStageRepo.Verify(x => x.GetByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockArtistRepo.Verify(x => x.GetByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
     public async Task GetScheduleDetailAsync_WithInvalidEdition_ThrowsEditionNotFoundException()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 9L;
 
         _mockEditionRepo.Setup(x => x.ExistsAsync(editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
@@ -175,8 +175,8 @@ public class ScheduleServiceTests
     public async Task GetScheduleAsync_WithValidEdition_ReturnsSchedule()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var scheduleId = Guid.NewGuid();
+        var editionId = 10L;
+        var scheduleId = 11L;
 
         var schedule = new Schedule
         {
@@ -208,10 +208,10 @@ public class ScheduleServiceTests
     public async Task PublishScheduleAsync_WithValidPermission_PublishesSchedule()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var scheduleId = Guid.NewGuid();
+        var editionId = 12L;
+        var festivalId = 13L;
+        var userId = 14L;
+        var scheduleId = 15L;
 
         var schedule = new Schedule
         {
@@ -247,9 +247,9 @@ public class ScheduleServiceTests
     public async Task PublishScheduleAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var editionId = 16L;
+        var festivalId = 17L;
+        var userId = 18L;
 
         _mockEditionRepo.Setup(x => x.GetFestivalIdAsync(editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(festivalId);
@@ -267,11 +267,11 @@ public class ScheduleServiceTests
     public async Task PublishScheduleAsync_WithNonExistentEdition_ThrowsEditionNotFoundException()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var editionId = 19L;
+        var userId = 20L;
 
         _mockEditionRepo.Setup(x => x.GetFestivalIdAsync(editionId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Guid?)null);
+            .ReturnsAsync((long?)null);
 
         // Act
         var act = () => _sut.PublishScheduleAsync(editionId, userId);
@@ -288,7 +288,7 @@ public class ScheduleServiceTests
     public async Task GetTimeSlotByIdAsync_WithValidId_ReturnsTimeSlot()
     {
         // Arrange
-        var timeSlotId = Guid.NewGuid();
+        var timeSlotId = 21L;
         var timeSlot = CreateTestTimeSlot(timeSlotId);
 
         _mockTimeSlotRepo.Setup(x => x.GetByIdAsync(timeSlotId, It.IsAny<CancellationToken>()))
@@ -306,7 +306,7 @@ public class ScheduleServiceTests
     public async Task GetTimeSlotByIdAsync_WithInvalidId_ThrowsTimeSlotNotFoundException()
     {
         // Arrange
-        var timeSlotId = Guid.NewGuid();
+        var timeSlotId = 22L;
 
         _mockTimeSlotRepo.Setup(x => x.GetByIdAsync(timeSlotId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((TimeSlot?)null);
@@ -322,8 +322,8 @@ public class ScheduleServiceTests
     public async Task GetTimeSlotsByStageAsync_WithValidIds_ReturnsTimeSlots()
     {
         // Arrange
-        var stageId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
+        var stageId = 23L;
+        var editionId = 24L;
         var timeSlots = new List<TimeSlot>
         {
             CreateTestTimeSlot(stageId: stageId, editionId: editionId),
@@ -344,10 +344,10 @@ public class ScheduleServiceTests
     public async Task CreateTimeSlotAsync_WithValidRequest_CreatesTimeSlot()
     {
         // Arrange
-        var stageId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var stageId = 25L;
+        var festivalId = 26L;
+        var editionId = 27L;
+        var userId = 28L;
         var request = new CreateTimeSlotRequest(
             EditionId: editionId,
             StartTimeUtc: _now.AddHours(2),
@@ -362,7 +362,7 @@ public class ScheduleServiceTests
         _mockTimeSlotRepo.Setup(x => x.HasOverlapAsync(stageId, editionId, request.StartTimeUtc, request.EndTimeUtc, null, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
         _mockTimeSlotRepo.Setup(x => x.CreateAsync(It.IsAny<TimeSlot>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(101L);
 
         // Act
         var result = await _sut.CreateTimeSlotAsync(stageId, userId, request);
@@ -381,10 +381,10 @@ public class ScheduleServiceTests
     public async Task CreateTimeSlotAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var stageId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var request = new CreateTimeSlotRequest(Guid.NewGuid(), _now, _now.AddHours(1));
+        var stageId = 29L;
+        var festivalId = 30L;
+        var userId = 31L;
+        var request = new CreateTimeSlotRequest(100L, _now, _now.AddHours(1));
 
         _mockStageRepo.Setup(x => x.GetFestivalIdAsync(stageId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(festivalId);
@@ -402,12 +402,12 @@ public class ScheduleServiceTests
     public async Task CreateTimeSlotAsync_WithNonExistentStage_ThrowsStageNotFoundException()
     {
         // Arrange
-        var stageId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var request = new CreateTimeSlotRequest(Guid.NewGuid(), _now, _now.AddHours(1));
+        var stageId = 32L;
+        var userId = 33L;
+        var request = new CreateTimeSlotRequest(101L, _now, _now.AddHours(1));
 
         _mockStageRepo.Setup(x => x.GetFestivalIdAsync(stageId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Guid?)null);
+            .ReturnsAsync((long?)null);
 
         // Act
         var act = () => _sut.CreateTimeSlotAsync(stageId, userId, request);
@@ -420,10 +420,10 @@ public class ScheduleServiceTests
     public async Task CreateTimeSlotAsync_WithOverlappingTimeSlot_ThrowsValidationException()
     {
         // Arrange
-        var stageId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var stageId = 34L;
+        var festivalId = 35L;
+        var editionId = 36L;
+        var userId = 37L;
         var request = new CreateTimeSlotRequest(editionId, _now.AddHours(2), _now.AddHours(3));
 
         _mockStageRepo.Setup(x => x.GetFestivalIdAsync(stageId, It.IsAny<CancellationToken>()))
@@ -447,9 +447,9 @@ public class ScheduleServiceTests
     public async Task UpdateTimeSlotAsync_WithValidRequest_UpdatesTimeSlot()
     {
         // Arrange
-        var timeSlotId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var timeSlotId = 38L;
+        var festivalId = 39L;
+        var userId = 40L;
         var timeSlot = CreateTestTimeSlot(timeSlotId);
         var request = new UpdateTimeSlotRequest(
             StartTimeUtc: _now.AddHours(4),
@@ -476,8 +476,8 @@ public class ScheduleServiceTests
     public async Task UpdateTimeSlotAsync_WithNonExistentTimeSlot_ThrowsTimeSlotNotFoundException()
     {
         // Arrange
-        var timeSlotId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var timeSlotId = 41L;
+        var userId = 42L;
         var request = new UpdateTimeSlotRequest(_now, _now.AddHours(1));
 
         _mockTimeSlotRepo.Setup(x => x.GetByIdAsync(timeSlotId, It.IsAny<CancellationToken>()))
@@ -494,9 +494,9 @@ public class ScheduleServiceTests
     public async Task DeleteTimeSlotAsync_WithValidPermission_DeletesTimeSlot()
     {
         // Arrange
-        var timeSlotId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var timeSlotId = 43L;
+        var festivalId = 44L;
+        var userId = 45L;
 
         _mockTimeSlotRepo.Setup(x => x.GetFestivalIdAsync(timeSlotId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(festivalId);
@@ -514,11 +514,11 @@ public class ScheduleServiceTests
     public async Task DeleteTimeSlotAsync_WithNonExistentTimeSlot_ThrowsTimeSlotNotFoundException()
     {
         // Arrange
-        var timeSlotId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var timeSlotId = 46L;
+        var userId = 47L;
 
         _mockTimeSlotRepo.Setup(x => x.GetFestivalIdAsync(timeSlotId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Guid?)null);
+            .ReturnsAsync((long?)null);
 
         // Act
         var act = () => _sut.DeleteTimeSlotAsync(timeSlotId, userId);
@@ -535,7 +535,7 @@ public class ScheduleServiceTests
     public async Task GetEngagementByIdAsync_WithValidId_ReturnsEngagement()
     {
         // Arrange
-        var engagementId = Guid.NewGuid();
+        var engagementId = 48L;
         var engagement = CreateTestEngagement(engagementId);
 
         _mockEngagementRepo.Setup(x => x.GetByIdAsync(engagementId, It.IsAny<CancellationToken>()))
@@ -553,7 +553,7 @@ public class ScheduleServiceTests
     public async Task GetEngagementByIdAsync_WithInvalidId_ThrowsEngagementNotFoundException()
     {
         // Arrange
-        var engagementId = Guid.NewGuid();
+        var engagementId = 49L;
 
         _mockEngagementRepo.Setup(x => x.GetByIdAsync(engagementId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Engagement?)null);
@@ -569,10 +569,10 @@ public class ScheduleServiceTests
     public async Task CreateEngagementAsync_WithValidRequest_CreatesEngagement()
     {
         // Arrange
-        var timeSlotId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var artistId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var timeSlotId = 50L;
+        var festivalId = 51L;
+        var artistId = 52L;
+        var userId = 53L;
         var request = new CreateEngagementRequest(ArtistId: artistId, Notes: "Great set");
 
         _mockTimeSlotRepo.Setup(x => x.ExistsAsync(timeSlotId, It.IsAny<CancellationToken>()))
@@ -586,7 +586,7 @@ public class ScheduleServiceTests
         _mockEngagementRepo.Setup(x => x.TimeSlotHasEngagementAsync(timeSlotId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
         _mockEngagementRepo.Setup(x => x.CreateAsync(It.IsAny<Engagement>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(102L);
 
         // Act
         var result = await _sut.CreateEngagementAsync(timeSlotId, userId, request);
@@ -605,9 +605,9 @@ public class ScheduleServiceTests
     public async Task CreateEngagementAsync_WithNonExistentTimeSlot_ThrowsTimeSlotNotFoundException()
     {
         // Arrange
-        var timeSlotId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var request = new CreateEngagementRequest(ArtistId: Guid.NewGuid(), Notes: null);
+        var timeSlotId = 54L;
+        var userId = 55L;
+        var request = new CreateEngagementRequest(ArtistId: 102L, Notes: null);
 
         _mockTimeSlotRepo.Setup(x => x.ExistsAsync(timeSlotId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
@@ -623,10 +623,10 @@ public class ScheduleServiceTests
     public async Task CreateEngagementAsync_WithNonExistentArtist_ThrowsArtistNotFoundException()
     {
         // Arrange
-        var timeSlotId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var artistId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var timeSlotId = 56L;
+        var festivalId = 57L;
+        var artistId = 58L;
+        var userId = 59L;
         var request = new CreateEngagementRequest(ArtistId: artistId, Notes: null);
 
         _mockTimeSlotRepo.Setup(x => x.ExistsAsync(timeSlotId, It.IsAny<CancellationToken>()))
@@ -649,10 +649,10 @@ public class ScheduleServiceTests
     public async Task CreateEngagementAsync_WithTimeSlotAlreadyAssigned_ThrowsValidationException()
     {
         // Arrange
-        var timeSlotId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var artistId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var timeSlotId = 60L;
+        var festivalId = 61L;
+        var artistId = 62L;
+        var userId = 63L;
         var request = new CreateEngagementRequest(ArtistId: artistId, Notes: null);
 
         _mockTimeSlotRepo.Setup(x => x.ExistsAsync(timeSlotId, It.IsAny<CancellationToken>()))
@@ -678,10 +678,10 @@ public class ScheduleServiceTests
     public async Task UpdateEngagementAsync_WithValidRequest_UpdatesEngagement()
     {
         // Arrange
-        var engagementId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var newArtistId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var engagementId = 64L;
+        var festivalId = 65L;
+        var newArtistId = 66L;
+        var userId = 67L;
         var engagement = CreateTestEngagement(engagementId);
         var request = new UpdateEngagementRequest(ArtistId: newArtistId, Notes: "Updated notes");
 
@@ -706,8 +706,8 @@ public class ScheduleServiceTests
     public async Task UpdateEngagementAsync_WithNonExistentEngagement_ThrowsEngagementNotFoundException()
     {
         // Arrange
-        var engagementId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var engagementId = 68L;
+        var userId = 69L;
         var request = new UpdateEngagementRequest(null, "Notes");
 
         _mockEngagementRepo.Setup(x => x.GetByIdAsync(engagementId, It.IsAny<CancellationToken>()))
@@ -724,9 +724,9 @@ public class ScheduleServiceTests
     public async Task DeleteEngagementAsync_WithValidPermission_DeletesEngagement()
     {
         // Arrange
-        var engagementId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var engagementId = 70L;
+        var festivalId = 71L;
+        var userId = 72L;
 
         _mockEngagementRepo.Setup(x => x.GetFestivalIdAsync(engagementId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(festivalId);
@@ -744,11 +744,11 @@ public class ScheduleServiceTests
     public async Task DeleteEngagementAsync_WithNonExistentEngagement_ThrowsEngagementNotFoundException()
     {
         // Arrange
-        var engagementId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var engagementId = 73L;
+        var userId = 74L;
 
         _mockEngagementRepo.Setup(x => x.GetFestivalIdAsync(engagementId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Guid?)null);
+            .ReturnsAsync((long?)null);
 
         // Act
         var act = () => _sut.DeleteEngagementAsync(engagementId, userId);
@@ -761,9 +761,9 @@ public class ScheduleServiceTests
     public async Task DeleteEngagementAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var engagementId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var engagementId = 75L;
+        var festivalId = 76L;
+        var userId = 77L;
 
         _mockEngagementRepo.Setup(x => x.GetFestivalIdAsync(engagementId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(festivalId);
@@ -781,36 +781,36 @@ public class ScheduleServiceTests
 
     #region Helper Methods
 
-    private TimeSlot CreateTestTimeSlot(Guid? timeSlotId = null, Guid? stageId = null, Guid? editionId = null)
+    private TimeSlot CreateTestTimeSlot(long? timeSlotId = null, long? stageId = null, long? editionId = null)
     {
         return new TimeSlot
         {
-            TimeSlotId = timeSlotId ?? Guid.NewGuid(),
-            StageId = stageId ?? Guid.NewGuid(),
-            EditionId = editionId ?? Guid.NewGuid(),
+            TimeSlotId = timeSlotId ?? 0L,
+            StageId = stageId ?? 0L,
+            EditionId = editionId ?? 0L,
             StartTimeUtc = _now.AddHours(2),
             EndTimeUtc = _now.AddHours(3),
             IsDeleted = false,
             CreatedAtUtc = _now,
-            CreatedBy = Guid.NewGuid(),
+            CreatedBy = 1L,
             ModifiedAtUtc = _now,
-            ModifiedBy = Guid.NewGuid()
+            ModifiedBy = 1L
         };
     }
 
-    private Engagement CreateTestEngagement(Guid? engagementId = null, Guid? timeSlotId = null, Guid? artistId = null)
+    private Engagement CreateTestEngagement(long? engagementId = null, long? timeSlotId = null, long? artistId = null)
     {
         return new Engagement
         {
-            EngagementId = engagementId ?? Guid.NewGuid(),
-            TimeSlotId = timeSlotId ?? Guid.NewGuid(),
-            ArtistId = artistId ?? Guid.NewGuid(),
+            EngagementId = engagementId ?? 0L,
+            TimeSlotId = timeSlotId ?? 0L,
+            ArtistId = artistId ?? 0L,
             Notes = "Test notes",
             IsDeleted = false,
             CreatedAtUtc = _now,
-            CreatedBy = Guid.NewGuid(),
+            CreatedBy = 1L,
             ModifiedAtUtc = _now,
-            ModifiedBy = Guid.NewGuid()
+            ModifiedBy = 1L
         };
     }
 

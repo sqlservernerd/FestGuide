@@ -38,9 +38,9 @@ public class OrganizerArtistsController : ControllerBase
     /// <summary>
     /// Gets all artists for a festival.
     /// </summary>
-    [HttpGet("festivals/{festivalId:guid}/artists")]
+    [HttpGet("festivals/{festivalId:long}/artists")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ArtistSummaryDto>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetArtists(Guid festivalId, CancellationToken ct)
+    public async Task<IActionResult> GetArtists(long festivalId, CancellationToken ct)
     {
         var artists = await _artistService.GetByFestivalAsync(festivalId, ct);
         return Ok(ApiResponse<IReadOnlyList<ArtistSummaryDto>>.Success(artists));
@@ -49,9 +49,9 @@ public class OrganizerArtistsController : ControllerBase
     /// <summary>
     /// Searches artists by name within a festival.
     /// </summary>
-    [HttpGet("festivals/{festivalId:guid}/artists/search")]
+    [HttpGet("festivals/{festivalId:long}/artists/search")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ArtistSummaryDto>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> SearchArtists(Guid festivalId, [FromQuery] string q, [FromQuery] int limit = 20, CancellationToken ct = default)
+    public async Task<IActionResult> SearchArtists(long festivalId, [FromQuery] string q, [FromQuery] int limit = 20, CancellationToken ct = default)
     {
         var artists = await _artistService.SearchAsync(festivalId, q ?? string.Empty, limit, ct);
         return Ok(ApiResponse<IReadOnlyList<ArtistSummaryDto>>.Success(artists));
@@ -60,10 +60,10 @@ public class OrganizerArtistsController : ControllerBase
     /// <summary>
     /// Gets an artist by ID.
     /// </summary>
-    [HttpGet("artists/{artistId:guid}")]
+    [HttpGet("artists/{artistId:long}")]
     [ProducesResponseType(typeof(ApiResponse<ArtistDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetArtist(Guid artistId, CancellationToken ct)
+    public async Task<IActionResult> GetArtist(long artistId, CancellationToken ct)
     {
         try
         {
@@ -79,12 +79,12 @@ public class OrganizerArtistsController : ControllerBase
     /// <summary>
     /// Creates a new artist for a festival.
     /// </summary>
-    [HttpPost("festivals/{festivalId:guid}/artists")]
+    [HttpPost("festivals/{festivalId:long}/artists")]
     [ProducesResponseType(typeof(ApiResponse<ArtistDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> CreateArtist(Guid festivalId, [FromBody] CreateArtistRequest request, CancellationToken ct)
+    public async Task<IActionResult> CreateArtist(long festivalId, [FromBody] CreateArtistRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -113,12 +113,12 @@ public class OrganizerArtistsController : ControllerBase
     /// <summary>
     /// Updates an artist.
     /// </summary>
-    [HttpPut("artists/{artistId:guid}")]
+    [HttpPut("artists/{artistId:long}")]
     [ProducesResponseType(typeof(ApiResponse<ArtistDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateArtist(Guid artistId, [FromBody] UpdateArtistRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateArtist(long artistId, [FromBody] UpdateArtistRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -147,11 +147,11 @@ public class OrganizerArtistsController : ControllerBase
     /// <summary>
     /// Deletes an artist.
     /// </summary>
-    [HttpDelete("artists/{artistId:guid}")]
+    [HttpDelete("artists/{artistId:long}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteArtist(Guid artistId, CancellationToken ct)
+    public async Task<IActionResult> DeleteArtist(long artistId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -171,10 +171,10 @@ public class OrganizerArtistsController : ControllerBase
         }
     }
 
-    private Guid? GetCurrentUserId()
+    private long? GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+        return long.TryParse(userIdClaim, out var userId) ? userId : null;
     }
 
     private static ApiErrorResponse CreateError(string code, string message) =>

@@ -46,7 +46,7 @@ public class FestivalServiceTests
     public async Task GetByIdAsync_WithValidId_ReturnsFestival()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
+        var festivalId = 1L;
         var festival = CreateTestFestival(festivalId);
 
         _mockFestivalRepo.Setup(r => r.GetByIdAsync(festivalId, It.IsAny<CancellationToken>()))
@@ -65,7 +65,7 @@ public class FestivalServiceTests
     public async Task GetByIdAsync_WithInvalidId_ThrowsFestivalNotFoundException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
+        var festivalId = 2L;
 
         _mockFestivalRepo.Setup(r => r.GetByIdAsync(festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Festival?)null);
@@ -85,11 +85,11 @@ public class FestivalServiceTests
     public async Task GetMyFestivalsAsync_WithValidUserId_ReturnsFestivals()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = 3L;
         var festivals = new List<Festival>
         {
-            CreateTestFestival(Guid.NewGuid(), userId),
-            CreateTestFestival(Guid.NewGuid(), userId)
+            CreateTestFestival(1L, userId),
+            CreateTestFestival(1L, userId)
         };
 
         _mockFestivalRepo.Setup(r => r.GetByUserAccessAsync(userId, It.IsAny<CancellationToken>()))
@@ -107,7 +107,7 @@ public class FestivalServiceTests
     public async Task GetMyFestivalsAsync_WithNoFestivals_ReturnsEmptyList()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = 4L;
 
         _mockFestivalRepo.Setup(r => r.GetByUserAccessAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Festival>());
@@ -130,8 +130,8 @@ public class FestivalServiceTests
         var searchTerm = "Summer";
         var festivals = new List<Festival>
         {
-            CreateTestFestival(Guid.NewGuid(), name: "Summer Fest"),
-            CreateTestFestival(Guid.NewGuid(), name: "Summer Music Festival")
+            CreateTestFestival(1L, name: "Summer Fest"),
+            CreateTestFestival(1L, name: "Summer Music Festival")
         };
 
         _mockFestivalRepo.Setup(r => r.SearchByNameAsync(searchTerm, 20, It.IsAny<CancellationToken>()))
@@ -152,7 +152,7 @@ public class FestivalServiceTests
     public async Task CreateAsync_WithValidRequest_CreatesFestivalAndOwnerPermission()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = 5L;
         var request = new CreateFestivalRequest(
             Name: "New Festival",
             Description: "A great festival",
@@ -160,9 +160,9 @@ public class FestivalServiceTests
             WebsiteUrl: "https://example.com");
 
         _mockFestivalRepo.Setup(r => r.CreateAsync(It.IsAny<Festival>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(101L);
         _mockPermissionRepo.Setup(r => r.CreateAsync(It.IsAny<FestivalPermission>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(102L);
 
         // Act
         var result = await _sut.CreateAsync(userId, request);
@@ -190,8 +190,8 @@ public class FestivalServiceTests
     public async Task UpdateAsync_WithValidRequest_UpdatesFestival()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 6L;
+        var userId = 7L;
         var festival = CreateTestFestival(festivalId, userId);
         var request = new UpdateFestivalRequest(
             Name: "Updated Name",
@@ -220,8 +220,8 @@ public class FestivalServiceTests
     public async Task UpdateAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 8L;
+        var userId = 9L;
         var request = new UpdateFestivalRequest(Name: "Updated", Description: null, ImageUrl: null, WebsiteUrl: null);
 
         _mockAuthService.Setup(a => a.CanEditFestivalAsync(userId, festivalId, It.IsAny<CancellationToken>()))
@@ -238,8 +238,8 @@ public class FestivalServiceTests
     public async Task UpdateAsync_WithNonExistentFestival_ThrowsFestivalNotFoundException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 10L;
+        var userId = 11L;
         var request = new UpdateFestivalRequest(Name: "Updated", Description: null, ImageUrl: null, WebsiteUrl: null);
 
         _mockAuthService.Setup(a => a.CanEditFestivalAsync(userId, festivalId, It.IsAny<CancellationToken>()))
@@ -262,8 +262,8 @@ public class FestivalServiceTests
     public async Task DeleteAsync_WithValidPermission_DeletesFestival()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 12L;
+        var userId = 13L;
 
         _mockAuthService.Setup(a => a.CanDeleteFestivalAsync(userId, festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
@@ -281,8 +281,8 @@ public class FestivalServiceTests
     public async Task DeleteAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 14L;
+        var userId = 15L;
 
         _mockAuthService.Setup(a => a.CanDeleteFestivalAsync(userId, festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
@@ -298,8 +298,8 @@ public class FestivalServiceTests
     public async Task DeleteAsync_WithNonExistentFestival_ThrowsFestivalNotFoundException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 16L;
+        var userId = 17L;
 
         _mockAuthService.Setup(a => a.CanDeleteFestivalAsync(userId, festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
@@ -321,9 +321,9 @@ public class FestivalServiceTests
     public async Task TransferOwnershipAsync_AsOwner_TransfersOwnership()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var currentOwnerId = Guid.NewGuid();
-        var newOwnerId = Guid.NewGuid();
+        var festivalId = 18L;
+        var currentOwnerId = 19L;
+        var newOwnerId = 20L;
         var festival = CreateTestFestival(festivalId, currentOwnerId);
         var request = new TransferOwnershipRequest(newOwnerId);
 
@@ -342,10 +342,10 @@ public class FestivalServiceTests
     public async Task TransferOwnershipAsync_NotAsOwner_ThrowsForbiddenException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var currentOwnerId = Guid.NewGuid();
-        var differentUserId = Guid.NewGuid();
-        var newOwnerId = Guid.NewGuid();
+        var festivalId = 21L;
+        var currentOwnerId = 22L;
+        var differentUserId = 23L;
+        var newOwnerId = 24L;
         var festival = CreateTestFestival(festivalId, currentOwnerId);
         var request = new TransferOwnershipRequest(newOwnerId);
 
@@ -364,9 +364,9 @@ public class FestivalServiceTests
     public async Task TransferOwnershipAsync_WithNonExistentFestival_ThrowsFestivalNotFoundException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var request = new TransferOwnershipRequest(Guid.NewGuid());
+        var festivalId = 25L;
+        var userId = 26L;
+        var request = new TransferOwnershipRequest(100L);
 
         _mockFestivalRepo.Setup(r => r.GetByIdAsync(festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Festival?)null);
@@ -382,21 +382,21 @@ public class FestivalServiceTests
 
     #region Helper Methods
 
-    private Festival CreateTestFestival(Guid? festivalId = null, Guid? ownerId = null, string? name = null)
+    private Festival CreateTestFestival(long? festivalId = null, long? ownerId = null, string? name = null)
     {
         return new Festival
         {
-            FestivalId = festivalId ?? Guid.NewGuid(),
+            FestivalId = festivalId ?? 0L,
             Name = name ?? "Test Festival",
             Description = "Test Description",
             ImageUrl = "https://example.com/image.jpg",
             WebsiteUrl = "https://example.com",
-            OwnerUserId = ownerId ?? Guid.NewGuid(),
+            OwnerUserId = ownerId ?? 0L,
             IsDeleted = false,
             CreatedAtUtc = _now,
-            CreatedBy = ownerId ?? Guid.NewGuid(),
+            CreatedBy = ownerId ?? 0L,
             ModifiedAtUtc = _now,
-            ModifiedBy = ownerId ?? Guid.NewGuid()
+            ModifiedBy = ownerId ?? 0L
         };
     }
 

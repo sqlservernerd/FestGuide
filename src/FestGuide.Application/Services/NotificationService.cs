@@ -44,12 +44,12 @@ public class NotificationService : INotificationService
     #region Device Management
 
     /// <inheritdoc />
-    public async Task<DeviceTokenDto> RegisterDeviceAsync(Guid userId, RegisterDeviceRequest request, CancellationToken ct = default)
+    public async Task<DeviceTokenDto> RegisterDeviceAsync(long userId, RegisterDeviceRequest request, CancellationToken ct = default)
     {
         var now = _dateTimeProvider.UtcNow;
         var deviceToken = new DeviceToken
         {
-            DeviceTokenId = Guid.NewGuid(),
+            DeviceTokenId = 0,
             UserId = userId,
             Token = request.Token,
             Platform = request.Platform.ToLowerInvariant(),
@@ -70,14 +70,14 @@ public class NotificationService : INotificationService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<DeviceTokenDto>> GetDevicesAsync(Guid userId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<DeviceTokenDto>> GetDevicesAsync(long userId, CancellationToken ct = default)
     {
         var devices = await _deviceTokenRepository.GetByUserAsync(userId, ct).ConfigureAwait(false);
         return devices.Select(DeviceTokenDto.FromEntity).ToList();
     }
 
     /// <inheritdoc />
-    public async Task UnregisterDeviceAsync(Guid userId, Guid deviceTokenId, CancellationToken ct = default)
+    public async Task UnregisterDeviceAsync(long userId, long deviceTokenId, CancellationToken ct = default)
     {
         var device = await _deviceTokenRepository.GetByIdAsync(deviceTokenId, ct).ConfigureAwait(false);
         if (device == null || device.UserId != userId)
@@ -91,7 +91,7 @@ public class NotificationService : INotificationService
     }
 
     /// <inheritdoc />
-    public async Task UnregisterDeviceByTokenAsync(Guid userId, string token, CancellationToken ct = default)
+    public async Task UnregisterDeviceByTokenAsync(long userId, string token, CancellationToken ct = default)
     {
         await _deviceTokenRepository.DeactivateByTokenAsync(token, userId, ct).ConfigureAwait(false);
         _logger.LogInformation("Device with token unregistered for user {UserId}", userId);
@@ -102,7 +102,7 @@ public class NotificationService : INotificationService
     #region Notification Preferences
 
     /// <inheritdoc />
-    public async Task<NotificationPreferenceDto> GetPreferencesAsync(Guid userId, CancellationToken ct = default)
+    public async Task<NotificationPreferenceDto> GetPreferencesAsync(long userId, CancellationToken ct = default)
     {
         var prefs = await _preferenceRepository.GetByUserAsync(userId, ct).ConfigureAwait(false);
         if (prefs == null)
@@ -114,14 +114,14 @@ public class NotificationService : INotificationService
     }
 
     /// <inheritdoc />
-    public async Task<NotificationPreferenceDto> UpdatePreferencesAsync(Guid userId, UpdateNotificationPreferenceRequest request, CancellationToken ct = default)
+    public async Task<NotificationPreferenceDto> UpdatePreferencesAsync(long userId, UpdateNotificationPreferenceRequest request, CancellationToken ct = default)
     {
         var existing = await _preferenceRepository.GetByUserAsync(userId, ct).ConfigureAwait(false);
         var now = _dateTimeProvider.UtcNow;
 
         var prefs = existing ?? new NotificationPreference
         {
-            NotificationPreferenceId = Guid.NewGuid(),
+            NotificationPreferenceId = 0,
             UserId = userId,
             CreatedAtUtc = now,
             CreatedBy = userId
@@ -152,20 +152,20 @@ public class NotificationService : INotificationService
     #region Notification History
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<NotificationDto>> GetNotificationsAsync(Guid userId, int limit = 50, int offset = 0, CancellationToken ct = default)
+    public async Task<IReadOnlyList<NotificationDto>> GetNotificationsAsync(long userId, int limit = 50, int offset = 0, CancellationToken ct = default)
     {
         var logs = await _notificationLogRepository.GetByUserAsync(userId, limit, offset, ct).ConfigureAwait(false);
         return logs.Select(NotificationDto.FromEntity).ToList();
     }
 
     /// <inheritdoc />
-    public async Task<int> GetUnreadCountAsync(Guid userId, CancellationToken ct = default)
+    public async Task<int> GetUnreadCountAsync(long userId, CancellationToken ct = default)
     {
         return await _notificationLogRepository.GetUnreadCountAsync(userId, ct).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public async Task MarkAsReadAsync(Guid userId, Guid notificationId, CancellationToken ct = default)
+    public async Task MarkAsReadAsync(long userId, long notificationId, CancellationToken ct = default)
     {
         var log = await _notificationLogRepository.GetByIdAsync(notificationId, ct).ConfigureAwait(false);
         if (log == null || log.UserId != userId)
@@ -177,7 +177,7 @@ public class NotificationService : INotificationService
     }
 
     /// <inheritdoc />
-    public async Task MarkAllAsReadAsync(Guid userId, CancellationToken ct = default)
+    public async Task MarkAllAsReadAsync(long userId, CancellationToken ct = default)
     {
         await _notificationLogRepository.MarkAllAsReadAsync(userId, userId, ct).ConfigureAwait(false);
     }
@@ -188,12 +188,12 @@ public class NotificationService : INotificationService
 
     /// <inheritdoc />
     public async Task SendToUserAsync(
-        Guid userId,
+        long userId,
         string notificationType,
         string title,
         string body,
         string? relatedEntityType = null,
-        Guid? relatedEntityId = null,
+        long? relatedEntityId = null,
         Dictionary<string, string>? data = null,
         CancellationToken ct = default)
     {
@@ -232,7 +232,7 @@ public class NotificationService : INotificationService
         {
             var log = new NotificationLog
             {
-                NotificationLogId = Guid.NewGuid(),
+                NotificationLogId = 0,
                 UserId = userId,
                 DeviceTokenId = device.DeviceTokenId,
                 NotificationType = notificationType,
@@ -285,12 +285,12 @@ public class NotificationService : INotificationService
 
     /// <inheritdoc />
     public async Task SendToUsersAsync(
-        IEnumerable<Guid> userIds,
+        IEnumerable<long> userIds,
         string notificationType,
         string title,
         string body,
         string? relatedEntityType = null,
-        Guid? relatedEntityId = null,
+        long? relatedEntityId = null,
         Dictionary<string, string>? data = null,
         CancellationToken ct = default)
     {
@@ -322,7 +322,7 @@ public class NotificationService : INotificationService
     /// <inheritdoc />
     public async Task SendScheduleChangeAsync(ScheduleChangeNotification change, CancellationToken ct = default)
     {
-        IEnumerable<Guid> userIds;
+        IEnumerable<long> userIds;
 
         // If we have a specific engagement, only notify users who have that engagement saved
         if (change.EngagementId.HasValue)
@@ -335,7 +335,7 @@ public class NotificationService : INotificationService
             // to avoid data loss for large festivals
             const int batchSize = 1000;
             var offset = 0;
-            var allUserIds = new HashSet<Guid>(batchSize);
+            var allUserIds = new HashSet<long>(batchSize);
             
             while (true)
             {

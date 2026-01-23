@@ -33,7 +33,7 @@ public class SqlServerRefreshTokenRepository : IRefreshTokenRepository
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<RefreshToken>> GetActiveTokensByUserIdAsync(Guid userId, CancellationToken ct = default)
+    public async Task<IEnumerable<RefreshToken>> GetActiveTokensByUserIdAsync(long userId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -50,7 +50,7 @@ public class SqlServerRefreshTokenRepository : IRefreshTokenRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(RefreshToken token, CancellationToken ct = default)
+    public async Task<long> CreateAsync(RefreshToken token, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO identity.RefreshToken (
@@ -68,7 +68,7 @@ public class SqlServerRefreshTokenRepository : IRefreshTokenRepository
     }
 
     /// <inheritdoc />
-    public async Task RevokeAsync(Guid tokenId, Guid? replacedByTokenId, CancellationToken ct = default)
+    public async Task RevokeAsync(long tokenId, long? replacedByTokenId, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE identity.RefreshToken
@@ -85,7 +85,7 @@ public class SqlServerRefreshTokenRepository : IRefreshTokenRepository
     }
 
     /// <inheritdoc />
-    public async Task RevokeAllForUserAsync(Guid userId, CancellationToken ct = default)
+    public async Task RevokeAllForUserAsync(long userId, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE identity.RefreshToken

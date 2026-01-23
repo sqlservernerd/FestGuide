@@ -5,11 +5,11 @@ namespace FestGuide.Domain.Exceptions;
 /// </summary>
 public class PermissionNotFoundException : DomainException
 {
-    public PermissionNotFoundException(Guid permissionId)
+    public PermissionNotFoundException(long permissionId)
         : base($"Permission with ID '{permissionId}' was not found.")
     {
         PermissionId = permissionId;
     }
 
-    public Guid PermissionId { get; }
+    public long PermissionId { get; }
 }

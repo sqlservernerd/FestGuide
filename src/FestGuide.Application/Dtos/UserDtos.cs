@@ -7,7 +7,7 @@ namespace FestGuide.Application.Dtos;
 /// Response DTO for user profile.
 /// </summary>
 public sealed record UserProfileDto(
-    Guid UserId,
+    long UserId,
     string Email,
     bool EmailVerified,
     string DisplayName,
@@ -37,7 +37,7 @@ public sealed record UpdateProfileRequest(
 /// Response DTO for user data export (GDPR).
 /// </summary>
 public sealed record UserDataExportDto(
-    Guid UserId,
+    long UserId,
     string Email,
     bool EmailVerified,
     string DisplayName,

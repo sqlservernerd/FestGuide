@@ -10,7 +10,7 @@ public interface IPasswordResetTokenRepository
     /// <summary>
     /// Creates a new password reset token.
     /// </summary>
-    Task<Guid> CreateAsync(PasswordResetToken token, CancellationToken ct = default);
+    Task<long> CreateAsync(PasswordResetToken token, CancellationToken ct = default);
 
     /// <summary>
     /// Gets a token by its hash value.
@@ -20,17 +20,17 @@ public interface IPasswordResetTokenRepository
     /// <summary>
     /// Gets the most recent unused token for a user.
     /// </summary>
-    Task<PasswordResetToken?> GetActiveByUserIdAsync(Guid userId, CancellationToken ct = default);
+    Task<PasswordResetToken?> GetActiveByUserIdAsync(long userId, CancellationToken ct = default);
 
     /// <summary>
     /// Marks a token as used.
     /// </summary>
-    Task MarkAsUsedAsync(Guid tokenId, CancellationToken ct = default);
+    Task MarkAsUsedAsync(long tokenId, CancellationToken ct = default);
 
     /// <summary>
     /// Invalidates all unused tokens for a user.
     /// </summary>
-    Task InvalidateAllForUserAsync(Guid userId, CancellationToken ct = default);
+    Task InvalidateAllForUserAsync(long userId, CancellationToken ct = default);
 
     /// <summary>
     /// Deletes expired tokens older than the specified date.

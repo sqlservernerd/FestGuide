@@ -18,7 +18,7 @@ public class SqlServerVenueRepository : IVenueRepository
     }
 
     /// <inheritdoc />
-    public async Task<Venue?> GetByIdAsync(Guid venueId, CancellationToken ct = default)
+    public async Task<Venue?> GetByIdAsync(long venueId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -34,7 +34,7 @@ public class SqlServerVenueRepository : IVenueRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Venue>> GetByFestivalAsync(Guid festivalId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Venue>> GetByFestivalAsync(long festivalId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -53,7 +53,7 @@ public class SqlServerVenueRepository : IVenueRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Venue>> GetByEditionAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Venue>> GetByEditionAsync(long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -73,7 +73,7 @@ public class SqlServerVenueRepository : IVenueRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(Venue venue, CancellationToken ct = default)
+    public async Task<long> CreateAsync(Venue venue, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO venue.Venue (
@@ -111,7 +111,7 @@ public class SqlServerVenueRepository : IVenueRepository
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid venueId, Guid deletedBy, CancellationToken ct = default)
+    public async Task DeleteAsync(long venueId, long deletedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE venue.Venue
@@ -130,7 +130,7 @@ public class SqlServerVenueRepository : IVenueRepository
     }
 
     /// <inheritdoc />
-    public async Task<bool> ExistsAsync(Guid venueId, CancellationToken ct = default)
+    public async Task<bool> ExistsAsync(long venueId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(1) FROM venue.Venue
@@ -144,19 +144,19 @@ public class SqlServerVenueRepository : IVenueRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid?> GetFestivalIdAsync(Guid venueId, CancellationToken ct = default)
+    public async Task<long?> GetFestivalIdAsync(long venueId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT FestivalId FROM venue.Venue
             WHERE VenueId = @VenueId AND IsDeleted = 0
             """;
 
-        return await _connection.ExecuteScalarAsync<Guid?>(
+        return await _connection.ExecuteScalarAsync<long?>(
             new CommandDefinition(sql, new { VenueId = venueId }, cancellationToken: ct));
     }
 
     /// <inheritdoc />
-    public async Task AddToEditionAsync(Guid editionId, Guid venueId, Guid createdBy, CancellationToken ct = default)
+    public async Task AddToEditionAsync(long editionId, long venueId, long createdBy, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO venue.EditionVenue (EditionVenueId, EditionId, VenueId, CreatedAtUtc, CreatedBy)
@@ -165,12 +165,12 @@ public class SqlServerVenueRepository : IVenueRepository
 
         await _connection.ExecuteAsync(new CommandDefinition(
             sql,
-            new { EditionVenueId = Guid.NewGuid(), EditionId = editionId, VenueId = venueId, CreatedAtUtc = DateTime.UtcNow, CreatedBy = createdBy },
+            new { EditionVenueId = 0L, EditionId = editionId, VenueId = venueId, CreatedAtUtc = DateTime.UtcNow, CreatedBy = createdBy },
             cancellationToken: ct));
     }
 
     /// <inheritdoc />
-    public async Task RemoveFromEditionAsync(Guid editionId, Guid venueId, CancellationToken ct = default)
+    public async Task RemoveFromEditionAsync(long editionId, long venueId, CancellationToken ct = default)
     {
         const string sql = """
             DELETE FROM venue.EditionVenue

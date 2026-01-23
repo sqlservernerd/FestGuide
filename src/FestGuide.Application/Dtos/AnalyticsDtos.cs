@@ -5,9 +5,9 @@ namespace FestGuide.Application.Dtos;
 /// </summary>
 public sealed record TrackEventRequest(
     string EventType,
-    Guid? EditionId,
+    long? EditionId,
     string? EntityType,
-    Guid? EntityId,
+    long? EntityId,
     string? Platform,
     string? SessionId,
     Dictionary<string, string>? Metadata);
@@ -16,7 +16,7 @@ public sealed record TrackEventRequest(
 /// Summary dashboard metrics for an edition.
 /// </summary>
 public sealed record EditionDashboardDto(
-    Guid EditionId,
+    long EditionId,
     string EditionName,
     string FestivalName,
     int TotalScheduleViews,
@@ -31,7 +31,7 @@ public sealed record EditionDashboardDto(
 /// Top artist by saves.
 /// </summary>
 public sealed record TopArtistDto(
-    Guid ArtistId,
+    long ArtistId,
     string ArtistName,
     int SaveCount);
 
@@ -39,7 +39,7 @@ public sealed record TopArtistDto(
 /// Top engagement/performance by saves.
 /// </summary>
 public sealed record TopEngagementDto(
-    Guid EngagementId,
+    long EngagementId,
     string? ArtistName,
     string? StageName,
     DateTime? StartTimeUtc,
@@ -106,7 +106,7 @@ public sealed record ExportResultDto(
 /// Festival-wide analytics summary metrics.
 /// </summary>
 public sealed record FestivalAnalyticsSummaryDto(
-    Guid FestivalId,
+    long FestivalId,
     string FestivalName,
     int TotalEditions,
     int TotalScheduleViews,
@@ -118,7 +118,7 @@ public sealed record FestivalAnalyticsSummaryDto(
 /// Brief metrics for each edition in a festival summary.
 /// </summary>
 public sealed record EditionMetricsSummaryDto(
-    Guid EditionId,
+    long EditionId,
     string EditionName,
     int ScheduleViews,
     int PersonalSchedules,
@@ -128,7 +128,7 @@ public sealed record EditionMetricsSummaryDto(
 /// Artist analytics for an edition.
 /// </summary>
 public sealed record ArtistAnalyticsDto(
-    Guid ArtistId,
+    long ArtistId,
     string ArtistName,
     string? ImageUrl,
     int SaveCount,
@@ -139,10 +139,10 @@ public sealed record ArtistAnalyticsDto(
 /// Engagement analytics for an edition.
 /// </summary>
 public sealed record EngagementAnalyticsDto(
-    Guid EngagementId,
-    Guid ArtistId,
+    long EngagementId,
+    long ArtistId,
     string ArtistName,
-    Guid StageId,
+    long StageId,
     string StageName,
     DateTime StartTimeUtc,
     DateTime EndTimeUtc,

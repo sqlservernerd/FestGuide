@@ -6,8 +6,8 @@ namespace FestGuide.Application.Dtos;
 /// Response DTO for venue.
 /// </summary>
 public sealed record VenueDto(
-    Guid VenueId,
-    Guid FestivalId,
+    long VenueId,
+    long FestivalId,
     string Name,
     string? Description,
     string? Address,
@@ -53,7 +53,7 @@ public sealed record UpdateVenueRequest(
 /// Summary DTO for venue list items.
 /// </summary>
 public sealed record VenueSummaryDto(
-    Guid VenueId,
+    long VenueId,
     string Name,
     string? Address)
 {
@@ -68,8 +68,8 @@ public sealed record VenueSummaryDto(
 /// Response DTO for stage.
 /// </summary>
 public sealed record StageDto(
-    Guid StageId,
-    Guid VenueId,
+    long StageId,
+    long VenueId,
     string Name,
     string? Description,
     int SortOrder,
@@ -107,7 +107,7 @@ public sealed record UpdateStageRequest(
 /// Summary DTO for stage list items.
 /// </summary>
 public sealed record StageSummaryDto(
-    Guid StageId,
+    long StageId,
     string Name,
     int SortOrder)
 {

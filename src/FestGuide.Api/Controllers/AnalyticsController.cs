@@ -44,11 +44,11 @@ public class AnalyticsController : ControllerBase
     /// <summary>
     /// Gets dashboard summary for an edition.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/dashboard")]
+    [HttpGet("editions/{editionId:long}/dashboard")]
     [ProducesResponseType(typeof(ApiResponse<EditionDashboardDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetEditionDashboard(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> GetEditionDashboard(long editionId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -71,11 +71,11 @@ public class AnalyticsController : ControllerBase
     /// <summary>
     /// Gets festival-wide summary.
     /// </summary>
-    [HttpGet("festivals/{festivalId:guid}/summary")]
+    [HttpGet("festivals/{festivalId:long}/summary")]
     [ProducesResponseType(typeof(ApiResponse<FestivalAnalyticsSummaryDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetFestivalSummary(Guid festivalId, CancellationToken ct)
+    public async Task<IActionResult> GetFestivalSummary(long festivalId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -98,10 +98,10 @@ public class AnalyticsController : ControllerBase
     /// <summary>
     /// Gets top artists for an edition.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/artists")]
+    [HttpGet("editions/{editionId:long}/artists")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ArtistAnalyticsDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetTopArtists(Guid editionId, [FromQuery] int limit = 10, CancellationToken ct = default)
+    public async Task<IActionResult> GetTopArtists(long editionId, [FromQuery] int limit = 10, CancellationToken ct = default)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -120,10 +120,10 @@ public class AnalyticsController : ControllerBase
     /// <summary>
     /// Gets top engagements for an edition.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/engagements")]
+    [HttpGet("editions/{editionId:long}/engagements")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<EngagementAnalyticsDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetTopEngagements(Guid editionId, [FromQuery] int limit = 10, CancellationToken ct = default)
+    public async Task<IActionResult> GetTopEngagements(long editionId, [FromQuery] int limit = 10, CancellationToken ct = default)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -142,11 +142,11 @@ public class AnalyticsController : ControllerBase
     /// <summary>
     /// Gets event timeline for charts.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/timeline")]
+    [HttpGet("editions/{editionId:long}/timeline")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<TimelineDataPointDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetEventTimeline(
-        Guid editionId,
+        long editionId,
         [FromQuery] DateTime fromUtc,
         [FromQuery] DateTime toUtc,
         [FromQuery] string? eventType = null,
@@ -170,11 +170,11 @@ public class AnalyticsController : ControllerBase
     /// <summary>
     /// Gets daily active users for an edition.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/daily-active-users")]
+    [HttpGet("editions/{editionId:long}/daily-active-users")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<DailyActiveUsersDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetDailyActiveUsers(
-        Guid editionId,
+        long editionId,
         [FromQuery] DateTime fromUtc,
         [FromQuery] DateTime toUtc,
         CancellationToken ct = default)
@@ -196,10 +196,10 @@ public class AnalyticsController : ControllerBase
     /// <summary>
     /// Gets platform distribution for an edition.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/platforms")]
+    [HttpGet("editions/{editionId:long}/platforms")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<PlatformDistributionDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GetPlatformDistribution(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> GetPlatformDistribution(long editionId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -218,11 +218,11 @@ public class AnalyticsController : ControllerBase
     /// <summary>
     /// Gets event type distribution for an edition.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/event-types")]
+    [HttpGet("editions/{editionId:long}/event-types")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<EventTypeDistributionDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     public async Task<IActionResult> GetEventTypeDistribution(
-        Guid editionId,
+        long editionId,
         [FromQuery] DateTime? fromUtc = null,
         [FromQuery] DateTime? toUtc = null,
         CancellationToken ct = default)
@@ -241,10 +241,10 @@ public class AnalyticsController : ControllerBase
         }
     }
 
-    private Guid? GetCurrentUserId()
+    private long? GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+        return long.TryParse(userIdClaim, out var userId) ? userId : null;
     }
 
     private static ApiErrorResponse CreateError(string code, string message) =>

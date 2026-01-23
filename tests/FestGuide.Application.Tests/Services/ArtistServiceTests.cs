@@ -46,7 +46,7 @@ public class ArtistServiceTests
     public async Task GetByIdAsync_WithValidId_ReturnsArtist()
     {
         // Arrange
-        var artistId = Guid.NewGuid();
+        var artistId = 1L;
         var artist = CreateTestArtist(artistId);
 
         _mockArtistRepo.Setup(r => r.GetByIdAsync(artistId, It.IsAny<CancellationToken>()))
@@ -65,7 +65,7 @@ public class ArtistServiceTests
     public async Task GetByIdAsync_WithInvalidId_ThrowsArtistNotFoundException()
     {
         // Arrange
-        var artistId = Guid.NewGuid();
+        var artistId = 2L;
 
         _mockArtistRepo.Setup(r => r.GetByIdAsync(artistId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Artist?)null);
@@ -85,7 +85,7 @@ public class ArtistServiceTests
     public async Task GetByFestivalAsync_WithValidFestivalId_ReturnsArtists()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
+        var festivalId = 3L;
         var artists = new List<Artist>
         {
             CreateTestArtist(festivalId: festivalId, name: "Artist One"),
@@ -107,7 +107,7 @@ public class ArtistServiceTests
     public async Task GetByFestivalAsync_WithNoArtists_ReturnsEmptyList()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
+        var festivalId = 4L;
 
         _mockArtistRepo.Setup(r => r.GetByFestivalAsync(festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Artist>());
@@ -127,7 +127,7 @@ public class ArtistServiceTests
     public async Task SearchAsync_WithMatchingTerm_ReturnsArtists()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
+        var festivalId = 5L;
         var searchTerm = "Rock";
         var artists = new List<Artist>
         {
@@ -149,7 +149,7 @@ public class ArtistServiceTests
     public async Task SearchAsync_WithNoMatches_ReturnsEmptyList()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
+        var festivalId = 6L;
         var searchTerm = "NonExistent";
 
         _mockArtistRepo.Setup(r => r.SearchByNameAsync(festivalId, searchTerm, 20, It.IsAny<CancellationToken>()))
@@ -170,8 +170,8 @@ public class ArtistServiceTests
     public async Task CreateAsync_WithValidRequest_CreatesArtist()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 7L;
+        var userId = 8L;
         var request = new CreateArtistRequest(
             Name: "The Headliners",
             Genre: "Rock",
@@ -185,7 +185,7 @@ public class ArtistServiceTests
         _mockFestivalRepo.Setup(r => r.ExistsAsync(festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         _mockArtistRepo.Setup(r => r.CreateAsync(It.IsAny<Artist>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(101L);
 
         // Act
         var result = await _sut.CreateAsync(festivalId, userId, request);
@@ -205,8 +205,8 @@ public class ArtistServiceTests
     public async Task CreateAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 9L;
+        var userId = 10L;
         var request = new CreateArtistRequest(Name: "Test", Genre: null, Bio: null, ImageUrl: null, WebsiteUrl: null, SpotifyUrl: null);
 
         _mockAuthService.Setup(a => a.HasScopeAsync(userId, festivalId, PermissionScope.Artists, It.IsAny<CancellationToken>()))
@@ -223,8 +223,8 @@ public class ArtistServiceTests
     public async Task CreateAsync_WithNonExistentFestival_ThrowsFestivalNotFoundException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 11L;
+        var userId = 12L;
         var request = new CreateArtistRequest(Name: "Test", Genre: null, Bio: null, ImageUrl: null, WebsiteUrl: null, SpotifyUrl: null);
 
         _mockAuthService.Setup(a => a.HasScopeAsync(userId, festivalId, PermissionScope.Artists, It.IsAny<CancellationToken>()))
@@ -247,9 +247,9 @@ public class ArtistServiceTests
     public async Task UpdateAsync_WithValidRequest_UpdatesArtist()
     {
         // Arrange
-        var artistId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var artistId = 13L;
+        var festivalId = 14L;
+        var userId = 15L;
         var artist = CreateTestArtist(artistId, festivalId);
         var request = new UpdateArtistRequest(
             Name: "Updated Artist Name",
@@ -276,8 +276,8 @@ public class ArtistServiceTests
     public async Task UpdateAsync_WithNonExistentArtist_ThrowsArtistNotFoundException()
     {
         // Arrange
-        var artistId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var artistId = 16L;
+        var userId = 17L;
         var request = new UpdateArtistRequest(Name: "Updated", Genre: null, Bio: null, ImageUrl: null, WebsiteUrl: null, SpotifyUrl: null);
 
         _mockArtistRepo.Setup(r => r.GetByIdAsync(artistId, It.IsAny<CancellationToken>()))
@@ -294,9 +294,9 @@ public class ArtistServiceTests
     public async Task UpdateAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var artistId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var artistId = 18L;
+        var festivalId = 19L;
+        var userId = 20L;
         var artist = CreateTestArtist(artistId, festivalId);
         var request = new UpdateArtistRequest(Name: "Updated", Genre: null, Bio: null, ImageUrl: null, WebsiteUrl: null, SpotifyUrl: null);
 
@@ -320,9 +320,9 @@ public class ArtistServiceTests
     public async Task DeleteAsync_WithValidPermission_DeletesArtist()
     {
         // Arrange
-        var artistId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var artistId = 21L;
+        var festivalId = 22L;
+        var userId = 23L;
         var artist = CreateTestArtist(artistId, festivalId);
 
         _mockArtistRepo.Setup(r => r.GetByIdAsync(artistId, It.IsAny<CancellationToken>()))
@@ -341,8 +341,8 @@ public class ArtistServiceTests
     public async Task DeleteAsync_WithNonExistentArtist_ThrowsArtistNotFoundException()
     {
         // Arrange
-        var artistId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var artistId = 24L;
+        var userId = 25L;
 
         _mockArtistRepo.Setup(r => r.GetByIdAsync(artistId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((Artist?)null);
@@ -358,9 +358,9 @@ public class ArtistServiceTests
     public async Task DeleteAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var artistId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var artistId = 26L;
+        var festivalId = 27L;
+        var userId = 28L;
         var artist = CreateTestArtist(artistId, festivalId);
 
         _mockArtistRepo.Setup(r => r.GetByIdAsync(artistId, It.IsAny<CancellationToken>()))
@@ -379,12 +379,12 @@ public class ArtistServiceTests
 
     #region Helper Methods
 
-    private Artist CreateTestArtist(Guid? artistId = null, Guid? festivalId = null, string? name = null)
+    private Artist CreateTestArtist(long? artistId = null, long? festivalId = null, string? name = null)
     {
         return new Artist
         {
-            ArtistId = artistId ?? Guid.NewGuid(),
-            FestivalId = festivalId ?? Guid.NewGuid(),
+            ArtistId = artistId ?? 0L,
+            FestivalId = festivalId ?? 0L,
             Name = name ?? "Test Artist",
             Genre = "Rock",
             Bio = "Test bio for the artist",
@@ -393,9 +393,9 @@ public class ArtistServiceTests
             SpotifyUrl = "https://spotify.com/artist/test",
             IsDeleted = false,
             CreatedAtUtc = _now,
-            CreatedBy = Guid.NewGuid(),
+            CreatedBy = 1L,
             ModifiedAtUtc = _now,
-            ModifiedBy = Guid.NewGuid()
+            ModifiedBy = 1L
         };
     }
 

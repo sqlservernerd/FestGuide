@@ -18,7 +18,7 @@ public class SqlServerTimeSlotRepository : ITimeSlotRepository
     }
 
     /// <inheritdoc />
-    public async Task<TimeSlot?> GetByIdAsync(Guid timeSlotId, CancellationToken ct = default)
+    public async Task<TimeSlot?> GetByIdAsync(long timeSlotId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -34,7 +34,7 @@ public class SqlServerTimeSlotRepository : ITimeSlotRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<TimeSlot>> GetByIdsAsync(IEnumerable<Guid> timeSlotIds, CancellationToken ct = default)
+    public async Task<IReadOnlyList<TimeSlot>> GetByIdsAsync(IEnumerable<long> timeSlotIds, CancellationToken ct = default)
     {
         var timeSlotIdsList = timeSlotIds?.ToList();
         if (timeSlotIdsList == null || !timeSlotIdsList.Any())
@@ -58,7 +58,7 @@ public class SqlServerTimeSlotRepository : ITimeSlotRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<TimeSlot>> GetByStageAndEditionAsync(Guid stageId, Guid editionId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<TimeSlot>> GetByStageAndEditionAsync(long stageId, long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -77,7 +77,7 @@ public class SqlServerTimeSlotRepository : ITimeSlotRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<TimeSlot>> GetByEditionAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<TimeSlot>> GetByEditionAsync(long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -96,7 +96,7 @@ public class SqlServerTimeSlotRepository : ITimeSlotRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(TimeSlot timeSlot, CancellationToken ct = default)
+    public async Task<long> CreateAsync(TimeSlot timeSlot, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO venue.TimeSlot (
@@ -129,7 +129,7 @@ public class SqlServerTimeSlotRepository : ITimeSlotRepository
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid timeSlotId, Guid deletedBy, CancellationToken ct = default)
+    public async Task DeleteAsync(long timeSlotId, long deletedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE venue.TimeSlot
@@ -148,7 +148,7 @@ public class SqlServerTimeSlotRepository : ITimeSlotRepository
     }
 
     /// <inheritdoc />
-    public async Task<bool> ExistsAsync(Guid timeSlotId, CancellationToken ct = default)
+    public async Task<bool> ExistsAsync(long timeSlotId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(1) FROM venue.TimeSlot
@@ -162,19 +162,19 @@ public class SqlServerTimeSlotRepository : ITimeSlotRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid?> GetEditionIdAsync(Guid timeSlotId, CancellationToken ct = default)
+    public async Task<long?> GetEditionIdAsync(long timeSlotId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT EditionId FROM venue.TimeSlot
             WHERE TimeSlotId = @TimeSlotId AND IsDeleted = 0
             """;
 
-        return await _connection.ExecuteScalarAsync<Guid?>(
+        return await _connection.ExecuteScalarAsync<long?>(
             new CommandDefinition(sql, new { TimeSlotId = timeSlotId }, cancellationToken: ct));
     }
 
     /// <inheritdoc />
-    public async Task<Guid?> GetFestivalIdAsync(Guid timeSlotId, CancellationToken ct = default)
+    public async Task<long?> GetFestivalIdAsync(long timeSlotId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT f.FestivalId 
@@ -184,12 +184,12 @@ public class SqlServerTimeSlotRepository : ITimeSlotRepository
             WHERE ts.TimeSlotId = @TimeSlotId AND ts.IsDeleted = 0
             """;
 
-        return await _connection.ExecuteScalarAsync<Guid?>(
+        return await _connection.ExecuteScalarAsync<long?>(
             new CommandDefinition(sql, new { TimeSlotId = timeSlotId }, cancellationToken: ct));
     }
 
     /// <inheritdoc />
-    public async Task<bool> HasOverlapAsync(Guid stageId, Guid editionId, DateTime startTimeUtc, DateTime endTimeUtc, Guid? excludeTimeSlotId = null, CancellationToken ct = default)
+    public async Task<bool> HasOverlapAsync(long stageId, long editionId, DateTime startTimeUtc, DateTime endTimeUtc, long? excludeTimeSlotId = null, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(1) FROM venue.TimeSlot

@@ -10,32 +10,32 @@ public interface IEngagementRepository
     /// <summary>
     /// Gets an engagement by its unique identifier.
     /// </summary>
-    Task<Engagement?> GetByIdAsync(Guid engagementId, CancellationToken ct = default);
+    Task<Engagement?> GetByIdAsync(long engagementId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets multiple engagements by their unique identifiers.
     /// </summary>
-    Task<IReadOnlyList<Engagement>> GetByIdsAsync(IEnumerable<Guid> engagementIds, CancellationToken ct = default);
+    Task<IReadOnlyList<Engagement>> GetByIdsAsync(IEnumerable<long> engagementIds, CancellationToken ct = default);
 
     /// <summary>
     /// Gets the engagement for a time slot.
     /// </summary>
-    Task<Engagement?> GetByTimeSlotAsync(Guid timeSlotId, CancellationToken ct = default);
+    Task<Engagement?> GetByTimeSlotAsync(long timeSlotId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets all engagements for an edition.
     /// </summary>
-    Task<IReadOnlyList<Engagement>> GetByEditionAsync(Guid editionId, CancellationToken ct = default);
+    Task<IReadOnlyList<Engagement>> GetByEditionAsync(long editionId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets all engagements for an artist.
     /// </summary>
-    Task<IReadOnlyList<Engagement>> GetByArtistAsync(Guid artistId, CancellationToken ct = default);
+    Task<IReadOnlyList<Engagement>> GetByArtistAsync(long artistId, CancellationToken ct = default);
 
     /// <summary>
     /// Creates a new engagement.
     /// </summary>
-    Task<Guid> CreateAsync(Engagement engagement, CancellationToken ct = default);
+    Task<long> CreateAsync(Engagement engagement, CancellationToken ct = default);
 
     /// <summary>
     /// Updates an existing engagement.
@@ -45,20 +45,20 @@ public interface IEngagementRepository
     /// <summary>
     /// Soft-deletes an engagement.
     /// </summary>
-    Task DeleteAsync(Guid engagementId, Guid deletedBy, CancellationToken ct = default);
+    Task DeleteAsync(long engagementId, long deletedBy, CancellationToken ct = default);
 
     /// <summary>
     /// Checks if an engagement exists.
     /// </summary>
-    Task<bool> ExistsAsync(Guid engagementId, CancellationToken ct = default);
+    Task<bool> ExistsAsync(long engagementId, CancellationToken ct = default);
 
     /// <summary>
     /// Checks if a time slot already has an engagement.
     /// </summary>
-    Task<bool> TimeSlotHasEngagementAsync(Guid timeSlotId, CancellationToken ct = default);
+    Task<bool> TimeSlotHasEngagementAsync(long timeSlotId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets the festival ID for an engagement (through time slot chain).
     /// </summary>
-    Task<Guid?> GetFestivalIdAsync(Guid engagementId, CancellationToken ct = default);
+    Task<long?> GetFestivalIdAsync(long engagementId, CancellationToken ct = default);
 }

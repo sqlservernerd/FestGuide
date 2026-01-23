@@ -5,11 +5,11 @@ namespace FestGuide.Domain.Exceptions;
 /// </summary>
 public class ScheduleNotFoundException : DomainException
 {
-    public ScheduleNotFoundException(Guid editionId)
+    public ScheduleNotFoundException(long editionId)
         : base($"Schedule for edition with ID '{editionId}' was not found.")
     {
         EditionId = editionId;
     }
 
-    public Guid EditionId { get; }
+    public long EditionId { get; }
 }

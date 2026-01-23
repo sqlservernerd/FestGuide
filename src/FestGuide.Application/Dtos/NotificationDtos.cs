@@ -14,7 +14,7 @@ public sealed record RegisterDeviceRequest(
 /// Response DTO for device token.
 /// </summary>
 public sealed record DeviceTokenDto(
-    Guid DeviceTokenId,
+    long DeviceTokenId,
     string Platform,
     string? DeviceName,
     bool IsActive,
@@ -35,12 +35,12 @@ public sealed record DeviceTokenDto(
 /// Response DTO for notification log.
 /// </summary>
 public sealed record NotificationDto(
-    Guid NotificationId,
+    long NotificationId,
     string NotificationType,
     string Title,
     string Body,
     string? RelatedEntityType,
-    Guid? RelatedEntityId,
+    long? RelatedEntityId,
     DateTime SentAtUtc,
     bool IsRead)
 {
@@ -118,10 +118,10 @@ public sealed record PushNotificationMessage(
 /// DTO for schedule change notification payload.
 /// </summary>
 public sealed record ScheduleChangeNotification(
-    Guid EditionId,
+    long EditionId,
     string ChangeType,
-    Guid? EngagementId,
-    Guid? TimeSlotId,
+    long? EngagementId,
+    long? TimeSlotId,
     string? ArtistName,
     string? StageName,
     DateTime? OldStartTime,

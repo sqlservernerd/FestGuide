@@ -18,7 +18,7 @@ public class SqlServerFestivalRepository : IFestivalRepository
     }
 
     /// <inheritdoc />
-    public async Task<Festival?> GetByIdAsync(Guid festivalId, CancellationToken ct = default)
+    public async Task<Festival?> GetByIdAsync(long festivalId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -34,7 +34,7 @@ public class SqlServerFestivalRepository : IFestivalRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Festival>> GetByIdsAsync(IEnumerable<Guid> festivalIds, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Festival>> GetByIdsAsync(IEnumerable<long> festivalIds, CancellationToken ct = default)
     {
         var festivalIdsList = festivalIds?.ToList();
         if (festivalIdsList == null || !festivalIdsList.Any())
@@ -58,7 +58,7 @@ public class SqlServerFestivalRepository : IFestivalRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Festival>> GetByOwnerAsync(Guid ownerUserId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Festival>> GetByOwnerAsync(long ownerUserId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -77,7 +77,7 @@ public class SqlServerFestivalRepository : IFestivalRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Festival>> GetByUserAccessAsync(Guid userId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Festival>> GetByUserAccessAsync(long userId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT DISTINCT f.FestivalId, f.Name, f.Description, f.ImageUrl, f.WebsiteUrl,
@@ -116,7 +116,7 @@ public class SqlServerFestivalRepository : IFestivalRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(Festival festival, CancellationToken ct = default)
+    public async Task<long> CreateAsync(Festival festival, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO core.Festival (
@@ -151,7 +151,7 @@ public class SqlServerFestivalRepository : IFestivalRepository
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid festivalId, Guid deletedBy, CancellationToken ct = default)
+    public async Task DeleteAsync(long festivalId, long deletedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE core.Festival
@@ -170,7 +170,7 @@ public class SqlServerFestivalRepository : IFestivalRepository
     }
 
     /// <inheritdoc />
-    public async Task<bool> ExistsAsync(Guid festivalId, CancellationToken ct = default)
+    public async Task<bool> ExistsAsync(long festivalId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(1) FROM core.Festival
@@ -184,7 +184,7 @@ public class SqlServerFestivalRepository : IFestivalRepository
     }
 
     /// <inheritdoc />
-    public async Task TransferOwnershipAsync(Guid festivalId, Guid newOwnerUserId, Guid modifiedBy, CancellationToken ct = default)
+    public async Task TransferOwnershipAsync(long festivalId, long newOwnerUserId, long modifiedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE core.Festival

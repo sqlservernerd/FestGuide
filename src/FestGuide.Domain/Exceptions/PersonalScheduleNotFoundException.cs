@@ -5,11 +5,11 @@ namespace FestGuide.Domain.Exceptions;
 /// </summary>
 public class PersonalScheduleNotFoundException : DomainException
 {
-    public PersonalScheduleNotFoundException(Guid personalScheduleId)
+    public PersonalScheduleNotFoundException(long personalScheduleId)
         : base($"Personal schedule with ID '{personalScheduleId}' was not found.")
     {
         PersonalScheduleId = personalScheduleId;
     }
 
-    public Guid PersonalScheduleId { get; }
+    public long PersonalScheduleId { get; }
 }

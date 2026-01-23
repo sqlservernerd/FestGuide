@@ -19,7 +19,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
 
     /// <inheritdoc />
-    public async Task<FestivalPermission?> GetByIdAsync(Guid permissionId, CancellationToken ct = default)
+    public async Task<FestivalPermission?> GetByIdAsync(long permissionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -35,7 +35,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
 
     /// <inheritdoc />
-    public async Task<FestivalPermission?> GetByUserAndFestivalAsync(Guid userId, Guid festivalId, CancellationToken ct = default)
+    public async Task<FestivalPermission?> GetByUserAndFestivalAsync(long userId, long festivalId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -51,7 +51,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<FestivalPermission>> GetByFestivalAsync(Guid festivalId, CancellationToken ct = default)
+    public async Task<IEnumerable<FestivalPermission>> GetByFestivalAsync(long festivalId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -68,7 +68,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<FestivalPermission>> GetActiveByFestivalAsync(Guid festivalId, CancellationToken ct = default)
+    public async Task<IEnumerable<FestivalPermission>> GetActiveByFestivalAsync(long festivalId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -87,7 +87,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
 
     /// <inheritdoc />
-    public async Task<IEnumerable<FestivalPermission>> GetByUserAsync(Guid userId, CancellationToken ct = default)
+    public async Task<IEnumerable<FestivalPermission>> GetByUserAsync(long userId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -104,7 +104,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
 
     /// <inheritdoc />
-    public async Task<FestivalPermission?> GetOwnerAsync(Guid festivalId, CancellationToken ct = default)
+    public async Task<FestivalPermission?> GetOwnerAsync(long festivalId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -120,7 +120,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
 
     /// <inheritdoc />
-    public async Task<bool> HasAnyPermissionAsync(Guid userId, Guid festivalId, CancellationToken ct = default)
+    public async Task<bool> HasAnyPermissionAsync(long userId, long festivalId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(1) FROM permissions.FestivalPermission
@@ -137,7 +137,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
 
     /// <inheritdoc />
-    public async Task<bool> HasRoleOrHigherAsync(Guid userId, Guid festivalId, FestivalRole minimumRole, CancellationToken ct = default)
+    public async Task<bool> HasRoleOrHigherAsync(long userId, long festivalId, FestivalRole minimumRole, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(1) FROM permissions.FestivalPermission
@@ -155,7 +155,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
 
     /// <inheritdoc />
-    public async Task<bool> HasScopeAsync(Guid userId, Guid festivalId, PermissionScope scope, CancellationToken ct = default)
+    public async Task<bool> HasScopeAsync(long userId, long festivalId, PermissionScope scope, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(1) FROM permissions.FestivalPermission
@@ -180,7 +180,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
 
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(FestivalPermission permission, CancellationToken ct = default)
+    public async Task<long> CreateAsync(FestivalPermission permission, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO permissions.FestivalPermission (
@@ -200,7 +200,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
     
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(FestivalPermission permission, ITransactionScope transactionScope, CancellationToken ct = default)
+    public async Task<long> CreateAsync(FestivalPermission permission, ITransactionScope transactionScope, CancellationToken ct = default)
     {
         if (transactionScope == null)
         {
@@ -241,7 +241,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
 
     /// <inheritdoc />
-    public async Task RevokeAsync(Guid permissionId, CancellationToken ct = default)
+    public async Task RevokeAsync(long permissionId, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE permissions.FestivalPermission
@@ -259,7 +259,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
 
     /// <inheritdoc />
-    public async Task TransferOwnershipAsync(Guid festivalId, Guid fromUserId, Guid toUserId, CancellationToken ct = default)
+    public async Task TransferOwnershipAsync(long festivalId, long fromUserId, long toUserId, CancellationToken ct = default)
     {
         var now = DateTime.UtcNow;
 
@@ -295,7 +295,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
 
     /// <inheritdoc />
-    public async Task AcceptInvitationAsync(Guid permissionId, CancellationToken ct = default)
+    public async Task AcceptInvitationAsync(long permissionId, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE permissions.FestivalPermission
@@ -313,7 +313,7 @@ public class SqlServerFestivalPermissionRepository : IFestivalPermissionReposito
     }
 
     /// <inheritdoc />
-    public async Task DeclineInvitationAsync(Guid permissionId, CancellationToken ct = default)
+    public async Task DeclineInvitationAsync(long permissionId, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE permissions.FestivalPermission

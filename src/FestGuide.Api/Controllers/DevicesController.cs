@@ -72,11 +72,11 @@ public class DevicesController : BaseApiController
     /// <summary>
     /// Unregisters a device.
     /// </summary>
-    [HttpDelete("{deviceId:guid}")]
+    [HttpDelete("{deviceId:long}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UnregisterDevice(Guid deviceId, CancellationToken ct)
+    public async Task<IActionResult> UnregisterDevice(long deviceId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         try
