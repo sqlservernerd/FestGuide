@@ -11,6 +11,8 @@
     <DefaultSchema>core</DefaultSchema>
     <GenerateCreateScript>True</GenerateCreateScript>
     <IncludeCompositeObjects>True</IncludeCompositeObjects>
+    <!-- Disable auto-discovery to use explicit build order -->
+    <EnableDefaultSqlItems>false</EnableDefaultSqlItems>
   </PropertyGroup>
 
   <PropertyGroup>
