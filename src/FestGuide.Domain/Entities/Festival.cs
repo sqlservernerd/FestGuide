@@ -8,7 +8,7 @@ public class Festival : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the festival.
     /// </summary>
-    public Guid FestivalId { get; set; }
+    public long FestivalId { get; set; }
 
     /// <summary>
     /// Gets or sets the festival name.
@@ -33,7 +33,7 @@ public class Festival : BaseEntity
     /// <summary>
     /// Gets or sets the ID of the user who owns the festival.
     /// </summary>
-    public Guid OwnerUserId { get; set; }
+    public long OwnerUserId { get; set; }
 
     /// <summary>
     /// Gets or sets whether the festival has been soft-deleted.

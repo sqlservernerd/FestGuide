@@ -5,11 +5,11 @@ namespace FestGuide.Domain.Exceptions;
 /// </summary>
 public class VenueNotFoundException : DomainException
 {
-    public VenueNotFoundException(Guid venueId)
+    public VenueNotFoundException(long venueId)
         : base($"Venue with ID '{venueId}' was not found.")
     {
         VenueId = venueId;
     }
 
-    public Guid VenueId { get; }
+    public long VenueId { get; }
 }

@@ -58,7 +58,7 @@ public class ExportService : IExportService
     }
 
     /// <inheritdoc />
-    public async Task<ExportResultDto> ExportEditionDataAsync(Guid editionId, Guid organizerId, ExportRequest request, CancellationToken ct = default)
+    public async Task<ExportResultDto> ExportEditionDataAsync(long editionId, long organizerId, ExportRequest request, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(request);
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
@@ -100,7 +100,7 @@ public class ExportService : IExportService
     }
 
     /// <inheritdoc />
-    public async Task<ExportResultDto> ExportScheduleCsvAsync(Guid editionId, Guid organizerId, CancellationToken ct = default)
+    public async Task<ExportResultDto> ExportScheduleCsvAsync(long editionId, long organizerId, CancellationToken ct = default)
     {
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -115,7 +115,7 @@ public class ExportService : IExportService
     }
 
     /// <inheritdoc />
-    public async Task<ExportResultDto> ExportArtistsCsvAsync(Guid editionId, Guid organizerId, CancellationToken ct = default)
+    public async Task<ExportResultDto> ExportArtistsCsvAsync(long editionId, long organizerId, CancellationToken ct = default)
     {
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -130,7 +130,7 @@ public class ExportService : IExportService
     }
 
     /// <inheritdoc />
-    public async Task<ExportResultDto> ExportAnalyticsCsvAsync(Guid editionId, Guid organizerId, DateTime? fromUtc, DateTime? toUtc, CancellationToken ct = default)
+    public async Task<ExportResultDto> ExportAnalyticsCsvAsync(long editionId, long organizerId, DateTime? fromUtc, DateTime? toUtc, CancellationToken ct = default)
     {
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -145,7 +145,7 @@ public class ExportService : IExportService
     }
 
     /// <inheritdoc />
-    public async Task<ExportResultDto> ExportAttendeeSavesCsvAsync(Guid editionId, Guid organizerId, CancellationToken ct = default)
+    public async Task<ExportResultDto> ExportAttendeeSavesCsvAsync(long editionId, long organizerId, CancellationToken ct = default)
     {
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -184,8 +184,8 @@ public class ExportService : IExportService
                 ex);
         }
         
-        var engagementDictionary = new Dictionary<Guid, Domain.Entities.Engagement>();
-        var missingEngagementIds = new List<Guid>();
+        var engagementDictionary = new Dictionary<long, Domain.Entities.Engagement>();
+        var missingEngagementIds = new List<long>();
         
         for (int i = 0; i < engagements.Length; i++)
         {
@@ -231,8 +231,8 @@ public class ExportService : IExportService
                 ex);
         }
         
-        var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
-        var missingArtistIds = new List<Guid>();
+        var artistDictionary = new Dictionary<long, Domain.Entities.Artist>();
+        var missingArtistIds = new List<long>();
         
         for (int i = 0; i < artists.Length; i++)
         {
@@ -278,8 +278,8 @@ public class ExportService : IExportService
                 ex);
         }
         
-        var timeSlotDictionary = new Dictionary<Guid, Domain.Entities.TimeSlot>();
-        var missingTimeSlotIds = new List<Guid>();
+        var timeSlotDictionary = new Dictionary<long, Domain.Entities.TimeSlot>();
+        var missingTimeSlotIds = new List<long>();
         
         for (int i = 0; i < timeSlots.Length; i++)
         {
@@ -326,8 +326,8 @@ public class ExportService : IExportService
                 ex);
         }
         
-        var stageDictionary = new Dictionary<Guid, Domain.Entities.Stage>();
-        var missingStageIds = new List<Guid>();
+        var stageDictionary = new Dictionary<long, Domain.Entities.Stage>();
+        var missingStageIds = new List<long>();
         
         for (int i = 0; i < stages.Length; i++)
         {
@@ -375,7 +375,7 @@ public class ExportService : IExportService
         return new ExportResultDto(fileName, "text/csv", data);
     }
 
-    private async Task<string> BuildScheduleCsvAsync(Guid editionId, CancellationToken ct)
+    private async Task<string> BuildScheduleCsvAsync(long editionId, CancellationToken ct)
     {
         var sb = new StringBuilder();
         sb.AppendLine("TimeSlotId,StageId,StageName,StartTimeUtc,EndTimeUtc,ArtistId,ArtistName");
@@ -394,7 +394,7 @@ public class ExportService : IExportService
         var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
         var stages = await Task.WhenAll(stageTasks);
         
-        var stageDictionary = new Dictionary<Guid, Domain.Entities.Stage>();
+        var stageDictionary = new Dictionary<long, Domain.Entities.Stage>();
         foreach (var stage in stages.OfType<Domain.Entities.Stage>())
         {
             stageDictionary[stage.StageId] = stage;
@@ -405,7 +405,7 @@ public class ExportService : IExportService
         var engagementTasks = timeSlotIds.Select(id => _engagementRepository.GetByTimeSlotAsync(id, ct)).ToArray();
         var engagements = await Task.WhenAll(engagementTasks);
         
-        var engagementDictionary = new Dictionary<Guid, Domain.Entities.Engagement>();
+        var engagementDictionary = new Dictionary<long, Domain.Entities.Engagement>();
         foreach (var engagement in engagements.Where(e => e != null))
         {
             engagementDictionary[engagement!.TimeSlotId] = engagement;
@@ -420,7 +420,7 @@ public class ExportService : IExportService
         var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();
         var artists = await Task.WhenAll(artistTasks);
         
-        var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
+        var artistDictionary = new Dictionary<long, Domain.Entities.Artist>();
         foreach (var artist in artists.Where(a => a != null))
         {
             artistDictionary[artist!.ArtistId] = artist;
@@ -445,7 +445,7 @@ public class ExportService : IExportService
         return sb.ToString();
     }
 
-    private async Task<string> BuildArtistsCsvAsync(Guid editionId, CancellationToken ct)
+    private async Task<string> BuildArtistsCsvAsync(long editionId, CancellationToken ct)
     {
         var sb = new StringBuilder();
         sb.AppendLine("ArtistId,Name,Genre,Bio,WebsiteUrl,ImageUrl");
@@ -463,7 +463,7 @@ public class ExportService : IExportService
         return sb.ToString();
     }
 
-    private async Task<string> BuildAnalyticsCsvAsync(Guid editionId, DateTime? fromUtc, DateTime? toUtc, CancellationToken ct)
+    private async Task<string> BuildAnalyticsCsvAsync(long editionId, DateTime? fromUtc, DateTime? toUtc, CancellationToken ct)
     {
         var sb = new StringBuilder();
 
@@ -500,7 +500,7 @@ public class ExportService : IExportService
         return sb.ToString();
     }
 
-    private async Task EnsureOrganizerAccessAsync(Guid festivalId, Guid organizerId, CancellationToken ct)
+    private async Task EnsureOrganizerAccessAsync(long festivalId, long organizerId, CancellationToken ct)
     {
         if (!await _authService.CanViewAnalyticsAsync(organizerId, festivalId, ct))
         {

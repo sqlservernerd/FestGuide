@@ -17,7 +17,7 @@ public class ReportsControllerTests
     private readonly Mock<IExportService> _mockExportService;
     private readonly Mock<ILogger<ReportsController>> _mockLogger;
     private readonly ReportsController _sut;
-    private readonly Guid _userId = Guid.NewGuid();
+    private readonly long _userId = 100L;
 
     public ReportsControllerTests()
     {
@@ -37,7 +37,7 @@ public class ReportsControllerTests
     public async Task ExportEditionData_WithValidRequest_ReturnsFileContent()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 1L;
         var request = new ExportRequest("csv", true, true, true, null, null);
         var exportResult = new ExportResultDto(
             "edition_export.csv",
@@ -61,7 +61,7 @@ public class ReportsControllerTests
     public async Task ExportEditionData_WithNonExistentEdition_Returns404NotFound()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 2L;
         var request = new ExportRequest("csv", true, true, true, null, null);
 
         _mockExportService.Setup(s => s.ExportEditionDataAsync(editionId, _userId, request, It.IsAny<CancellationToken>()))
@@ -80,7 +80,7 @@ public class ReportsControllerTests
     public async Task ExportEditionData_WithoutPermission_Returns403Forbidden()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 3L;
         var request = new ExportRequest("csv", true, true, true, null, null);
 
         _mockExportService.Setup(s => s.ExportEditionDataAsync(editionId, _userId, request, It.IsAny<CancellationToken>()))
@@ -100,7 +100,7 @@ public class ReportsControllerTests
     public async Task ExportEditionData_WithoutAuthentication_Returns401Unauthorized()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 4L;
         var request = new ExportRequest("csv", true, true, true, null, null);
         var controller = new ReportsController(_mockExportService.Object, _mockLogger.Object);
         controller.ControllerContext = new ControllerContext
@@ -123,7 +123,7 @@ public class ReportsControllerTests
     public async Task ExportScheduleCsv_WithValidEditionId_ReturnsFileContent()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 5L;
         var exportResult = new ExportResultDto(
             "schedule.csv",
             "text/csv",
@@ -146,7 +146,7 @@ public class ReportsControllerTests
     public async Task ExportScheduleCsv_WithNonExistentEdition_Returns404NotFound()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 6L;
 
         _mockExportService.Setup(s => s.ExportScheduleCsvAsync(editionId, _userId, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new EditionNotFoundException(editionId));
@@ -164,7 +164,7 @@ public class ReportsControllerTests
     public async Task ExportScheduleCsv_WithoutPermission_Returns403Forbidden()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 7L;
 
         _mockExportService.Setup(s => s.ExportScheduleCsvAsync(editionId, _userId, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new ForbiddenException("Access denied"));
@@ -185,7 +185,7 @@ public class ReportsControllerTests
     public async Task ExportArtistsCsv_WithValidEditionId_ReturnsFileContent()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 8L;
         var exportResult = new ExportResultDto(
             "artists.csv",
             "text/csv",
@@ -208,7 +208,7 @@ public class ReportsControllerTests
     public async Task ExportArtistsCsv_WithNonExistentEdition_Returns404NotFound()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 9L;
 
         _mockExportService.Setup(s => s.ExportArtistsCsvAsync(editionId, _userId, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new EditionNotFoundException(editionId));
@@ -230,7 +230,7 @@ public class ReportsControllerTests
     public async Task ExportAnalyticsCsv_WithValidEditionId_ReturnsFileContent()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 10L;
         var exportResult = new ExportResultDto(
             "analytics.csv",
             "text/csv",
@@ -253,7 +253,7 @@ public class ReportsControllerTests
     public async Task ExportAnalyticsCsv_WithDateRange_PassesParameters()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 11L;
         var fromUtc = DateTime.UtcNow.AddDays(-30);
         var toUtc = DateTime.UtcNow;
         var exportResult = new ExportResultDto(
@@ -282,7 +282,7 @@ public class ReportsControllerTests
     public async Task ExportAnalyticsCsv_WithNonExistentEdition_Returns404NotFound()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 12L;
 
         _mockExportService.Setup(s => s.ExportAnalyticsCsvAsync(editionId, _userId, null, null, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new EditionNotFoundException(editionId));
@@ -304,7 +304,7 @@ public class ReportsControllerTests
     public async Task ExportAttendeeSavesCsv_WithValidEditionId_ReturnsFileContent()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 13L;
         var exportResult = new ExportResultDto(
             "attendee_saves.csv",
             "text/csv",
@@ -327,7 +327,7 @@ public class ReportsControllerTests
     public async Task ExportAttendeeSavesCsv_WithNonExistentEdition_Returns404NotFound()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 14L;
 
         _mockExportService.Setup(s => s.ExportAttendeeSavesCsvAsync(editionId, _userId, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new EditionNotFoundException(editionId));
@@ -345,7 +345,7 @@ public class ReportsControllerTests
     public async Task ExportAttendeeSavesCsv_WithoutPermission_Returns403Forbidden()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 15L;
 
         _mockExportService.Setup(s => s.ExportAttendeeSavesCsvAsync(editionId, _userId, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new ForbiddenException("Access denied"));

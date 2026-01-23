@@ -18,7 +18,7 @@ public class SqlServerStageRepository : IStageRepository
     }
 
     /// <inheritdoc />
-    public async Task<Stage?> GetByIdAsync(Guid stageId, CancellationToken ct = default)
+    public async Task<Stage?> GetByIdAsync(long stageId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -34,7 +34,7 @@ public class SqlServerStageRepository : IStageRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Stage>> GetByIdsAsync(IEnumerable<Guid> stageIds, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Stage>> GetByIdsAsync(IEnumerable<long> stageIds, CancellationToken ct = default)
     {
         var stageIdsList = stageIds?.ToList();
         if (stageIdsList == null || !stageIdsList.Any())
@@ -58,7 +58,7 @@ public class SqlServerStageRepository : IStageRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Stage>> GetByVenueAsync(Guid venueId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Stage>> GetByVenueAsync(long venueId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -77,7 +77,7 @@ public class SqlServerStageRepository : IStageRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Stage>> GetByEditionAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Stage>> GetByEditionAsync(long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -98,14 +98,14 @@ public class SqlServerStageRepository : IStageRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(Stage stage, CancellationToken ct = default)
+    public async Task<long> CreateAsync(Stage stage, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO venue.Stage (
-                StageId, VenueId, Name, Description, SortOrder, IsDeleted,
+                VenueId, Name, Description, SortOrder, IsDeleted,
                 CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
             ) VALUES (
-                @StageId, @VenueId, @Name, @Description, @SortOrder, @IsDeleted,
+                @VenueId, @Name, @Description, @SortOrder, @IsDeleted,
                 @CreatedAtUtc, @CreatedBy, @ModifiedAtUtc, @ModifiedBy
             )
             """;
@@ -132,7 +132,7 @@ public class SqlServerStageRepository : IStageRepository
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid stageId, Guid deletedBy, CancellationToken ct = default)
+    public async Task DeleteAsync(long stageId, long deletedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE venue.Stage
@@ -151,7 +151,7 @@ public class SqlServerStageRepository : IStageRepository
     }
 
     /// <inheritdoc />
-    public async Task<bool> ExistsAsync(Guid stageId, CancellationToken ct = default)
+    public async Task<bool> ExistsAsync(long stageId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(1) FROM venue.Stage
@@ -165,19 +165,19 @@ public class SqlServerStageRepository : IStageRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid?> GetVenueIdAsync(Guid stageId, CancellationToken ct = default)
+    public async Task<long?> GetVenueIdAsync(long stageId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT VenueId FROM venue.Stage
             WHERE StageId = @StageId AND IsDeleted = 0
             """;
 
-        return await _connection.ExecuteScalarAsync<Guid?>(
+        return await _connection.ExecuteScalarAsync<long?>(
             new CommandDefinition(sql, new { StageId = stageId }, cancellationToken: ct));
     }
 
     /// <inheritdoc />
-    public async Task<Guid?> GetFestivalIdAsync(Guid stageId, CancellationToken ct = default)
+    public async Task<long?> GetFestivalIdAsync(long stageId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT v.FestivalId 
@@ -186,7 +186,7 @@ public class SqlServerStageRepository : IStageRepository
             WHERE s.StageId = @StageId AND s.IsDeleted = 0
             """;
 
-        return await _connection.ExecuteScalarAsync<Guid?>(
+        return await _connection.ExecuteScalarAsync<long?>(
             new CommandDefinition(sql, new { StageId = stageId }, cancellationToken: ct));
     }
 }

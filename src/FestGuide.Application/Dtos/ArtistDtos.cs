@@ -6,8 +6,8 @@ namespace FestGuide.Application.Dtos;
 /// Response DTO for artist.
 /// </summary>
 public sealed record ArtistDto(
-    Guid ArtistId,
-    Guid FestivalId,
+    long ArtistId,
+    long FestivalId,
     string Name,
     string? Genre,
     string? Bio,
@@ -57,7 +57,7 @@ public sealed record UpdateArtistRequest(
 /// Summary DTO for artist list items.
 /// </summary>
 public sealed record ArtistSummaryDto(
-    Guid ArtistId,
+    long ArtistId,
     string Name,
     string? Genre,
     string? ImageUrl)

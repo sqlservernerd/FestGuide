@@ -8,12 +8,12 @@ public class RefreshToken
     /// <summary>
     /// Gets or sets the unique identifier for the refresh token.
     /// </summary>
-    public Guid RefreshTokenId { get; set; }
+    public long RefreshTokenId { get; set; }
 
     /// <summary>
     /// Gets or sets the user ID this token belongs to.
     /// </summary>
-    public Guid UserId { get; set; }
+    public long UserId { get; set; }
 
     /// <summary>
     /// Gets or sets the hashed token value.
@@ -38,7 +38,7 @@ public class RefreshToken
     /// <summary>
     /// Gets or sets the ID of the token that replaced this one (for rotation).
     /// </summary>
-    public Guid? ReplacedByTokenId { get; set; }
+    public long? ReplacedByTokenId { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time when the token was created (UTC).

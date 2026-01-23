@@ -22,7 +22,7 @@ public class FestivalAuthorizationService : IFestivalAuthorizationService
     }
 
     /// <inheritdoc />
-    public async Task<bool> CanViewFestivalAsync(Guid userId, Guid festivalId, CancellationToken ct = default)
+    public async Task<bool> CanViewFestivalAsync(long userId, long festivalId, CancellationToken ct = default)
     {
         _logger.LogDebug("Checking view permission for user {UserId} on festival {FestivalId}", userId, festivalId);
         
@@ -31,7 +31,7 @@ public class FestivalAuthorizationService : IFestivalAuthorizationService
     }
 
     /// <inheritdoc />
-    public async Task<bool> CanEditFestivalAsync(Guid userId, Guid festivalId, CancellationToken ct = default)
+    public async Task<bool> CanEditFestivalAsync(long userId, long festivalId, CancellationToken ct = default)
     {
         _logger.LogDebug("Checking edit permission for user {UserId} on festival {FestivalId}", userId, festivalId);
         
@@ -40,7 +40,7 @@ public class FestivalAuthorizationService : IFestivalAuthorizationService
     }
 
     /// <inheritdoc />
-    public async Task<bool> CanDeleteFestivalAsync(Guid userId, Guid festivalId, CancellationToken ct = default)
+    public async Task<bool> CanDeleteFestivalAsync(long userId, long festivalId, CancellationToken ct = default)
     {
         _logger.LogDebug("Checking delete permission for user {UserId} on festival {FestivalId}", userId, festivalId);
         
@@ -50,7 +50,7 @@ public class FestivalAuthorizationService : IFestivalAuthorizationService
 
 
     /// <inheritdoc />
-    public async Task<bool> HasScopeAsync(Guid userId, Guid festivalId, PermissionScope scope, CancellationToken ct = default)
+    public async Task<bool> HasScopeAsync(long userId, long festivalId, PermissionScope scope, CancellationToken ct = default)
     {
         _logger.LogDebug(
             "Checking scope '{Scope}' for user {UserId} on festival {FestivalId}",
@@ -60,7 +60,7 @@ public class FestivalAuthorizationService : IFestivalAuthorizationService
     }
 
     /// <inheritdoc />
-    public async Task<string?> GetRoleAsync(Guid userId, Guid festivalId, CancellationToken ct = default)
+    public async Task<string?> GetRoleAsync(long userId, long festivalId, CancellationToken ct = default)
     {
         _logger.LogDebug("Getting role for user {UserId} on festival {FestivalId}", userId, festivalId);
         
@@ -70,7 +70,7 @@ public class FestivalAuthorizationService : IFestivalAuthorizationService
     }
 
     /// <inheritdoc />
-    public async Task<bool> CanManagePermissionsAsync(Guid userId, Guid festivalId, CancellationToken ct = default)
+    public async Task<bool> CanManagePermissionsAsync(long userId, long festivalId, CancellationToken ct = default)
     {
         _logger.LogDebug(
             "Checking permission management capability for user {UserId} on festival {FestivalId}",
@@ -81,7 +81,7 @@ public class FestivalAuthorizationService : IFestivalAuthorizationService
     }
 
     /// <inheritdoc />
-    public async Task<bool> CanTransferOwnershipAsync(Guid userId, Guid festivalId, CancellationToken ct = default)
+    public async Task<bool> CanTransferOwnershipAsync(long userId, long festivalId, CancellationToken ct = default)
     {
         _logger.LogDebug(
             "Checking ownership transfer capability for user {UserId} on festival {FestivalId}",
@@ -92,7 +92,7 @@ public class FestivalAuthorizationService : IFestivalAuthorizationService
     }
 
     /// <inheritdoc />
-    public async Task<bool> CanPublishScheduleAsync(Guid userId, Guid festivalId, CancellationToken ct = default)
+    public async Task<bool> CanPublishScheduleAsync(long userId, long festivalId, CancellationToken ct = default)
     {
         _logger.LogDebug(
             "Checking schedule publish capability for user {UserId} on festival {FestivalId}",
@@ -103,7 +103,7 @@ public class FestivalAuthorizationService : IFestivalAuthorizationService
     }
 
     /// <inheritdoc />
-    public async Task<bool> CanViewAnalyticsAsync(Guid userId, Guid festivalId, CancellationToken ct = default)
+    public async Task<bool> CanViewAnalyticsAsync(long userId, long festivalId, CancellationToken ct = default)
     {
         _logger.LogDebug(
             "Checking analytics view capability for user {UserId} on festival {FestivalId}",

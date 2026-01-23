@@ -9,12 +9,12 @@ public class Artist : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the artist.
     /// </summary>
-    public Guid ArtistId { get; set; }
+    public long ArtistId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the festival this artist belongs to.
     /// </summary>
-    public Guid FestivalId { get; set; }
+    public long FestivalId { get; set; }
 
     /// <summary>
     /// Gets or sets the artist name.

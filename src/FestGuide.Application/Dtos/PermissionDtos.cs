@@ -7,16 +7,16 @@ namespace FestGuide.Application.Dtos;
 /// Response DTO for festival permission.
 /// </summary>
 public sealed record PermissionDto(
-    Guid PermissionId,
-    Guid FestivalId,
-    Guid UserId,
+    long PermissionId,
+    long FestivalId,
+    long UserId,
     string? UserEmail,
     string? UserDisplayName,
     FestivalRole Role,
     PermissionScope Scope,
     bool IsPending,
     DateTime? AcceptedAtUtc,
-    Guid? InvitedByUserId,
+    long? InvitedByUserId,
     DateTime CreatedAtUtc)
 {
     public static PermissionDto FromEntity(FestivalPermission permission, string? userEmail = null, string? userDisplayName = null) =>
@@ -38,8 +38,8 @@ public sealed record PermissionDto(
 /// Summary DTO for permission list items.
 /// </summary>
 public sealed record PermissionSummaryDto(
-    Guid PermissionId,
-    Guid UserId,
+    long PermissionId,
+    long UserId,
     string? UserEmail,
     string? UserDisplayName,
     FestivalRole Role,
@@ -65,7 +65,7 @@ public sealed record UpdatePermissionRequest(
 /// Response DTO for invitation result.
 /// </summary>
 public sealed record InvitationResultDto(
-    Guid PermissionId,
+    long PermissionId,
     string InvitedEmail,
     FestivalRole Role,
     PermissionScope Scope,
@@ -76,14 +76,14 @@ public sealed record InvitationResultDto(
 /// Request DTO for accepting an invitation.
 /// </summary>
 public sealed record AcceptInvitationRequest(
-    Guid PermissionId);
+    long PermissionId);
 
 /// <summary>
 /// Response DTO for pending invitations for a user.
 /// </summary>
 public sealed record PendingInvitationDto(
-    Guid PermissionId,
-    Guid FestivalId,
+    long PermissionId,
+    long FestivalId,
     string FestivalName,
     FestivalRole Role,
     PermissionScope Scope,

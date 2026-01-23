@@ -10,7 +10,7 @@ public class User : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the user.
     /// </summary>
-    public Guid UserId { get; set; }
+    public long UserId { get; set; }
 
     /// <summary>
     /// Gets or sets the user's email address.

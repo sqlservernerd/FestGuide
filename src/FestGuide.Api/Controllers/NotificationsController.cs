@@ -77,11 +77,11 @@ public class NotificationsController : BaseApiController
     /// <summary>
     /// Marks a notification as read.
     /// </summary>
-    [HttpPost("{notificationId:guid}/read")]
+    [HttpPost("{notificationId:long}/read")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> MarkAsRead(Guid notificationId, CancellationToken ct)
+    public async Task<IActionResult> MarkAsRead(long notificationId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         try

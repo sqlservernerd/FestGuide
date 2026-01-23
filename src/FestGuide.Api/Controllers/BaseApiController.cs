@@ -11,11 +11,11 @@ public abstract class BaseApiController : ControllerBase
     /// <summary>
     /// Gets the current user's ID from the authentication claims.
     /// </summary>
-    /// <returns>The current user's ID as a Guid.</returns>
+    /// <returns>The current user's ID as a long.</returns>
     /// <exception cref="InvalidOperationException">
-    /// Thrown if the user is not authenticated or the NameIdentifier claim is not a valid GUID.
+    /// Thrown if the user is not authenticated or the NameIdentifier claim is not a valid long.
     /// </exception>
-    protected Guid GetCurrentUserId()
+    protected long GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
@@ -24,9 +24,9 @@ public abstract class BaseApiController : ControllerBase
             throw new InvalidOperationException("Authenticated user does not contain a NameIdentifier claim.");
         }
 
-        if (!Guid.TryParse(userIdClaim, out var userId))
+        if (!long.TryParse(userIdClaim, out var userId))
         {
-            throw new InvalidOperationException("User NameIdentifier claim is not a valid GUID.");
+            throw new InvalidOperationException("User NameIdentifier claim is not a valid long.");
         }
 
         return userId;

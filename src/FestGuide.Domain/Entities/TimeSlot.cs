@@ -8,17 +8,17 @@ public class TimeSlot : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the time slot.
     /// </summary>
-    public Guid TimeSlotId { get; set; }
+    public long TimeSlotId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the stage this time slot belongs to.
     /// </summary>
-    public Guid StageId { get; set; }
+    public long StageId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the edition this time slot belongs to.
     /// </summary>
-    public Guid EditionId { get; set; }
+    public long EditionId { get; set; }
 
     /// <summary>
     /// Gets or sets the start time of the slot (UTC).

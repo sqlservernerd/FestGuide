@@ -57,16 +57,16 @@ public class PermissionServiceTests
     public async Task GetByFestivalAsync_WithValidFestivalId_ReturnsPermissions()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var user1Id = Guid.NewGuid();
-        var user2Id = Guid.NewGuid();
+        var festivalId = 1L;
+        var userId = 2L;
+        var user1Id = 3L;
+        var user2Id = 4L;
 
         var permissions = new List<FestivalPermission>
         {
             new()
             {
-                FestivalPermissionId = Guid.NewGuid(),
+                FestivalPermissionId = 1L,
                 FestivalId = festivalId,
                 UserId = user1Id,
                 Role = FestivalRole.Manager,
@@ -76,7 +76,7 @@ public class PermissionServiceTests
             },
             new()
             {
-                FestivalPermissionId = Guid.NewGuid(),
+                FestivalPermissionId = 2L,
                 FestivalId = festivalId,
                 UserId = user2Id,
                 Role = FestivalRole.Viewer,
@@ -96,7 +96,7 @@ public class PermissionServiceTests
             .ReturnsAsync(true);
         _mockPermissionRepo.Setup(x => x.GetActiveByFestivalAsync(festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(permissions);
-        _mockUserRepo.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+        _mockUserRepo.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(users);
 
         // Act
@@ -111,15 +111,15 @@ public class PermissionServiceTests
         result[1].UserDisplayName.Should().Be("User 2");
         
         // Verify batch fetch was used (called once, not per permission)
-        _mockUserRepo.Verify(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockUserRepo.Verify(x => x.GetByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
     public async Task GetByFestivalAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 5L;
+        var userId = 6L;
 
         _mockAuthService.Setup(x => x.CanViewFestivalAsync(userId, festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
@@ -136,16 +136,16 @@ public class PermissionServiceTests
     public async Task GetPendingInvitationsAsync_WithPendingInvitations_ReturnsInvitations()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var festivalId1 = Guid.NewGuid();
-        var festivalId2 = Guid.NewGuid();
-        var inviterId = Guid.NewGuid();
+        var userId = 7L;
+        var festivalId1 = 100L;
+        var festivalId2 = 101L;
+        var inviterId = 8L;
 
         var permissions = new List<FestivalPermission>
         {
             new()
             {
-                FestivalPermissionId = Guid.NewGuid(),
+                FestivalPermissionId = 1L,
                 FestivalId = festivalId1,
                 UserId = userId,
                 Role = FestivalRole.Manager,
@@ -157,7 +157,7 @@ public class PermissionServiceTests
             },
             new()
             {
-                FestivalPermissionId = Guid.NewGuid(),
+                FestivalPermissionId = 2L,
                 FestivalId = festivalId2,
                 UserId = userId,
                 Role = FestivalRole.Viewer,
@@ -169,7 +169,7 @@ public class PermissionServiceTests
             },
             new()
             {
-                FestivalPermissionId = Guid.NewGuid(),
+                FestivalPermissionId = 3L,
                 FestivalId = festivalId1,
                 UserId = userId,
                 Role = FestivalRole.Viewer,
@@ -182,17 +182,17 @@ public class PermissionServiceTests
 
         var festivals = new List<Festival>
         {
-            new() { FestivalId = festivalId1, Name = "Festival 1", OwnerUserId = Guid.NewGuid() },
-            new() { FestivalId = festivalId2, Name = "Festival 2", OwnerUserId = Guid.NewGuid() }
+            new() { FestivalId = festivalId1, Name = "Festival 1", OwnerUserId = 1L },
+            new() { FestivalId = festivalId2, Name = "Festival 2", OwnerUserId = 1L }
         };
 
         var inviter = new User { UserId = inviterId, Email = "inviter@test.com", DisplayName = "Inviter" };
 
         _mockPermissionRepo.Setup(x => x.GetByUserAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(permissions);
-        _mockFestivalRepo.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+        _mockFestivalRepo.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(festivals);
-        _mockUserRepo.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+        _mockUserRepo.Setup(x => x.GetByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<User> { inviter });
 
         // Act
@@ -206,18 +206,18 @@ public class PermissionServiceTests
         result[1].FestivalName.Should().Be("Festival 2");
         
         // Verify batch fetches were used
-        _mockFestivalRepo.Verify(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()), Times.Once);
-        _mockUserRepo.Verify(x => x.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockFestivalRepo.Verify(x => x.GetByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockUserRepo.Verify(x => x.GetByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()), Times.Once);
     }
 
     [Fact]
     public async Task GetByIdAsync_WithValidPermission_ReturnsPermission()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var targetUserId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var permissionId = 9L;
+        var userId = 10L;
+        var targetUserId = 11L;
+        var festivalId = 12L;
 
         var permission = new FestivalPermission
         {
@@ -253,8 +253,8 @@ public class PermissionServiceTests
     public async Task GetByIdAsync_WithNonExistentPermission_ThrowsPermissionNotFoundException()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var permissionId = 13L;
+        var userId = 14L;
 
         _mockPermissionRepo.Setup(x => x.GetByIdAsync(permissionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((FestivalPermission?)null);
@@ -270,15 +270,15 @@ public class PermissionServiceTests
     public async Task GetByIdAsync_WithoutViewPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var permissionId = 15L;
+        var userId = 16L;
+        var festivalId = 17L;
 
         var permission = new FestivalPermission
         {
             FestivalPermissionId = permissionId,
             FestivalId = festivalId,
-            UserId = Guid.NewGuid(),
+            UserId = 1L,
             Role = FestivalRole.Manager,
             Scope = PermissionScope.Artists
         };
@@ -300,9 +300,9 @@ public class PermissionServiceTests
     public async Task InviteUserAsync_WithExistingUser_CreatesInvitation()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var invitingUserId = Guid.NewGuid();
-        var invitedUserId = Guid.NewGuid();
+        var festivalId = 18L;
+        var invitingUserId = 19L;
+        var invitedUserId = 20L;
         var email = "invited@test.com";
 
         var request = new InviteUserRequest(
@@ -338,8 +338,8 @@ public class PermissionServiceTests
     public async Task InviteUserAsync_WithNewUser_CreatesInvitationWithPlaceholderId()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var invitingUserId = Guid.NewGuid();
+        var festivalId = 21L;
+        var invitingUserId = 22L;
         var email = "newuser@test.com";
 
         var request = new InviteUserRequest(
@@ -370,9 +370,9 @@ public class PermissionServiceTests
     public async Task InviteUserAsync_WithExistingPermission_ThrowsConflictException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var invitingUserId = Guid.NewGuid();
-        var invitedUserId = Guid.NewGuid();
+        var festivalId = 23L;
+        var invitingUserId = 24L;
+        var invitedUserId = 25L;
         var email = "invited@test.com";
 
         var request = new InviteUserRequest(
@@ -383,7 +383,7 @@ public class PermissionServiceTests
         var invitedUser = new User { UserId = invitedUserId, Email = email, DisplayName = "Invited User" };
         var existingPermission = new FestivalPermission
         {
-            FestivalPermissionId = Guid.NewGuid(),
+            FestivalPermissionId = 1L,
             FestivalId = festivalId,
             UserId = invitedUserId,
             IsRevoked = false
@@ -410,8 +410,8 @@ public class PermissionServiceTests
     public async Task InviteUserAsync_WithoutManagePermission_ThrowsForbiddenException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var invitingUserId = Guid.NewGuid();
+        var festivalId = 26L;
+        var invitingUserId = 27L;
         var request = new InviteUserRequest(
             Email: "test@test.com",
             Role: FestivalRole.Manager,
@@ -438,9 +438,9 @@ public class PermissionServiceTests
     public async Task InviteUserAsync_WhenEmailSendingFails_RollsBackTransaction()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var invitingUserId = Guid.NewGuid();
-        var invitedUserId = Guid.NewGuid();
+        var festivalId = 28L;
+        var invitingUserId = 29L;
+        var invitedUserId = 30L;
         var email = "invited@test.com";
 
         var request = new InviteUserRequest(
@@ -488,10 +488,10 @@ public class PermissionServiceTests
     public async Task UpdateAsync_WithValidRequest_UpdatesPermission()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var targetUserId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var permissionId = 31L;
+        var userId = 32L;
+        var targetUserId = 33L;
+        var festivalId = 34L;
 
         var permission = new FestivalPermission
         {
@@ -531,15 +531,15 @@ public class PermissionServiceTests
     public async Task UpdateAsync_WithOwnerRole_ThrowsForbiddenException()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var permissionId = 35L;
+        var userId = 36L;
+        var festivalId = 37L;
 
         var permission = new FestivalPermission
         {
             FestivalPermissionId = permissionId,
             FestivalId = festivalId,
-            UserId = Guid.NewGuid(),
+            UserId = 1L,
             Role = FestivalRole.Owner,
             Scope = PermissionScope.All
         };
@@ -563,15 +563,15 @@ public class PermissionServiceTests
     public async Task UpdateAsync_PromotingToOwner_ThrowsForbiddenException()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var permissionId = 38L;
+        var userId = 39L;
+        var festivalId = 40L;
 
         var permission = new FestivalPermission
         {
             FestivalPermissionId = permissionId,
             FestivalId = festivalId,
-            UserId = Guid.NewGuid(),
+            UserId = 1L,
             Role = FestivalRole.Manager,
             Scope = PermissionScope.All
         };
@@ -595,10 +595,10 @@ public class PermissionServiceTests
     public async Task RevokeAsync_WithValidPermission_RevokesPermission()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var targetUserId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var permissionId = 41L;
+        var userId = 42L;
+        var targetUserId = 43L;
+        var festivalId = 44L;
 
         var permission = new FestivalPermission
         {
@@ -625,15 +625,15 @@ public class PermissionServiceTests
     public async Task RevokeAsync_WithOwnerPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var permissionId = 45L;
+        var userId = 46L;
+        var festivalId = 47L;
 
         var permission = new FestivalPermission
         {
             FestivalPermissionId = permissionId,
             FestivalId = festivalId,
-            UserId = Guid.NewGuid(),
+            UserId = 1L,
             Role = FestivalRole.Owner,
             Scope = PermissionScope.All
         };
@@ -655,9 +655,9 @@ public class PermissionServiceTests
     public async Task RevokeAsync_RevokeOwnPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var permissionId = 48L;
+        var userId = 49L;
+        var festivalId = 50L;
 
         var permission = new FestivalPermission
         {
@@ -685,9 +685,9 @@ public class PermissionServiceTests
     public async Task AcceptInvitationAsync_WithValidInvitation_AcceptsInvitation()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var permissionId = 51L;
+        var userId = 52L;
+        var festivalId = 53L;
 
         var permission = new FestivalPermission
         {
@@ -732,14 +732,14 @@ public class PermissionServiceTests
     public async Task AcceptInvitationAsync_WithWrongUser_ThrowsForbiddenException()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var differentUserId = Guid.NewGuid();
+        var permissionId = 54L;
+        var userId = 55L;
+        var differentUserId = 56L;
 
         var permission = new FestivalPermission
         {
             FestivalPermissionId = permissionId,
-            FestivalId = Guid.NewGuid(),
+            FestivalId = 1L,
             UserId = differentUserId, // Different user
             Role = FestivalRole.Manager,
             Scope = PermissionScope.Artists,
@@ -762,13 +762,13 @@ public class PermissionServiceTests
     public async Task AcceptInvitationAsync_WithAlreadyProcessedInvitation_ThrowsConflictException()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var permissionId = 57L;
+        var userId = 58L;
 
         var permission = new FestivalPermission
         {
             FestivalPermissionId = permissionId,
-            FestivalId = Guid.NewGuid(),
+            FestivalId = 1L,
             UserId = userId,
             Role = FestivalRole.Manager,
             Scope = PermissionScope.Artists,
@@ -791,13 +791,13 @@ public class PermissionServiceTests
     public async Task AcceptInvitationAsync_WithRevokedInvitation_ThrowsConflictException()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var permissionId = 59L;
+        var userId = 60L;
 
         var permission = new FestivalPermission
         {
             FestivalPermissionId = permissionId,
-            FestivalId = Guid.NewGuid(),
+            FestivalId = 1L,
             UserId = userId,
             Role = FestivalRole.Manager,
             Scope = PermissionScope.Artists,
@@ -820,9 +820,9 @@ public class PermissionServiceTests
     public async Task DeclineInvitationAsync_WithValidInvitation_DeclinesInvitation()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var permissionId = 61L;
+        var userId = 62L;
+        var festivalId = 63L;
 
         var permission = new FestivalPermission
         {
@@ -849,14 +849,14 @@ public class PermissionServiceTests
     public async Task DeclineInvitationAsync_WithWrongUser_ThrowsForbiddenException()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var differentUserId = Guid.NewGuid();
+        var permissionId = 64L;
+        var userId = 65L;
+        var differentUserId = 66L;
 
         var permission = new FestivalPermission
         {
             FestivalPermissionId = permissionId,
-            FestivalId = Guid.NewGuid(),
+            FestivalId = 1L,
             UserId = differentUserId, // Different user
             Role = FestivalRole.Manager,
             Scope = PermissionScope.Artists,
@@ -879,13 +879,13 @@ public class PermissionServiceTests
     public async Task DeclineInvitationAsync_WithAlreadyProcessedInvitation_ThrowsConflictException()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var permissionId = 67L;
+        var userId = 68L;
 
         var permission = new FestivalPermission
         {
             FestivalPermissionId = permissionId,
-            FestivalId = Guid.NewGuid(),
+            FestivalId = 1L,
             UserId = userId,
             Role = FestivalRole.Manager,
             Scope = PermissionScope.Artists,
@@ -908,13 +908,13 @@ public class PermissionServiceTests
     public async Task DeclineInvitationAsync_WithRevokedInvitation_ThrowsConflictException()
     {
         // Arrange
-        var permissionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var permissionId = 69L;
+        var userId = 70L;
 
         var permission = new FestivalPermission
         {
             FestivalPermissionId = permissionId,
-            FestivalId = Guid.NewGuid(),
+            FestivalId = 1L,
             UserId = userId,
             Role = FestivalRole.Manager,
             Scope = PermissionScope.Artists,

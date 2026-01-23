@@ -13,7 +13,7 @@ public abstract class BaseEntity
     /// <summary>
     /// Gets or sets the ID of the user who created the entity.
     /// </summary>
-    public Guid? CreatedBy { get; set; }
+    public long? CreatedBy { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time when the entity was last modified (UTC).
@@ -23,5 +23,5 @@ public abstract class BaseEntity
     /// <summary>
     /// Gets or sets the ID of the user who last modified the entity.
     /// </summary>
-    public Guid? ModifiedBy { get; set; }
+    public long? ModifiedBy { get; set; }
 }

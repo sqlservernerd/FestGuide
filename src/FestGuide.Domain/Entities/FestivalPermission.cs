@@ -11,17 +11,17 @@ public class FestivalPermission : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the permission.
     /// </summary>
-    public Guid FestivalPermissionId { get; set; }
+    public long FestivalPermissionId { get; set; }
 
     /// <summary>
     /// Gets or sets the festival this permission applies to.
     /// </summary>
-    public Guid FestivalId { get; set; }
+    public long FestivalId { get; set; }
 
     /// <summary>
     /// Gets or sets the user who has this permission.
     /// </summary>
-    public Guid UserId { get; set; }
+    public long UserId { get; set; }
 
     /// <summary>
     /// Gets or sets the role level (Owner, Administrator, Manager, Viewer).
@@ -37,7 +37,7 @@ public class FestivalPermission : BaseEntity
     /// <summary>
     /// Gets or sets the user who invited this user (null for Owner who created festival).
     /// </summary>
-    public Guid? InvitedByUserId { get; set; }
+    public long? InvitedByUserId { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time when the invitation was accepted (UTC).

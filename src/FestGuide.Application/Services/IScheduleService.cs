@@ -10,60 +10,60 @@ public interface IScheduleService
     /// <summary>
     /// Gets the schedule for an edition.
     /// </summary>
-    Task<ScheduleDto> GetScheduleAsync(Guid editionId, CancellationToken ct = default);
+    Task<ScheduleDto> GetScheduleAsync(long editionId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets the detailed schedule for an edition including all time slots and engagements.
     /// </summary>
-    Task<ScheduleDetailDto> GetScheduleDetailAsync(Guid editionId, CancellationToken ct = default);
+    Task<ScheduleDetailDto> GetScheduleDetailAsync(long editionId, CancellationToken ct = default);
 
     /// <summary>
     /// Publishes a schedule, making it visible to attendees.
     /// </summary>
-    Task<ScheduleDto> PublishScheduleAsync(Guid editionId, Guid userId, CancellationToken ct = default);
+    Task<ScheduleDto> PublishScheduleAsync(long editionId, long userId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets a time slot by ID.
     /// </summary>
-    Task<TimeSlotDto> GetTimeSlotByIdAsync(Guid timeSlotId, CancellationToken ct = default);
+    Task<TimeSlotDto> GetTimeSlotByIdAsync(long timeSlotId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets all time slots for a stage within an edition.
     /// </summary>
-    Task<IReadOnlyList<TimeSlotDto>> GetTimeSlotsByStageAsync(Guid stageId, Guid editionId, CancellationToken ct = default);
+    Task<IReadOnlyList<TimeSlotDto>> GetTimeSlotsByStageAsync(long stageId, long editionId, CancellationToken ct = default);
 
     /// <summary>
     /// Creates a new time slot.
     /// </summary>
-    Task<TimeSlotDto> CreateTimeSlotAsync(Guid stageId, Guid userId, CreateTimeSlotRequest request, CancellationToken ct = default);
+    Task<TimeSlotDto> CreateTimeSlotAsync(long stageId, long userId, CreateTimeSlotRequest request, CancellationToken ct = default);
 
     /// <summary>
     /// Updates an existing time slot.
     /// </summary>
-    Task<TimeSlotDto> UpdateTimeSlotAsync(Guid timeSlotId, Guid userId, UpdateTimeSlotRequest request, CancellationToken ct = default);
+    Task<TimeSlotDto> UpdateTimeSlotAsync(long timeSlotId, long userId, UpdateTimeSlotRequest request, CancellationToken ct = default);
 
     /// <summary>
     /// Deletes a time slot.
     /// </summary>
-    Task DeleteTimeSlotAsync(Guid timeSlotId, Guid userId, CancellationToken ct = default);
+    Task DeleteTimeSlotAsync(long timeSlotId, long userId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets an engagement by ID.
     /// </summary>
-    Task<EngagementDto> GetEngagementByIdAsync(Guid engagementId, CancellationToken ct = default);
+    Task<EngagementDto> GetEngagementByIdAsync(long engagementId, CancellationToken ct = default);
 
     /// <summary>
     /// Creates an engagement (assigns artist to time slot).
     /// </summary>
-    Task<EngagementDto> CreateEngagementAsync(Guid timeSlotId, Guid userId, CreateEngagementRequest request, CancellationToken ct = default);
+    Task<EngagementDto> CreateEngagementAsync(long timeSlotId, long userId, CreateEngagementRequest request, CancellationToken ct = default);
 
     /// <summary>
     /// Updates an existing engagement.
     /// </summary>
-    Task<EngagementDto> UpdateEngagementAsync(Guid engagementId, Guid userId, UpdateEngagementRequest request, CancellationToken ct = default);
+    Task<EngagementDto> UpdateEngagementAsync(long engagementId, long userId, UpdateEngagementRequest request, CancellationToken ct = default);
 
     /// <summary>
     /// Deletes an engagement.
     /// </summary>
-    Task DeleteEngagementAsync(Guid engagementId, Guid userId, CancellationToken ct = default);
+    Task DeleteEngagementAsync(long engagementId, long userId, CancellationToken ct = default);
 }

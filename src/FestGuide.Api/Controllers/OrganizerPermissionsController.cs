@@ -38,11 +38,11 @@ public class OrganizerPermissionsController : ControllerBase
     /// <summary>
     /// Gets all permissions for a festival.
     /// </summary>
-    [HttpGet("festivals/{festivalId:guid}/permissions")]
+    [HttpGet("festivals/{festivalId:long}/permissions")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<PermissionSummaryDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetPermissions(Guid festivalId, CancellationToken ct)
+    public async Task<IActionResult> GetPermissions(long festivalId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -65,11 +65,11 @@ public class OrganizerPermissionsController : ControllerBase
     /// <summary>
     /// Gets a specific permission by ID.
     /// </summary>
-    [HttpGet("permissions/{permissionId:guid}")]
+    [HttpGet("permissions/{permissionId:long}")]
     [ProducesResponseType(typeof(ApiResponse<PermissionDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetPermission(Guid permissionId, CancellationToken ct)
+    public async Task<IActionResult> GetPermission(long permissionId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -92,13 +92,13 @@ public class OrganizerPermissionsController : ControllerBase
     /// <summary>
     /// Invites a user to a festival.
     /// </summary>
-    [HttpPost("festivals/{festivalId:guid}/permissions/invite")]
+    [HttpPost("festivals/{festivalId:long}/permissions/invite")]
     [ProducesResponseType(typeof(ApiResponse<InvitationResultDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> InviteUser(Guid festivalId, [FromBody] InviteUserRequest request, CancellationToken ct)
+    public async Task<IActionResult> InviteUser(long festivalId, [FromBody] InviteUserRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -134,12 +134,12 @@ public class OrganizerPermissionsController : ControllerBase
     /// <summary>
     /// Updates a permission.
     /// </summary>
-    [HttpPut("permissions/{permissionId:guid}")]
+    [HttpPut("permissions/{permissionId:long}")]
     [ProducesResponseType(typeof(ApiResponse<PermissionDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdatePermission(Guid permissionId, [FromBody] UpdatePermissionRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdatePermission(long permissionId, [FromBody] UpdatePermissionRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -168,11 +168,11 @@ public class OrganizerPermissionsController : ControllerBase
     /// <summary>
     /// Revokes a permission.
     /// </summary>
-    [HttpDelete("permissions/{permissionId:guid}")]
+    [HttpDelete("permissions/{permissionId:long}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> RevokePermission(Guid permissionId, CancellationToken ct)
+    public async Task<IActionResult> RevokePermission(long permissionId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -209,12 +209,12 @@ public class OrganizerPermissionsController : ControllerBase
     /// <summary>
     /// Accepts a pending invitation.
     /// </summary>
-    [HttpPost("invitations/{permissionId:guid}/accept")]
+    [HttpPost("invitations/{permissionId:long}/accept")]
     [ProducesResponseType(typeof(ApiResponse<PermissionDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> AcceptInvitation(Guid permissionId, CancellationToken ct)
+    public async Task<IActionResult> AcceptInvitation(long permissionId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -241,12 +241,12 @@ public class OrganizerPermissionsController : ControllerBase
     /// <summary>
     /// Declines a pending invitation.
     /// </summary>
-    [HttpPost("invitations/{permissionId:guid}/decline")]
+    [HttpPost("invitations/{permissionId:long}/decline")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> DeclineInvitation(Guid permissionId, CancellationToken ct)
+    public async Task<IActionResult> DeclineInvitation(long permissionId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -270,10 +270,10 @@ public class OrganizerPermissionsController : ControllerBase
         }
     }
 
-    private Guid? GetCurrentUserId()
+    private long? GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+        return long.TryParse(userIdClaim, out var userId) ? userId : null;
     }
 
     private static ApiErrorResponse CreateError(string code, string message) =>

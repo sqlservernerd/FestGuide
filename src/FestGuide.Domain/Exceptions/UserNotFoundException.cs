@@ -5,7 +5,7 @@ namespace FestGuide.Domain.Exceptions;
 /// </summary>
 public class UserNotFoundException : DomainException
 {
-    public UserNotFoundException(Guid userId)
+    public UserNotFoundException(long userId)
         : base($"User with ID '{userId}' was not found.")
     {
         UserId = userId;
@@ -17,6 +17,6 @@ public class UserNotFoundException : DomainException
         Email = email;
     }
 
-    public Guid? UserId { get; }
+    public long? UserId { get; }
     public string? Email { get; }
 }

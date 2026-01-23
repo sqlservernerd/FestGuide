@@ -45,7 +45,7 @@ public class PersonalScheduleService : IPersonalScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<PersonalScheduleSummaryDto>> GetMySchedulesAsync(Guid userId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<PersonalScheduleSummaryDto>> GetMySchedulesAsync(long userId, CancellationToken ct = default)
     {
         var schedules = await _scheduleRepository.GetByUserAsync(userId, ct);
         if (!schedules.Any())
@@ -98,7 +98,7 @@ public class PersonalScheduleService : IPersonalScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<PersonalScheduleDto>> GetByEditionAsync(Guid userId, Guid editionId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<PersonalScheduleDto>> GetByEditionAsync(long userId, long editionId, CancellationToken ct = default)
     {
         var schedules = await _scheduleRepository.GetByUserAndEditionAsync(userId, editionId, ct);
         var result = new List<PersonalScheduleDto>();
@@ -118,7 +118,7 @@ public class PersonalScheduleService : IPersonalScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<PersonalScheduleDto> GetByIdAsync(Guid personalScheduleId, Guid userId, CancellationToken ct = default)
+    public async Task<PersonalScheduleDto> GetByIdAsync(long personalScheduleId, long userId, CancellationToken ct = default)
     {
         var schedule = await _scheduleRepository.GetByIdAsync(personalScheduleId, ct)
             ?? throw new PersonalScheduleNotFoundException(personalScheduleId);
@@ -133,7 +133,7 @@ public class PersonalScheduleService : IPersonalScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<PersonalScheduleDetailDto> GetDetailAsync(Guid personalScheduleId, Guid userId, CancellationToken ct = default)
+    public async Task<PersonalScheduleDetailDto> GetDetailAsync(long personalScheduleId, long userId, CancellationToken ct = default)
     {
         var schedule = await _scheduleRepository.GetByIdAsync(personalScheduleId, ct)
             ?? throw new PersonalScheduleNotFoundException(personalScheduleId);
@@ -162,7 +162,7 @@ public class PersonalScheduleService : IPersonalScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<PersonalScheduleDto> CreateAsync(Guid userId, CreatePersonalScheduleRequest request, CancellationToken ct = default)
+    public async Task<PersonalScheduleDto> CreateAsync(long userId, CreatePersonalScheduleRequest request, CancellationToken ct = default)
     {
         if (!await _editionRepository.ExistsAsync(request.EditionId, ct))
         {
@@ -175,7 +175,6 @@ public class PersonalScheduleService : IPersonalScheduleService
         var now = _dateTimeProvider.UtcNow;
         var schedule = new PersonalSchedule
         {
-            PersonalScheduleId = Guid.NewGuid(),
             UserId = userId,
             EditionId = request.EditionId,
             Name = request.Name ?? (isFirstSchedule ? "My Schedule" : $"Schedule {existingSchedules.Count + 1}"),
@@ -196,7 +195,7 @@ public class PersonalScheduleService : IPersonalScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<PersonalScheduleDto> UpdateAsync(Guid personalScheduleId, Guid userId, UpdatePersonalScheduleRequest request, CancellationToken ct = default)
+    public async Task<PersonalScheduleDto> UpdateAsync(long personalScheduleId, long userId, UpdatePersonalScheduleRequest request, CancellationToken ct = default)
     {
         var schedule = await _scheduleRepository.GetByIdAsync(personalScheduleId, ct)
             ?? throw new PersonalScheduleNotFoundException(personalScheduleId);
@@ -235,7 +234,7 @@ public class PersonalScheduleService : IPersonalScheduleService
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid personalScheduleId, Guid userId, CancellationToken ct = default)
+    public async Task DeleteAsync(long personalScheduleId, long userId, CancellationToken ct = default)
     {
         var schedule = await _scheduleRepository.GetByIdAsync(personalScheduleId, ct)
             ?? throw new PersonalScheduleNotFoundException(personalScheduleId);
@@ -251,7 +250,7 @@ public class PersonalScheduleService : IPersonalScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<PersonalScheduleDto> GetOrCreateDefaultAsync(Guid userId, Guid editionId, CancellationToken ct = default)
+    public async Task<PersonalScheduleDto> GetOrCreateDefaultAsync(long userId, long editionId, CancellationToken ct = default)
     {
         var existing = await _scheduleRepository.GetDefaultAsync(userId, editionId, ct);
         if (existing != null)
@@ -264,7 +263,7 @@ public class PersonalScheduleService : IPersonalScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<PersonalScheduleEntryDto> AddEntryAsync(Guid personalScheduleId, Guid userId, AddScheduleEntryRequest request, CancellationToken ct = default)
+    public async Task<PersonalScheduleEntryDto> AddEntryAsync(long personalScheduleId, long userId, AddScheduleEntryRequest request, CancellationToken ct = default)
     {
         var schedule = await _scheduleRepository.GetByIdAsync(personalScheduleId, ct)
             ?? throw new PersonalScheduleNotFoundException(personalScheduleId);
@@ -287,7 +286,6 @@ public class PersonalScheduleService : IPersonalScheduleService
         var now = _dateTimeProvider.UtcNow;
         var entry = new PersonalScheduleEntry
         {
-            PersonalScheduleEntryId = Guid.NewGuid(),
             PersonalScheduleId = personalScheduleId,
             EngagementId = request.EngagementId,
             Notes = request.Notes,
@@ -318,7 +316,7 @@ public class PersonalScheduleService : IPersonalScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<PersonalScheduleEntryDto> UpdateEntryAsync(Guid entryId, Guid userId, UpdateScheduleEntryRequest request, CancellationToken ct = default)
+    public async Task<PersonalScheduleEntryDto> UpdateEntryAsync(long entryId, long userId, UpdateScheduleEntryRequest request, CancellationToken ct = default)
     {
         var entry = await _scheduleRepository.GetEntryByIdAsync(entryId, ct)
             ?? throw new PersonalScheduleEntryNotFoundException(entryId);
@@ -361,7 +359,7 @@ public class PersonalScheduleService : IPersonalScheduleService
     }
 
     /// <inheritdoc />
-    public async Task RemoveEntryAsync(Guid entryId, Guid userId, CancellationToken ct = default)
+    public async Task RemoveEntryAsync(long entryId, long userId, CancellationToken ct = default)
     {
         var scheduleId = await _scheduleRepository.GetScheduleIdForEntryAsync(entryId, ct)
             ?? throw new PersonalScheduleEntryNotFoundException(entryId);
@@ -381,7 +379,7 @@ public class PersonalScheduleService : IPersonalScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<PersonalScheduleDetailDto> SyncAsync(Guid personalScheduleId, Guid userId, CancellationToken ct = default)
+    public async Task<PersonalScheduleDetailDto> SyncAsync(long personalScheduleId, long userId, CancellationToken ct = default)
     {
         var schedule = await _scheduleRepository.GetByIdAsync(personalScheduleId, ct)
             ?? throw new PersonalScheduleNotFoundException(personalScheduleId);

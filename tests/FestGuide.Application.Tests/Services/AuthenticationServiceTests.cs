@@ -63,7 +63,7 @@ public class AuthenticationServiceTests
             .ReturnsAsync(false);
         _mockPasswordHasher.Setup(x => x.HashPassword(request.Password))
             .Returns("hashed_password");
-        _mockJwtService.Setup(x => x.GenerateAccessToken(It.IsAny<Guid>(), request.Email, "Attendee"))
+        _mockJwtService.Setup(x => x.GenerateAccessToken(It.IsAny<long>(), request.Email, "Attendee"))
             .Returns("access_token");
         _mockJwtService.Setup(x => x.GenerateRefreshToken())
             .Returns("refresh_token");
@@ -112,7 +112,7 @@ public class AuthenticationServiceTests
         var request = new LoginRequest("test@example.com", "SecurePassword123!");
         var user = new User
         {
-            UserId = Guid.NewGuid(),
+            UserId = 1L,
             Email = "test@example.com",
             EmailNormalized = "test@example.com",
             PasswordHash = "hashed_password",
@@ -152,7 +152,7 @@ public class AuthenticationServiceTests
         var request = new LoginRequest("test@example.com", "WrongPassword");
         var user = new User
         {
-            UserId = Guid.NewGuid(),
+            UserId = 1L,
             Email = "test@example.com",
             PasswordHash = "hashed_password"
         };
@@ -194,7 +194,7 @@ public class AuthenticationServiceTests
         var request = new LoginRequest("test@example.com", "Password123!");
         var user = new User
         {
-            UserId = Guid.NewGuid(),
+            UserId = 1L,
             Email = "test@example.com",
             LockoutEndUtc = _now.AddMinutes(10)
         };
@@ -216,12 +216,12 @@ public class AuthenticationServiceTests
                 // Arrange
                 var token = "valid_token";
                 var tokenHash = "hashed_token";
-                var userId = Guid.NewGuid();
+                var userId = 1L;
                 var request = new VerifyEmailRequest(token);
 
                 var storedToken = new EmailVerificationToken
                 {
-                    TokenId = Guid.NewGuid(),
+                    TokenId = 1L,
                     UserId = userId,
                     TokenHash = tokenHash,
                     ExpiresAtUtc = DateTime.UtcNow.AddHours(24), // Use actual future time for IsValid check
@@ -277,7 +277,7 @@ public class AuthenticationServiceTests
                 var request = new ForgotPasswordRequest("test@example.com");
                 var user = new User
                 {
-                    UserId = Guid.NewGuid(),
+                    UserId = 1L,
                     Email = "test@example.com",
                     DisplayName = "Test User"
                 };
@@ -321,12 +321,12 @@ public class AuthenticationServiceTests
                 // Arrange
                 var token = "valid_token";
                 var tokenHash = "hashed_token";
-                var userId = Guid.NewGuid();
+                var userId = 2L;
                 var request = new ResetPasswordRequest(token, "NewSecurePassword123!");
 
                 var storedToken = new PasswordResetToken
                 {
-                    TokenId = Guid.NewGuid(),
+                    TokenId = 1L,
                     UserId = userId,
                     TokenHash = tokenHash,
                     ExpiresAtUtc = DateTime.UtcNow.AddHours(1), // Use actual future time for IsValid check
@@ -385,7 +385,7 @@ public class AuthenticationServiceTests
                 var request = new ResendVerificationRequest("test@example.com");
                 var user = new User
                 {
-                    UserId = Guid.NewGuid(),
+                    UserId = 1L,
                     Email = "test@example.com",
                     EmailVerified = false,
                     DisplayName = "Test User"

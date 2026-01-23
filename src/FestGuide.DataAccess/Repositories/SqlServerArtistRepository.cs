@@ -18,7 +18,7 @@ public class SqlServerArtistRepository : IArtistRepository
     }
 
     /// <inheritdoc />
-    public async Task<Artist?> GetByIdAsync(Guid artistId, CancellationToken ct = default)
+    public async Task<Artist?> GetByIdAsync(long artistId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -35,7 +35,7 @@ public class SqlServerArtistRepository : IArtistRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Artist>> GetByIdsAsync(IEnumerable<Guid> artistIds, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Artist>> GetByIdsAsync(IEnumerable<long> artistIds, CancellationToken ct = default)
     {
         var artistIdsList = artistIds?.ToList();
         if (artistIdsList == null || !artistIdsList.Any())
@@ -60,7 +60,7 @@ public class SqlServerArtistRepository : IArtistRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Artist>> GetByFestivalAsync(Guid festivalId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Artist>> GetByFestivalAsync(long festivalId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -80,7 +80,7 @@ public class SqlServerArtistRepository : IArtistRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Artist>> SearchByNameAsync(Guid festivalId, string searchTerm, int limit = 20, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Artist>> SearchByNameAsync(long festivalId, string searchTerm, int limit = 20, CancellationToken ct = default)
     {
         const string sql = """
             SELECT TOP (@Limit)
@@ -100,15 +100,15 @@ public class SqlServerArtistRepository : IArtistRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(Artist artist, CancellationToken ct = default)
+    public async Task<long> CreateAsync(Artist artist, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO core.Artist (
-                ArtistId, FestivalId, Name, Genre, Bio,
+                FestivalId, Name, Genre, Bio,
                 ImageUrl, WebsiteUrl, SpotifyUrl, IsDeleted,
                 CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
             ) VALUES (
-                @ArtistId, @FestivalId, @Name, @Genre, @Bio,
+                @FestivalId, @Name, @Genre, @Bio,
                 @ImageUrl, @WebsiteUrl, @SpotifyUrl, @IsDeleted,
                 @CreatedAtUtc, @CreatedBy, @ModifiedAtUtc, @ModifiedBy
             )
@@ -139,7 +139,7 @@ public class SqlServerArtistRepository : IArtistRepository
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid artistId, Guid deletedBy, CancellationToken ct = default)
+    public async Task DeleteAsync(long artistId, long deletedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE core.Artist
@@ -158,7 +158,7 @@ public class SqlServerArtistRepository : IArtistRepository
     }
 
     /// <inheritdoc />
-    public async Task<bool> ExistsAsync(Guid artistId, CancellationToken ct = default)
+    public async Task<bool> ExistsAsync(long artistId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(1) FROM core.Artist
@@ -172,14 +172,14 @@ public class SqlServerArtistRepository : IArtistRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid?> GetFestivalIdAsync(Guid artistId, CancellationToken ct = default)
+    public async Task<long?> GetFestivalIdAsync(long artistId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT FestivalId FROM core.Artist
             WHERE ArtistId = @ArtistId AND IsDeleted = 0
             """;
 
-        return await _connection.ExecuteScalarAsync<Guid?>(
+        return await _connection.ExecuteScalarAsync<long?>(
             new CommandDefinition(sql, new { ArtistId = artistId }, cancellationToken: ct));
     }
 }

@@ -5,11 +5,11 @@ namespace FestGuide.Domain.Exceptions;
 /// </summary>
 public class StageNotFoundException : DomainException
 {
-    public StageNotFoundException(Guid stageId)
+    public StageNotFoundException(long stageId)
         : base($"Stage with ID '{stageId}' was not found.")
     {
         StageId = stageId;
     }
 
-    public Guid StageId { get; }
+    public long StageId { get; }
 }

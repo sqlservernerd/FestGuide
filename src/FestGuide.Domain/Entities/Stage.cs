@@ -8,12 +8,12 @@ public class Stage : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the stage.
     /// </summary>
-    public Guid StageId { get; set; }
+    public long StageId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the venue this stage belongs to.
     /// </summary>
-    public Guid VenueId { get; set; }
+    public long VenueId { get; set; }
 
     /// <summary>
     /// Gets or sets the stage name.

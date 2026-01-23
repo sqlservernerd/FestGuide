@@ -8,22 +8,22 @@ public class AnalyticsEvent
     /// <summary>
     /// Gets or sets the unique identifier for the event.
     /// </summary>
-    public Guid AnalyticsEventId { get; set; }
+    public long AnalyticsEventId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the user who triggered the event (null for anonymous).
     /// </summary>
-    public Guid? UserId { get; set; }
+    public long? UserId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the festival related to the event.
     /// </summary>
-    public Guid? FestivalId { get; set; }
+    public long? FestivalId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the edition related to the event.
     /// </summary>
-    public Guid? EditionId { get; set; }
+    public long? EditionId { get; set; }
 
     /// <summary>
     /// Gets or sets the type of event (e.g., schedule_view, artist_save, engagement_add).
@@ -38,7 +38,7 @@ public class AnalyticsEvent
     /// <summary>
     /// Gets or sets the entity ID involved.
     /// </summary>
-    public Guid? EntityId { get; set; }
+    public long? EntityId { get; set; }
 
     /// <summary>
     /// Gets or sets optional JSON metadata for the event.

@@ -18,7 +18,7 @@ public class SqlServerNotificationPreferenceRepository : INotificationPreference
     }
 
     /// <inheritdoc />
-    public async Task<NotificationPreference?> GetByUserAsync(Guid userId, CancellationToken ct = default)
+    public async Task<NotificationPreference?> GetByUserAsync(long userId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -35,7 +35,7 @@ public class SqlServerNotificationPreferenceRepository : INotificationPreference
     }
 
     /// <inheritdoc />
-    public async Task<Guid> UpsertAsync(NotificationPreference preference, CancellationToken ct = default)
+    public async Task<long> UpsertAsync(NotificationPreference preference, CancellationToken ct = default)
     {
         const string sql = """
             MERGE notifications.NotificationPreference AS target

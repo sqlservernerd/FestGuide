@@ -56,10 +56,10 @@ public class FestivalsController : ControllerBase
     /// <summary>
     /// Gets a festival by ID (public view).
     /// </summary>
-    [HttpGet("{festivalId:guid}")]
+    [HttpGet("{festivalId:long}")]
     [ProducesResponseType(typeof(ApiResponse<FestivalDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetFestival(Guid festivalId, CancellationToken ct)
+    public async Task<IActionResult> GetFestival(long festivalId, CancellationToken ct)
     {
         try
         {
@@ -75,9 +75,9 @@ public class FestivalsController : ControllerBase
     /// <summary>
     /// Gets all published editions for a festival.
     /// </summary>
-    [HttpGet("{festivalId:guid}/editions")]
+    [HttpGet("{festivalId:long}/editions")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<EditionSummaryDto>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetEditions(Guid festivalId, CancellationToken ct)
+    public async Task<IActionResult> GetEditions(long festivalId, CancellationToken ct)
     {
         var editions = await _editionService.GetPublishedByFestivalAsync(festivalId, ct);
         return Ok(ApiResponse<IReadOnlyList<EditionSummaryDto>>.Success(editions));
@@ -86,10 +86,10 @@ public class FestivalsController : ControllerBase
     /// <summary>
     /// Gets an edition by ID (public view).
     /// </summary>
-    [HttpGet("editions/{editionId:guid}")]
+    [HttpGet("editions/{editionId:long}")]
     [ProducesResponseType(typeof(ApiResponse<EditionDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetEdition(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> GetEdition(long editionId, CancellationToken ct)
     {
         try
         {
@@ -105,10 +105,10 @@ public class FestivalsController : ControllerBase
     /// <summary>
     /// Gets the published schedule for an edition.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/schedule")]
+    [HttpGet("editions/{editionId:long}/schedule")]
     [ProducesResponseType(typeof(ApiResponse<ScheduleDetailDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetSchedule(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> GetSchedule(long editionId, CancellationToken ct)
     {
         try
         {
@@ -124,9 +124,9 @@ public class FestivalsController : ControllerBase
     /// <summary>
     /// Gets venues for an edition.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}/venues")]
+    [HttpGet("editions/{editionId:long}/venues")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<VenueSummaryDto>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetVenues(Guid editionId, [FromServices] IVenueService venueService, CancellationToken ct)
+    public async Task<IActionResult> GetVenues(long editionId, [FromServices] IVenueService venueService, CancellationToken ct)
     {
         var venues = await venueService.GetByEditionAsync(editionId, ct);
         return Ok(ApiResponse<IReadOnlyList<VenueSummaryDto>>.Success(venues));
@@ -135,9 +135,9 @@ public class FestivalsController : ControllerBase
     /// <summary>
     /// Gets artists for a festival.
     /// </summary>
-    [HttpGet("{festivalId:guid}/artists")]
+    [HttpGet("{festivalId:long}/artists")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ArtistSummaryDto>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetArtists(Guid festivalId, [FromServices] IArtistService artistService, CancellationToken ct)
+    public async Task<IActionResult> GetArtists(long festivalId, [FromServices] IArtistService artistService, CancellationToken ct)
     {
         var artists = await artistService.GetByFestivalAsync(festivalId, ct);
         return Ok(ApiResponse<IReadOnlyList<ArtistSummaryDto>>.Success(artists));
@@ -146,10 +146,10 @@ public class FestivalsController : ControllerBase
     /// <summary>
     /// Gets a specific artist.
     /// </summary>
-    [HttpGet("artists/{artistId:guid}")]
+    [HttpGet("artists/{artistId:long}")]
     [ProducesResponseType(typeof(ApiResponse<ArtistDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetArtist(Guid artistId, [FromServices] IArtistService artistService, CancellationToken ct)
+    public async Task<IActionResult> GetArtist(long artistId, [FromServices] IArtistService artistService, CancellationToken ct)
     {
         try
         {

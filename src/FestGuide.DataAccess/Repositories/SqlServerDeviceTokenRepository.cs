@@ -23,7 +23,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
     }
 
     /// <inheritdoc />
-    public async Task<DeviceToken?> GetByIdAsync(Guid deviceTokenId, CancellationToken ct = default)
+    public async Task<DeviceToken?> GetByIdAsync(long deviceTokenId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -55,7 +55,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<DeviceToken>> GetByUserAsync(Guid userId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<DeviceToken>> GetByUserAsync(long userId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -74,7 +74,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<DeviceToken>> GetByUsersAsync(IEnumerable<Guid> userIds, CancellationToken ct = default)
+    public async Task<IReadOnlyList<DeviceToken>> GetByUsersAsync(IEnumerable<long> userIds, CancellationToken ct = default)
     {
         var userIdArray = userIds.ToArray();
         if (userIdArray.Length == 0)
@@ -108,7 +108,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> UpsertAsync(DeviceToken deviceToken, CancellationToken ct = default)
+    public async Task<long> UpsertAsync(DeviceToken deviceToken, CancellationToken ct = default)
     {
         const string sql = """
             MERGE notifications.DeviceToken AS target
@@ -143,7 +143,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
     }
 
     /// <inheritdoc />
-    public async Task DeactivateAsync(Guid deviceTokenId, Guid modifiedBy, CancellationToken ct = default)
+    public async Task DeactivateAsync(long deviceTokenId, long modifiedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE notifications.DeviceToken SET
@@ -158,7 +158,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
     }
 
     /// <inheritdoc />
-    public async Task DeactivateByTokenAsync(string token, Guid modifiedBy, CancellationToken ct = default)
+    public async Task DeactivateByTokenAsync(string token, long modifiedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE notifications.DeviceToken SET
@@ -173,7 +173,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
     }
 
     /// <inheritdoc />
-    public async Task DeactivateAllForUserAsync(Guid userId, Guid modifiedBy, CancellationToken ct = default)
+    public async Task DeactivateAllForUserAsync(long userId, long modifiedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE notifications.DeviceToken SET
@@ -188,7 +188,7 @@ public class SqlServerDeviceTokenRepository : IDeviceTokenRepository
     }
 
     /// <inheritdoc />
-    public async Task UpdateLastUsedAsync(Guid deviceTokenId, DateTime lastUsedAtUtc, CancellationToken ct = default)
+    public async Task UpdateLastUsedAsync(long deviceTokenId, DateTime lastUsedAtUtc, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE notifications.DeviceToken SET

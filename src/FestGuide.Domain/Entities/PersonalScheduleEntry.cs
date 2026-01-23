@@ -9,17 +9,17 @@ public class PersonalScheduleEntry : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the entry.
     /// </summary>
-    public Guid PersonalScheduleEntryId { get; set; }
+    public long PersonalScheduleEntryId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the personal schedule this entry belongs to.
     /// </summary>
-    public Guid PersonalScheduleId { get; set; }
+    public long PersonalScheduleId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the engagement (artist performance) saved.
     /// </summary>
-    public Guid EngagementId { get; set; }
+    public long EngagementId { get; set; }
 
     /// <summary>
     /// Gets or sets optional notes the attendee added for this entry.

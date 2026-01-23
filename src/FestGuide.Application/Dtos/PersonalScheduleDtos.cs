@@ -6,9 +6,9 @@ namespace FestGuide.Application.Dtos;
 /// Response DTO for personal schedule.
 /// </summary>
 public sealed record PersonalScheduleDto(
-    Guid PersonalScheduleId,
-    Guid UserId,
-    Guid EditionId,
+    long PersonalScheduleId,
+    long UserId,
+    long EditionId,
     string? Name,
     bool IsDefault,
     int EntryCount,
@@ -33,8 +33,8 @@ public sealed record PersonalScheduleDto(
 /// Summary DTO for personal schedule list items.
 /// </summary>
 public sealed record PersonalScheduleSummaryDto(
-    Guid PersonalScheduleId,
-    Guid EditionId,
+    long PersonalScheduleId,
+    long EditionId,
     string? EditionName,
     string? FestivalName,
     string? Name,
@@ -45,7 +45,7 @@ public sealed record PersonalScheduleSummaryDto(
 /// Request DTO for creating a personal schedule.
 /// </summary>
 public sealed record CreatePersonalScheduleRequest(
-    Guid EditionId,
+    long EditionId,
     string? Name);
 
 /// <summary>
@@ -59,9 +59,9 @@ public sealed record UpdatePersonalScheduleRequest(
 /// Response DTO for personal schedule entry.
 /// </summary>
 public sealed record PersonalScheduleEntryDto(
-    Guid PersonalScheduleEntryId,
-    Guid PersonalScheduleId,
-    Guid EngagementId,
+    long PersonalScheduleEntryId,
+    long PersonalScheduleId,
+    long EngagementId,
     string? ArtistName,
     string? StageName,
     DateTime StartTimeUtc,
@@ -93,7 +93,7 @@ public sealed record PersonalScheduleEntryDto(
 /// Request DTO for adding an entry to a personal schedule.
 /// </summary>
 public sealed record AddScheduleEntryRequest(
-    Guid EngagementId,
+    long EngagementId,
     string? Notes,
     bool NotificationsEnabled = true);
 
@@ -108,9 +108,9 @@ public sealed record UpdateScheduleEntryRequest(
 /// Detailed personal schedule with all entries.
 /// </summary>
 public sealed record PersonalScheduleDetailDto(
-    Guid PersonalScheduleId,
-    Guid UserId,
-    Guid EditionId,
+    long PersonalScheduleId,
+    long UserId,
+    long EditionId,
     string? EditionName,
     string? FestivalName,
     string? Name,

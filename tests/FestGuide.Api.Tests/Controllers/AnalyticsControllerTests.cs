@@ -17,7 +17,7 @@ public class AnalyticsControllerTests
     private readonly Mock<IAnalyticsService> _mockAnalyticsService;
     private readonly Mock<ILogger<AnalyticsController>> _mockLogger;
     private readonly AnalyticsController _sut;
-    private readonly Guid _userId = Guid.NewGuid();
+    private readonly long _userId = 100L;
 
     public AnalyticsControllerTests()
     {
@@ -39,11 +39,11 @@ public class AnalyticsControllerTests
         // Arrange
         var request = new TrackEventRequest(
             "schedule_view",
-            Guid.NewGuid(),
+            101L,
             null,
             null,
             "iOS",
-            Guid.NewGuid().ToString(),
+            102L.ToString(),
             null);
 
         // Act
@@ -52,7 +52,7 @@ public class AnalyticsControllerTests
         // Assert
         result.Should().BeOfType<NoContentResult>();
         _mockAnalyticsService.Verify(s => s.TrackEventAsync(
-            It.IsAny<Guid?>(),
+            It.IsAny<long?>(),
             request,
             It.IsAny<CancellationToken>()), Times.Once);
     }
@@ -63,11 +63,11 @@ public class AnalyticsControllerTests
         // Arrange
         var request = new TrackEventRequest(
             "schedule_view",
-            Guid.NewGuid(),
+            103L,
             null,
             null,
             "iOS",
-            Guid.NewGuid().ToString(),
+            104L.ToString(),
             null);
 
         // Act
@@ -85,7 +85,7 @@ public class AnalyticsControllerTests
     public async Task GetEditionDashboard_WithValidEditionId_Returns200Ok()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 1L;
         var dashboard = new EditionDashboardDto(
             editionId,
             "Summer Festival 2026",
@@ -114,7 +114,7 @@ public class AnalyticsControllerTests
     public async Task GetEditionDashboard_WithNonExistentEdition_Returns404NotFound()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 2L;
 
         _mockAnalyticsService.Setup(s => s.GetEditionDashboardAsync(editionId, _userId, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new EditionNotFoundException(editionId));
@@ -132,7 +132,7 @@ public class AnalyticsControllerTests
     public async Task GetEditionDashboard_WithoutPermission_Returns403Forbidden()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 3L;
 
         _mockAnalyticsService.Setup(s => s.GetEditionDashboardAsync(editionId, _userId, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new ForbiddenException("Access denied"));
@@ -151,7 +151,7 @@ public class AnalyticsControllerTests
     public async Task GetEditionDashboard_WithoutAuthentication_Returns401Unauthorized()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 4L;
         var controller = new AnalyticsController(_mockAnalyticsService.Object, _mockLogger.Object);
         controller.ControllerContext = new ControllerContext
         {
@@ -173,7 +173,7 @@ public class AnalyticsControllerTests
     public async Task GetFestivalSummary_WithValidFestivalId_Returns200Ok()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
+        var festivalId = 5L;
         var summary = new FestivalAnalyticsSummaryDto(
             festivalId,
             "Summer Music Fest",
@@ -199,7 +199,7 @@ public class AnalyticsControllerTests
     public async Task GetFestivalSummary_WithNonExistentFestival_Returns404NotFound()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
+        var festivalId = 6L;
 
         _mockAnalyticsService.Setup(s => s.GetFestivalSummaryAsync(festivalId, _userId, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new FestivalNotFoundException(festivalId));
@@ -221,11 +221,11 @@ public class AnalyticsControllerTests
     public async Task GetTopArtists_WithValidEditionId_Returns200Ok()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 7L;
         var artists = new List<ArtistAnalyticsDto>
         {
-            new(Guid.NewGuid(), "Artist One", "image1.jpg", 100, 1, 0.5m),
-            new(Guid.NewGuid(), "Artist Two", "image2.jpg", 75, 2, 0.3m)
+            new(105L, "Artist One", "image1.jpg", 100, 1, 0.5m),
+            new(106L, "Artist Two", "image2.jpg", 75, 2, 0.3m)
         };
 
         _mockAnalyticsService.Setup(s => s.GetTopArtistsAsync(editionId, _userId, 10, It.IsAny<CancellationToken>()))
@@ -244,7 +244,7 @@ public class AnalyticsControllerTests
     public async Task GetTopArtists_WithoutPermission_Returns403Forbidden()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 8L;
 
         _mockAnalyticsService.Setup(s => s.GetTopArtistsAsync(editionId, _userId, 10, It.IsAny<CancellationToken>()))
             .ThrowsAsync(new ForbiddenException("Access denied"));
@@ -265,10 +265,10 @@ public class AnalyticsControllerTests
     public async Task GetTopEngagements_WithValidEditionId_Returns200Ok()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 9L;
         var engagements = new List<EngagementAnalyticsDto>
         {
-            new(Guid.NewGuid(), Guid.NewGuid(), "Artist One", Guid.NewGuid(), "Main Stage", DateTime.UtcNow, DateTime.UtcNow.AddHours(1), 50, 1)
+            new(107L, 108L, "Artist One", 109L, "Main Stage", DateTime.UtcNow, DateTime.UtcNow.AddHours(1), 50, 1)
         };
 
         _mockAnalyticsService.Setup(s => s.GetTopEngagementsAsync(editionId, _userId, 10, It.IsAny<CancellationToken>()))
@@ -291,7 +291,7 @@ public class AnalyticsControllerTests
     public async Task GetEventTimeline_WithValidParameters_Returns200Ok()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 10L;
         var fromUtc = DateTime.UtcNow.AddDays(-7);
         var toUtc = DateTime.UtcNow;
         var timeline = new List<TimelineDataPointDto>
@@ -320,7 +320,7 @@ public class AnalyticsControllerTests
     public async Task GetEventTimeline_WithoutEventType_UsesNull()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 11L;
         var fromUtc = DateTime.UtcNow.AddDays(-7);
         var toUtc = DateTime.UtcNow;
 
@@ -346,7 +346,7 @@ public class AnalyticsControllerTests
     public async Task GetDailyActiveUsers_WithDateRange_Returns200Ok()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 12L;
         var fromUtc = DateTime.UtcNow.AddDays(-7);
         var toUtc = DateTime.UtcNow;
         var dau = new List<DailyActiveUsersDto>
@@ -375,7 +375,7 @@ public class AnalyticsControllerTests
     public async Task GetPlatformDistribution_WithValidEditionId_Returns200Ok()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 13L;
         var platforms = new List<PlatformDistributionDto>
         {
             new("iOS", 100, 0.5m),
@@ -403,7 +403,7 @@ public class AnalyticsControllerTests
     public async Task GetEventTypeDistribution_WithValidEditionId_Returns200Ok()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 14L;
         var distribution = new List<EventTypeDistributionDto>
         {
             new("schedule_view", 100, 0.5m),
@@ -431,7 +431,7 @@ public class AnalyticsControllerTests
     public async Task GetEventTypeDistribution_WithDateRange_PassesParameters()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 15L;
         var fromUtc = DateTime.UtcNow.AddDays(-7);
         var toUtc = DateTime.UtcNow;
 

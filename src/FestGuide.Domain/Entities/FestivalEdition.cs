@@ -10,12 +10,12 @@ public class FestivalEdition : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the edition.
     /// </summary>
-    public Guid EditionId { get; set; }
+    public long EditionId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the festival this edition belongs to.
     /// </summary>
-    public Guid FestivalId { get; set; }
+    public long FestivalId { get; set; }
 
     /// <summary>
     /// Gets or sets the edition name (e.g., "2026 Summer Edition").

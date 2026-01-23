@@ -8,17 +8,17 @@ public class NotificationLog : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the notification log.
     /// </summary>
-    public Guid NotificationLogId { get; set; }
+    public long NotificationLogId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the user who received the notification.
     /// </summary>
-    public Guid UserId { get; set; }
+    public long UserId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the device token used (if push notification).
     /// </summary>
-    public Guid? DeviceTokenId { get; set; }
+    public long? DeviceTokenId { get; set; }
 
     /// <summary>
     /// Gets or sets the notification type (schedule_change, reminder, announcement, etc.).
@@ -48,7 +48,7 @@ public class NotificationLog : BaseEntity
     /// <summary>
     /// Gets or sets the related entity ID.
     /// </summary>
-    public Guid? RelatedEntityId { get; set; }
+    public long? RelatedEntityId { get; set; }
 
     /// <summary>
     /// Gets or sets when the notification was sent.

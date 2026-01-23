@@ -43,7 +43,7 @@ public class AuthControllerTests
         // Arrange
         var request = new RegisterRequest("test@example.com", "SecurePassword123!", "Test User", UserType.Attendee);
         var authResponse = new AuthResponse(
-            Guid.NewGuid(),
+            100L,
             "test@example.com",
             "Test User",
             "Attendee",
@@ -92,7 +92,7 @@ public class AuthControllerTests
         // Arrange
         var request = new LoginRequest("test@example.com", "SecurePassword123!");
         var authResponse = new AuthResponse(
-            Guid.NewGuid(),
+            101L,
             "test@example.com",
             "Test User",
             "Attendee",

@@ -18,7 +18,7 @@ public class SqlServerEngagementRepository : IEngagementRepository
     }
 
     /// <inheritdoc />
-    public async Task<Engagement?> GetByIdAsync(Guid engagementId, CancellationToken ct = default)
+    public async Task<Engagement?> GetByIdAsync(long engagementId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -34,7 +34,7 @@ public class SqlServerEngagementRepository : IEngagementRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Engagement>> GetByIdsAsync(IEnumerable<Guid> engagementIds, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Engagement>> GetByIdsAsync(IEnumerable<long> engagementIds, CancellationToken ct = default)
     {
         var engagementIdsList = engagementIds?.ToList();
         if (engagementIdsList == null || !engagementIdsList.Any())
@@ -58,7 +58,7 @@ public class SqlServerEngagementRepository : IEngagementRepository
     }
 
     /// <inheritdoc />
-    public async Task<Engagement?> GetByTimeSlotAsync(Guid timeSlotId, CancellationToken ct = default)
+    public async Task<Engagement?> GetByTimeSlotAsync(long timeSlotId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -74,7 +74,7 @@ public class SqlServerEngagementRepository : IEngagementRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Engagement>> GetByEditionAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Engagement>> GetByEditionAsync(long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -94,7 +94,7 @@ public class SqlServerEngagementRepository : IEngagementRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Engagement>> GetByArtistAsync(Guid artistId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<Engagement>> GetByArtistAsync(long artistId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -112,14 +112,14 @@ public class SqlServerEngagementRepository : IEngagementRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(Engagement engagement, CancellationToken ct = default)
+    public async Task<long> CreateAsync(Engagement engagement, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO schedule.Engagement (
-                EngagementId, TimeSlotId, ArtistId, Notes, IsDeleted,
+                TimeSlotId, ArtistId, Notes, IsDeleted,
                 CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
             ) VALUES (
-                @EngagementId, @TimeSlotId, @ArtistId, @Notes, @IsDeleted,
+                @TimeSlotId, @ArtistId, @Notes, @IsDeleted,
                 @CreatedAtUtc, @CreatedBy, @ModifiedAtUtc, @ModifiedBy
             )
             """;
@@ -145,7 +145,7 @@ public class SqlServerEngagementRepository : IEngagementRepository
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid engagementId, Guid deletedBy, CancellationToken ct = default)
+    public async Task DeleteAsync(long engagementId, long deletedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE schedule.Engagement
@@ -164,7 +164,7 @@ public class SqlServerEngagementRepository : IEngagementRepository
     }
 
     /// <inheritdoc />
-    public async Task<bool> ExistsAsync(Guid engagementId, CancellationToken ct = default)
+    public async Task<bool> ExistsAsync(long engagementId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(1) FROM schedule.Engagement
@@ -178,7 +178,7 @@ public class SqlServerEngagementRepository : IEngagementRepository
     }
 
     /// <inheritdoc />
-    public async Task<bool> TimeSlotHasEngagementAsync(Guid timeSlotId, CancellationToken ct = default)
+    public async Task<bool> TimeSlotHasEngagementAsync(long timeSlotId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(1) FROM schedule.Engagement
@@ -192,7 +192,7 @@ public class SqlServerEngagementRepository : IEngagementRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid?> GetFestivalIdAsync(Guid engagementId, CancellationToken ct = default)
+    public async Task<long?> GetFestivalIdAsync(long engagementId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT f.FestivalId 
@@ -203,7 +203,7 @@ public class SqlServerEngagementRepository : IEngagementRepository
             WHERE e.EngagementId = @EngagementId AND e.IsDeleted = 0
             """;
 
-        return await _connection.ExecuteScalarAsync<Guid?>(
+        return await _connection.ExecuteScalarAsync<long?>(
             new CommandDefinition(sql, new { EngagementId = engagementId }, cancellationToken: ct));
     }
 }

@@ -8,12 +8,12 @@ public class NotificationPreference : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the preference record.
     /// </summary>
-    public Guid NotificationPreferenceId { get; set; }
+    public long NotificationPreferenceId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the user.
     /// </summary>
-    public Guid UserId { get; set; }
+    public long UserId { get; set; }
 
     /// <summary>
     /// Gets or sets whether push notifications are enabled globally.
@@ -37,7 +37,7 @@ public class NotificationPreference : BaseEntity
 
     /// <summary>
     /// Gets or sets how many minutes before a performance to send reminders.
-    /// Valid range: 5-120 minutes. Validation is enforced at the application layer.
+    /// Valid range: 5-1440 minutes (up to 24 hours). Validation is enforced at the application layer.
     /// </summary>
     public int ReminderMinutesBefore { get; set; } = 30;
 

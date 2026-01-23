@@ -9,17 +9,17 @@ public class Engagement : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the engagement.
     /// </summary>
-    public Guid EngagementId { get; set; }
+    public long EngagementId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the time slot for this engagement.
     /// </summary>
-    public Guid TimeSlotId { get; set; }
+    public long TimeSlotId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the artist for this engagement.
     /// </summary>
-    public Guid ArtistId { get; set; }
+    public long ArtistId { get; set; }
 
     /// <summary>
     /// Gets or sets optional notes about the engagement.

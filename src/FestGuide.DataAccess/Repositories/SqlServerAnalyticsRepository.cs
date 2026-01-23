@@ -18,15 +18,15 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> RecordEventAsync(AnalyticsEvent analyticsEvent, CancellationToken ct = default)
+    public async Task<long> RecordEventAsync(AnalyticsEvent analyticsEvent, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO analytics.AnalyticsEvent (
-                AnalyticsEventId, UserId, FestivalId, EditionId, EventType,
+                UserId, FestivalId, EditionId, EventType,
                 EntityType, EntityId, Metadata, Platform, DeviceType,
                 SessionId, EventTimestampUtc, CreatedAtUtc
             ) VALUES (
-                @AnalyticsEventId, @UserId, @FestivalId, @EditionId, @EventType,
+                @UserId, @FestivalId, @EditionId, @EventType,
                 @EntityType, @EntityId, @Metadata, @Platform, @DeviceType,
                 @SessionId, @EventTimestampUtc, @CreatedAtUtc
             )
@@ -44,11 +44,11 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
         ArgumentNullException.ThrowIfNull(events);
         const string sql = """
             INSERT INTO analytics.AnalyticsEvent (
-                AnalyticsEventId, UserId, FestivalId, EditionId, EventType,
+                UserId, FestivalId, EditionId, EventType,
                 EntityType, EntityId, Metadata, Platform, DeviceType,
                 SessionId, EventTimestampUtc, CreatedAtUtc
             ) VALUES (
-                @AnalyticsEventId, @UserId, @FestivalId, @EditionId, @EventType,
+                @UserId, @FestivalId, @EditionId, @EventType,
                 @EntityType, @EntityId, @Metadata, @Platform, @DeviceType,
                 @SessionId, @EventTimestampUtc, @CreatedAtUtc
             )
@@ -59,7 +59,7 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
     }
 
     /// <inheritdoc />
-    public async Task<int> GetScheduleViewCountAsync(Guid editionId, DateTime? fromUtc = null, DateTime? toUtc = null, CancellationToken ct = default)
+    public async Task<int> GetScheduleViewCountAsync(long editionId, DateTime? fromUtc = null, DateTime? toUtc = null, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(*)
@@ -75,7 +75,7 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
     }
 
     /// <inheritdoc />
-    public async Task<int> GetUniqueViewerCountAsync(Guid editionId, DateTime? fromUtc = null, DateTime? toUtc = null, CancellationToken ct = default)
+    public async Task<int> GetUniqueViewerCountAsync(long editionId, DateTime? fromUtc = null, DateTime? toUtc = null, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(DISTINCT UserId)
@@ -92,7 +92,7 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<(Guid EngagementId, int SaveCount)>> GetTopSavedEngagementsAsync(Guid editionId, int limit = 10, CancellationToken ct = default)
+    public async Task<IReadOnlyList<(long EngagementId, int SaveCount)>> GetTopSavedEngagementsAsync(long editionId, int limit = 10, CancellationToken ct = default)
     {
         const string sql = """
             SELECT TOP (@Limit) EntityId AS EngagementId, COUNT(*) AS SaveCount
@@ -105,14 +105,14 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
             ORDER BY COUNT(*) DESC
             """;
 
-        var result = await _connection.QueryAsync<(Guid EngagementId, int SaveCount)>(
+        var result = await _connection.QueryAsync<(long EngagementId, int SaveCount)>(
             new CommandDefinition(sql, new { EditionId = editionId, Limit = limit }, cancellationToken: ct));
 
         return result.ToList();
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<(Guid ArtistId, string ArtistName, int SaveCount)>> GetTopArtistsAsync(Guid editionId, int limit = 10, CancellationToken ct = default)
+    public async Task<IReadOnlyList<(long ArtistId, string ArtistName, int SaveCount)>> GetTopArtistsAsync(long editionId, int limit = 10, CancellationToken ct = default)
     {
         const string sql = """
             SELECT TOP (@Limit) 
@@ -130,14 +130,14 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
             ORDER BY COUNT(*) DESC
             """;
 
-        var result = await _connection.QueryAsync<(Guid ArtistId, string ArtistName, int SaveCount)>(
+        var result = await _connection.QueryAsync<(long ArtistId, string ArtistName, int SaveCount)>(
             new CommandDefinition(sql, new { EditionId = editionId, Limit = limit }, cancellationToken: ct));
 
         return result.ToList();
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<(DateTime Hour, int Count)>> GetEventTimelineAsync(Guid editionId, string eventType, DateTime fromUtc, DateTime toUtc, CancellationToken ct = default)
+    public async Task<IReadOnlyList<(DateTime Hour, int Count)>> GetEventTimelineAsync(long editionId, string eventType, DateTime fromUtc, DateTime toUtc, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -159,7 +159,7 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<(string Platform, int Count)>> GetPlatformDistributionAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<(string Platform, int Count)>> GetPlatformDistributionAsync(long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -177,7 +177,7 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
     }
 
     /// <inheritdoc />
-    public async Task<int> GetPersonalScheduleCountAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<int> GetPersonalScheduleCountAsync(long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(*)
@@ -190,7 +190,7 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
     }
 
     /// <inheritdoc />
-    public async Task<int> GetTotalEngagementSavesAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<int> GetTotalEngagementSavesAsync(long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(*)
@@ -206,7 +206,7 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<(DateTime Date, int Count)>> GetDailyActiveUsersAsync(Guid editionId, DateTime fromUtc, DateTime toUtc, CancellationToken ct = default)
+    public async Task<IReadOnlyList<(DateTime Date, int Count)>> GetDailyActiveUsersAsync(long editionId, DateTime fromUtc, DateTime toUtc, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -228,7 +228,7 @@ public class SqlServerAnalyticsRepository : IAnalyticsRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<(string EventType, int Count)>> GetEventTypeDistributionAsync(Guid editionId, DateTime? fromUtc = null, DateTime? toUtc = null, CancellationToken ct = default)
+    public async Task<IReadOnlyList<(string EventType, int Count)>> GetEventTypeDistributionAsync(long editionId, DateTime? fromUtc = null, DateTime? toUtc = null, CancellationToken ct = default)
     {
         const string sql = """
             SELECT EventType, COUNT(*) AS Count

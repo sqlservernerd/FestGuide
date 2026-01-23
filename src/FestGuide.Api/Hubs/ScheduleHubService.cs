@@ -11,17 +11,17 @@ public interface IScheduleHubService
     /// <summary>
     /// Notifies all clients watching an edition about a schedule change.
     /// </summary>
-    Task NotifyScheduleChangedAsync(Guid editionId, ScheduleChangeNotification change, CancellationToken ct = default);
+    Task NotifyScheduleChangedAsync(long editionId, ScheduleChangeNotification change, CancellationToken ct = default);
 
     /// <summary>
     /// Notifies all clients watching an edition that the schedule was published.
     /// </summary>
-    Task NotifySchedulePublishedAsync(Guid editionId, int version, CancellationToken ct = default);
+    Task NotifySchedulePublishedAsync(long editionId, int version, CancellationToken ct = default);
 
     /// <summary>
     /// Notifies a specific user about an update to their personal schedule.
     /// </summary>
-    Task NotifyPersonalScheduleUpdatedAsync(Guid scheduleId, string updateType, CancellationToken ct = default);
+    Task NotifyPersonalScheduleUpdatedAsync(long scheduleId, string updateType, CancellationToken ct = default);
 }
 
 /// <summary>
@@ -39,7 +39,7 @@ public class ScheduleHubService : IScheduleHubService
     }
 
     /// <inheritdoc />
-    public async Task NotifyScheduleChangedAsync(Guid editionId, ScheduleChangeNotification change, CancellationToken ct = default)
+    public async Task NotifyScheduleChangedAsync(long editionId, ScheduleChangeNotification change, CancellationToken ct = default)
     {
         var groupName = ScheduleHub.GetEditionGroupName(editionId);
 
@@ -65,7 +65,7 @@ public class ScheduleHubService : IScheduleHubService
     }
 
     /// <inheritdoc />
-    public async Task NotifySchedulePublishedAsync(Guid editionId, int version, CancellationToken ct = default)
+    public async Task NotifySchedulePublishedAsync(long editionId, int version, CancellationToken ct = default)
     {
         var groupName = ScheduleHub.GetEditionGroupName(editionId);
 
@@ -84,7 +84,7 @@ public class ScheduleHubService : IScheduleHubService
     }
 
     /// <inheritdoc />
-    public async Task NotifyPersonalScheduleUpdatedAsync(Guid scheduleId, string updateType, CancellationToken ct = default)
+    public async Task NotifyPersonalScheduleUpdatedAsync(long scheduleId, string updateType, CancellationToken ct = default)
     {
         var groupName = ScheduleHub.GetPersonalScheduleGroupName(scheduleId);
 

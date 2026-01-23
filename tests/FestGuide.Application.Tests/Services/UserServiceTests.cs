@@ -40,7 +40,7 @@ public class UserServiceTests
     public async Task GetProfileAsync_WithValidUserId_ReturnsProfile()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = 1L;
         var user = new User
         {
             UserId = userId,
@@ -71,7 +71,7 @@ public class UserServiceTests
     public async Task GetProfileAsync_WithInvalidUserId_ThrowsUserNotFoundException()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = 2L;
         _mockUserRepo.Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((User?)null);
 
@@ -86,7 +86,7 @@ public class UserServiceTests
     public async Task UpdateProfileAsync_WithValidRequest_UpdatesProfile()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = 3L;
         var user = new User
         {
             UserId = userId,
@@ -120,7 +120,7 @@ public class UserServiceTests
     public async Task DeleteAccountAsync_WithValidUserId_SoftDeletesUser()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = 4L;
         var user = new User { UserId = userId };
 
         _mockUserRepo.Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
@@ -138,7 +138,7 @@ public class UserServiceTests
     public async Task ExportDataAsync_WithValidUserId_ReturnsUserData()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = 5L;
         var user = new User
         {
             UserId = userId,

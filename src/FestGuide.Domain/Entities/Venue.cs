@@ -8,12 +8,12 @@ public class Venue : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the venue.
     /// </summary>
-    public Guid VenueId { get; set; }
+    public long VenueId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the festival this venue belongs to.
     /// </summary>
-    public Guid FestivalId { get; set; }
+    public long FestivalId { get; set; }
 
     /// <summary>
     /// Gets or sets the venue name.

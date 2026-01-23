@@ -7,8 +7,8 @@ namespace FestGuide.Application.Dtos;
 /// Response DTO for festival edition.
 /// </summary>
 public sealed record EditionDto(
-    Guid EditionId,
-    Guid FestivalId,
+    long EditionId,
+    long FestivalId,
     string Name,
     DateTime StartDateUtc,
     DateTime EndDateUtc,
@@ -56,7 +56,7 @@ public sealed record UpdateEditionRequest(
 /// Summary DTO for edition list items.
 /// </summary>
 public sealed record EditionSummaryDto(
-    Guid EditionId,
+    long EditionId,
     string Name,
     DateTime StartDateUtc,
     DateTime EndDateUtc,

@@ -19,7 +19,7 @@ public class SqlServerEditionRepository : IEditionRepository
     }
 
     /// <inheritdoc />
-    public async Task<FestivalEdition?> GetByIdAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<FestivalEdition?> GetByIdAsync(long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -35,7 +35,7 @@ public class SqlServerEditionRepository : IEditionRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<FestivalEdition>> GetByIdsAsync(IEnumerable<Guid> editionIds, CancellationToken ct = default)
+    public async Task<IReadOnlyList<FestivalEdition>> GetByIdsAsync(IEnumerable<long> editionIds, CancellationToken ct = default)
     {
         var editionIdsList = editionIds?.ToList();
         if (editionIdsList == null || !editionIdsList.Any())
@@ -59,7 +59,7 @@ public class SqlServerEditionRepository : IEditionRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<FestivalEdition>> GetByFestivalAsync(Guid festivalId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<FestivalEdition>> GetByFestivalAsync(long festivalId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -78,7 +78,7 @@ public class SqlServerEditionRepository : IEditionRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<FestivalEdition>> GetPublishedByFestivalAsync(Guid festivalId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<FestivalEdition>> GetPublishedByFestivalAsync(long festivalId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -97,7 +97,7 @@ public class SqlServerEditionRepository : IEditionRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<FestivalEdition>> GetCurrentAndRecentAsync(Guid festivalId, int archiveMonths = 3, CancellationToken ct = default)
+    public async Task<IReadOnlyList<FestivalEdition>> GetCurrentAndRecentAsync(long festivalId, int archiveMonths = 3, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -120,15 +120,15 @@ public class SqlServerEditionRepository : IEditionRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(FestivalEdition edition, CancellationToken ct = default)
+    public async Task<long> CreateAsync(FestivalEdition edition, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO core.FestivalEdition (
-                EditionId, FestivalId, Name, StartDateUtc, EndDateUtc,
+                FestivalId, Name, StartDateUtc, EndDateUtc,
                 TimezoneId, TicketUrl, Status, IsDeleted,
                 CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
             ) VALUES (
-                @EditionId, @FestivalId, @Name, @StartDateUtc, @EndDateUtc,
+                @FestivalId, @Name, @StartDateUtc, @EndDateUtc,
                 @TimezoneId, @TicketUrl, @Status, @IsDeleted,
                 @CreatedAtUtc, @CreatedBy, @ModifiedAtUtc, @ModifiedBy
             )
@@ -136,7 +136,6 @@ public class SqlServerEditionRepository : IEditionRepository
 
         await _connection.ExecuteAsync(new CommandDefinition(sql, new
         {
-            edition.EditionId,
             edition.FestivalId,
             edition.Name,
             edition.StartDateUtc,
@@ -173,7 +172,7 @@ public class SqlServerEditionRepository : IEditionRepository
     }
 
     /// <inheritdoc />
-    public async Task UpdateStatusAsync(Guid editionId, EditionStatus status, Guid modifiedBy, CancellationToken ct = default)
+    public async Task UpdateStatusAsync(long editionId, EditionStatus status, long modifiedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE core.FestivalEdition
@@ -190,7 +189,7 @@ public class SqlServerEditionRepository : IEditionRepository
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid editionId, Guid deletedBy, CancellationToken ct = default)
+    public async Task DeleteAsync(long editionId, long deletedBy, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE core.FestivalEdition
@@ -209,7 +208,7 @@ public class SqlServerEditionRepository : IEditionRepository
     }
 
     /// <inheritdoc />
-    public async Task<bool> ExistsAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<bool> ExistsAsync(long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT COUNT(1) FROM core.FestivalEdition
@@ -223,14 +222,14 @@ public class SqlServerEditionRepository : IEditionRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid?> GetFestivalIdAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<long?> GetFestivalIdAsync(long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT FestivalId FROM core.FestivalEdition
             WHERE EditionId = @EditionId AND IsDeleted = 0
             """;
 
-        return await _connection.ExecuteScalarAsync<Guid?>(
+        return await _connection.ExecuteScalarAsync<long?>(
             new CommandDefinition(sql, new { EditionId = editionId }, cancellationToken: ct));
     }
 }

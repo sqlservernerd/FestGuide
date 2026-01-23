@@ -19,14 +19,14 @@ public class ForbiddenException : DomainException
     public string? Action { get; }
     public string? Resource { get; }
 
-    public static ForbiddenException CannotEditFestival(Guid festivalId) =>
+    public static ForbiddenException CannotEditFestival(long festivalId) =>
         new("edit", "festival") { FestivalId = festivalId };
 
-    public static ForbiddenException CannotDeleteFestival(Guid festivalId) =>
+    public static ForbiddenException CannotDeleteFestival(long festivalId) =>
         new("delete", "festival") { FestivalId = festivalId };
 
-    public static ForbiddenException CannotManagePermissions(Guid festivalId) =>
+    public static ForbiddenException CannotManagePermissions(long festivalId) =>
         new("manage permissions for", "festival") { FestivalId = festivalId };
 
-    public Guid? FestivalId { get; init; }
+    public long? FestivalId { get; init; }
 }

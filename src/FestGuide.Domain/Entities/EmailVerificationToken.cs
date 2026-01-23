@@ -8,12 +8,12 @@ public class EmailVerificationToken : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the token.
     /// </summary>
-    public Guid TokenId { get; set; }
+    public long TokenId { get; set; }
 
     /// <summary>
     /// Gets or sets the user ID this token belongs to.
     /// </summary>
-    public Guid UserId { get; set; }
+    public long UserId { get; set; }
 
     /// <summary>
     /// Gets or sets the hashed token value.

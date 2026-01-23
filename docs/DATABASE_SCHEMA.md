@@ -32,8 +32,8 @@
 | UTC Timestamps | All datetime columns store UTC values |
 | IANA Timezones | Timezone identifiers stored as IANA strings |
 | Soft Deletes | Where applicable, use `IsDeleted` flag |
-| Audit Columns | All tables include `CreatedAtUtc`, `CreatedBy`, `ModifiedAtUtc`, `ModifiedBy` |
-| GUID Primary Keys | Use `NEWSEQUENTIALID()` for clustered index performance |
+| Audit Columns | All tables include `CreatedAtUtc`, `CreatedBy`, `ModifiedAtUtc`, `ModifiedBy`, except system-generated token tables (PasswordResetToken, EmailVerificationToken) which only include `CreatedAtUtc` |
+| BIGINT IDENTITY Primary Keys | Use `BIGINT IDENTITY(1,1)` for auto-incrementing primary keys with better performance |
 
 ---
 
@@ -45,7 +45,7 @@
 | `core` | Core domain entities | Festival, FestivalEdition, Artist |
 | `venue` | Venue and stage management | Venue, Stage, TimeSlot |
 | `schedule` | Schedule and engagements | Schedule, Engagement |
-| `permissions` | Authorization | FestivalPermission, PermissionScope |
+| `permissions` | Authorization | FestivalPermission |
 | `attendee` | Attendee-specific data | PersonalSchedule, PersonalScheduleEntry |
 | `notifications` | Push notification management | DeviceToken, NotificationLog |
 | `integrations` | External integrations | ApiKey, WebhookSubscription |
@@ -139,24 +139,26 @@ Stores user account information.
 ```sql
 CREATE TABLE [identity].[User]
 (
-    [UserId]                UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
+    [UserId]                BIGINT IDENTITY(1,1)    NOT NULL,
     [Email]                 NVARCHAR(256)       NOT NULL,
     [EmailNormalized]       NVARCHAR(256)       NOT NULL,
     [EmailVerified]         BIT                 NOT NULL    DEFAULT 0,
     [PasswordHash]          NVARCHAR(500)       NOT NULL,
     [DisplayName]           NVARCHAR(100)       NOT NULL,
-    [UserType]              NVARCHAR(20)        NOT NULL,   -- 'attendee' or 'organizer'
+    [UserType]              TINYINT             NOT NULL,   -- 0 = Attendee, 1 = Organizer
     [PreferredTimezoneId]   NVARCHAR(100)       NULL,       -- IANA timezone
+    [FailedLoginAttempts]   INT                 NOT NULL    DEFAULT 0,
+    [LockoutEndUtc]         DATETIME2(7)        NULL,
     [IsDeleted]             BIT                 NOT NULL    DEFAULT 0,
     [DeletedAtUtc]          DATETIME2(7)        NULL,
     [CreatedAtUtc]          DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [CreatedBy]             UNIQUEIDENTIFIER    NULL,
+    [CreatedBy]             BIGINT              NULL,
     [ModifiedAtUtc]         DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [ModifiedBy]            UNIQUEIDENTIFIER    NULL,
+    [ModifiedBy]            BIGINT              NULL,
 
     CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED ([UserId]),
     CONSTRAINT [UQ_User_Email] UNIQUE ([EmailNormalized]),
-    CONSTRAINT [CK_User_UserType] CHECK ([UserType] IN ('attendee', 'organizer'))
+    CONSTRAINT [CK_User_UserType] CHECK ([UserType] IN (0, 1))
 );
 
 CREATE INDEX [IX_User_Email] ON [identity].[User] ([EmailNormalized]);
@@ -165,14 +167,16 @@ CREATE INDEX [IX_User_UserType] ON [identity].[User] ([UserType]) WHERE [IsDelet
 
 | **Column** | **Type** | **Description** |
 |---|---|---|
-| UserId | UNIQUEIDENTIFIER | Primary key |
+| UserId | BIGINT IDENTITY | Primary key |
 | Email | NVARCHAR(256) | User's email address |
 | EmailNormalized | NVARCHAR(256) | Lowercase email for uniqueness |
 | EmailVerified | BIT | Email verification status |
 | PasswordHash | NVARCHAR(500) | Argon2id password hash |
 | DisplayName | NVARCHAR(100) | User's display name |
-| UserType | NVARCHAR(20) | Account type: attendee or organizer |
+| UserType | TINYINT | Account type: 0 = Attendee, 1 = Organizer |
 | PreferredTimezoneId | NVARCHAR(100) | IANA timezone identifier |
+| FailedLoginAttempts | INT | Number of consecutive failed login attempts |
+| LockoutEndUtc | DATETIME2(7) | UTC timestamp when account lockout expires |
 
 ---
 
@@ -183,13 +187,13 @@ Stores refresh tokens for JWT authentication.
 ```sql
 CREATE TABLE [identity].[RefreshToken]
 (
-    [RefreshTokenId]    UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [UserId]            UNIQUEIDENTIFIER    NOT NULL,
+    [RefreshTokenId]    BIGINT IDENTITY(1,1)    NOT NULL,
+    [UserId]            BIGINT              NOT NULL,
     [TokenHash]         NVARCHAR(500)       NOT NULL,
     [ExpiresAtUtc]      DATETIME2(7)        NOT NULL,
     [IsRevoked]         BIT                 NOT NULL    DEFAULT 0,
     [RevokedAtUtc]      DATETIME2(7)        NULL,
-    [ReplacedByTokenId] UNIQUEIDENTIFIER    NULL,
+    [ReplacedByTokenId] BIGINT              NULL,
     [CreatedAtUtc]      DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
     [CreatedByIp]       NVARCHAR(45)        NULL,
 
@@ -212,18 +216,18 @@ Represents a recurring festival brand.
 ```sql
 CREATE TABLE [core].[Festival]
 (
-    [FestivalId]        UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
+    [FestivalId]        BIGINT IDENTITY(1,1)    NOT NULL,
     [Name]              NVARCHAR(200)       NOT NULL,
     [Description]       NVARCHAR(MAX)       NULL,
-    [ImageUrl]          NVARCHAR(500)       NULL,
-    [WebsiteUrl]        NVARCHAR(500)       NULL,
-    [OwnerUserId]       UNIQUEIDENTIFIER    NOT NULL,
+    [ImageUrl]          NVARCHAR(2083)      NULL,
+    [WebsiteUrl]        NVARCHAR(2083)      NULL,
+    [OwnerUserId]       BIGINT              NOT NULL,
     [IsDeleted]         BIT                 NOT NULL    DEFAULT 0,
     [DeletedAtUtc]      DATETIME2(7)        NULL,
     [CreatedAtUtc]      DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [CreatedBy]         UNIQUEIDENTIFIER    NOT NULL,
+    [CreatedBy]         BIGINT              NULL,
     [ModifiedAtUtc]     DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [ModifiedBy]        UNIQUEIDENTIFIER    NOT NULL,
+    [ModifiedBy]        BIGINT              NULL,
 
     CONSTRAINT [PK_Festival] PRIMARY KEY CLUSTERED ([FestivalId]),
     CONSTRAINT [FK_Festival_Owner] FOREIGN KEY ([OwnerUserId]) REFERENCES [identity].[User]([UserId])
@@ -242,25 +246,25 @@ Represents a specific instance of a festival with dates.
 ```sql
 CREATE TABLE [core].[FestivalEdition]
 (
-    [EditionId]         UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [FestivalId]        UNIQUEIDENTIFIER    NOT NULL,
+    [EditionId]         BIGINT IDENTITY(1,1)    NOT NULL,
+    [FestivalId]        BIGINT              NOT NULL,
     [Name]              NVARCHAR(200)       NOT NULL,
     [StartDateUtc]      DATETIME2(7)        NOT NULL,
     [EndDateUtc]        DATETIME2(7)        NOT NULL,
     [TimezoneId]        NVARCHAR(100)       NOT NULL,   -- IANA timezone
-    [TicketUrl]         NVARCHAR(500)       NULL,
-    [Status]            NVARCHAR(20)        NOT NULL    DEFAULT 'draft',
+    [TicketUrl]         NVARCHAR(2083)      NULL,
+    [Status]            TINYINT             NOT NULL    DEFAULT 0,  -- 0 = Draft, 1 = Published, 2 = Archived
     [IsDeleted]         BIT                 NOT NULL    DEFAULT 0,
     [DeletedAtUtc]      DATETIME2(7)        NULL,
     [CreatedAtUtc]      DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [CreatedBy]         UNIQUEIDENTIFIER    NOT NULL,
+    [CreatedBy]         BIGINT              NULL,
     [ModifiedAtUtc]     DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [ModifiedBy]        UNIQUEIDENTIFIER    NOT NULL,
+    [ModifiedBy]        BIGINT              NULL,
 
     CONSTRAINT [PK_FestivalEdition] PRIMARY KEY CLUSTERED ([EditionId]),
     CONSTRAINT [FK_FestivalEdition_Festival] FOREIGN KEY ([FestivalId]) REFERENCES [core].[Festival]([FestivalId]),
     CONSTRAINT [CK_FestivalEdition_Dates] CHECK ([EndDateUtc] >= [StartDateUtc]),
-    CONSTRAINT [CK_FestivalEdition_Status] CHECK ([Status] IN ('draft', 'published', 'archived'))
+    CONSTRAINT [CK_FestivalEdition_Status] CHECK ([Status] IN (0, 1, 2))
 );
 
 CREATE INDEX [IX_FestivalEdition_Festival] ON [core].[FestivalEdition] ([FestivalId]) WHERE [IsDeleted] = 0;
@@ -276,20 +280,20 @@ Represents a performer, scoped to a festival.
 ```sql
 CREATE TABLE [core].[Artist]
 (
-    [ArtistId]          UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [FestivalId]        UNIQUEIDENTIFIER    NOT NULL,
+    [ArtistId] BIGINT IDENTITY(1,1)    NOT NULL,
+    [FestivalId] BIGINT              NOT NULL,
     [Name]              NVARCHAR(200)       NOT NULL,
     [Genre]             NVARCHAR(100)       NULL,
     [Bio]               NVARCHAR(MAX)       NULL,
-    [ImageUrl]          NVARCHAR(500)       NULL,
-    [WebsiteUrl]        NVARCHAR(500)       NULL,
-    [SpotifyUrl]        NVARCHAR(500)       NULL,
+    [ImageUrl] NVARCHAR(2083)       NULL,
+    [WebsiteUrl] NVARCHAR(2083)       NULL,
+    [SpotifyUrl] NVARCHAR(2083)       NULL,
     [IsDeleted]         BIT                 NOT NULL    DEFAULT 0,
     [DeletedAtUtc]      DATETIME2(7)        NULL,
     [CreatedAtUtc]      DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [CreatedBy]         UNIQUEIDENTIFIER    NOT NULL,
+    [CreatedBy] BIGINT              NULL,
     [ModifiedAtUtc]     DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [ModifiedBy]        UNIQUEIDENTIFIER    NOT NULL,
+    [ModifiedBy] BIGINT              NULL,
 
     CONSTRAINT [PK_Artist] PRIMARY KEY CLUSTERED ([ArtistId]),
     CONSTRAINT [FK_Artist_Festival] FOREIGN KEY ([FestivalId]) REFERENCES [core].[Festival]([FestivalId])
@@ -310,19 +314,19 @@ Represents a physical location with stages.
 ```sql
 CREATE TABLE [venue].[Venue]
 (
-    [VenueId]           UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [FestivalId]        UNIQUEIDENTIFIER    NOT NULL,
+    [VenueId] BIGINT IDENTITY(1,1)    NOT NULL,
+    [FestivalId] BIGINT              NOT NULL,
     [Name]              NVARCHAR(200)       NOT NULL,
     [Description]       NVARCHAR(MAX)       NULL,
     [Address]           NVARCHAR(500)       NULL,
-    [Latitude]          DECIMAL(9,6)        NULL,
-    [Longitude]         DECIMAL(9,6)        NULL,
+    [Latitude]          DECIMAL(9,6)         NULL,
+    [Longitude]         DECIMAL(9,6)         NULL,
     [IsDeleted]         BIT                 NOT NULL    DEFAULT 0,
     [DeletedAtUtc]      DATETIME2(7)        NULL,
     [CreatedAtUtc]      DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [CreatedBy]         UNIQUEIDENTIFIER    NOT NULL,
+    [CreatedBy] BIGINT              NULL,
     [ModifiedAtUtc]     DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [ModifiedBy]        UNIQUEIDENTIFIER    NOT NULL,
+    [ModifiedBy] BIGINT              NULL,
 
     CONSTRAINT [PK_Venue] PRIMARY KEY CLUSTERED ([VenueId]),
     CONSTRAINT [FK_Venue_Festival] FOREIGN KEY ([FestivalId]) REFERENCES [core].[Festival]([FestivalId])
@@ -340,11 +344,11 @@ Junction table linking editions to venues.
 ```sql
 CREATE TABLE [venue].[EditionVenue]
 (
-    [EditionVenueId]    UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [EditionId]         UNIQUEIDENTIFIER    NOT NULL,
-    [VenueId]           UNIQUEIDENTIFIER    NOT NULL,
+    [EditionVenueId] BIGINT IDENTITY(1,1)    NOT NULL,
+    [EditionId] BIGINT              NOT NULL,
+    [VenueId] BIGINT              NOT NULL,
     [CreatedAtUtc]      DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [CreatedBy]         UNIQUEIDENTIFIER    NOT NULL,
+    [CreatedBy] BIGINT              NULL,
 
     CONSTRAINT [PK_EditionVenue] PRIMARY KEY CLUSTERED ([EditionVenueId]),
     CONSTRAINT [FK_EditionVenue_Edition] FOREIGN KEY ([EditionId]) REFERENCES [core].[FestivalEdition]([EditionId]),
@@ -362,17 +366,17 @@ Represents a performance area within a venue.
 ```sql
 CREATE TABLE [venue].[Stage]
 (
-    [StageId]           UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [VenueId]           UNIQUEIDENTIFIER    NOT NULL,
+    [StageId] BIGINT IDENTITY(1,1)    NOT NULL,
+    [VenueId] BIGINT              NOT NULL,
     [Name]              NVARCHAR(200)       NOT NULL,
     [Description]       NVARCHAR(MAX)       NULL,
     [SortOrder]         INT                 NOT NULL    DEFAULT 0,
     [IsDeleted]         BIT                 NOT NULL    DEFAULT 0,
     [DeletedAtUtc]      DATETIME2(7)        NULL,
     [CreatedAtUtc]      DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [CreatedBy]         UNIQUEIDENTIFIER    NOT NULL,
+    [CreatedBy] BIGINT              NULL,
     [ModifiedAtUtc]     DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [ModifiedBy]        UNIQUEIDENTIFIER    NOT NULL,
+    [ModifiedBy] BIGINT              NULL,
 
     CONSTRAINT [PK_Stage] PRIMARY KEY CLUSTERED ([StageId]),
     CONSTRAINT [FK_Stage_Venue] FOREIGN KEY ([VenueId]) REFERENCES [venue].[Venue]([VenueId])
@@ -390,18 +394,18 @@ Represents a block of time on a stage.
 ```sql
 CREATE TABLE [venue].[TimeSlot]
 (
-    [TimeSlotId]        UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [StageId]           UNIQUEIDENTIFIER    NOT NULL,
-    [EditionId]         UNIQUEIDENTIFIER    NOT NULL,
+    [TimeSlotId] BIGINT IDENTITY(1,1)    NOT NULL,
+    [StageId] BIGINT              NOT NULL,
+    [EditionId] BIGINT              NOT NULL,
     [StartTimeUtc]      DATETIME2(7)        NOT NULL,
     [EndTimeUtc]        DATETIME2(7)        NOT NULL,
     [SlotType]          NVARCHAR(20)        NOT NULL    DEFAULT 'performance',
     [IsDeleted]         BIT                 NOT NULL    DEFAULT 0,
     [DeletedAtUtc]      DATETIME2(7)        NULL,
     [CreatedAtUtc]      DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [CreatedBy]         UNIQUEIDENTIFIER    NOT NULL,
+    [CreatedBy] BIGINT              NULL,
     [ModifiedAtUtc]     DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [ModifiedBy]        UNIQUEIDENTIFIER    NOT NULL,
+    [ModifiedBy] BIGINT              NULL,
 
     CONSTRAINT [PK_TimeSlot] PRIMARY KEY CLUSTERED ([TimeSlotId]),
     CONSTRAINT [FK_TimeSlot_Stage] FOREIGN KEY ([StageId]) REFERENCES [venue].[Stage]([StageId]),
@@ -425,21 +429,18 @@ Represents a master schedule for an edition.
 ```sql
 CREATE TABLE [schedule].[Schedule]
 (
-    [ScheduleId]            UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [EditionId]             UNIQUEIDENTIFIER    NOT NULL,
-    [Status]                NVARCHAR(20)        NOT NULL    DEFAULT 'draft',
-    [PublishedAtUtc]        DATETIME2(7)        NULL,
-    [PublishedBy]           UNIQUEIDENTIFIER    NULL,
+    [ScheduleId] BIGINT IDENTITY(1,1)    NOT NULL,
+    [EditionId] BIGINT              NOT NULL,
     [Version]               INT                 NOT NULL    DEFAULT 1,
+    [PublishedAtUtc]        DATETIME2(7)        NULL,
+    [PublishedBy] BIGINT              NULL,
     [CreatedAtUtc]          DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [CreatedBy]             UNIQUEIDENTIFIER    NOT NULL,
+    [CreatedBy] BIGINT              NULL,
     [ModifiedAtUtc]         DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [ModifiedBy]            UNIQUEIDENTIFIER    NOT NULL,
+    [ModifiedBy] BIGINT              NULL,
 
     CONSTRAINT [PK_Schedule] PRIMARY KEY CLUSTERED ([ScheduleId]),
-    CONSTRAINT [FK_Schedule_Edition] FOREIGN KEY ([EditionId]) REFERENCES [core].[FestivalEdition]([EditionId]),
-    CONSTRAINT [UQ_Schedule_Edition] UNIQUE ([EditionId]),
-    CONSTRAINT [CK_Schedule_Status] CHECK ([Status] IN ('draft', 'published'))
+    CONSTRAINT [FK_Schedule_Edition] FOREIGN KEY ([EditionId]) REFERENCES [core].[FestivalEdition]([EditionId])
 );
 ```
 
@@ -452,24 +453,23 @@ Links an artist to a time slot.
 ```sql
 CREATE TABLE [schedule].[Engagement]
 (
-    [EngagementId]      UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [TimeSlotId]        UNIQUEIDENTIFIER    NOT NULL,
-    [ArtistId]          UNIQUEIDENTIFIER    NOT NULL,
-    [IsHeadliner]       BIT                 NOT NULL    DEFAULT 0,
-    [Notes]             NVARCHAR(500)       NULL,
+    [EngagementId] BIGINT IDENTITY(1,1)    NOT NULL,
+    [TimeSlotId] BIGINT              NOT NULL,
+    [ArtistId] BIGINT              NOT NULL,
+    [Notes]             NVARCHAR(MAX)       NULL,
     [IsDeleted]         BIT                 NOT NULL    DEFAULT 0,
     [DeletedAtUtc]      DATETIME2(7)        NULL,
     [CreatedAtUtc]      DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [CreatedBy]         UNIQUEIDENTIFIER    NOT NULL,
+    [CreatedBy] BIGINT              NULL,
     [ModifiedAtUtc]     DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [ModifiedBy]        UNIQUEIDENTIFIER    NOT NULL,
+    [ModifiedBy] BIGINT              NULL,
 
     CONSTRAINT [PK_Engagement] PRIMARY KEY CLUSTERED ([EngagementId]),
     CONSTRAINT [FK_Engagement_TimeSlot] FOREIGN KEY ([TimeSlotId]) REFERENCES [venue].[TimeSlot]([TimeSlotId]),
-    CONSTRAINT [FK_Engagement_Artist] FOREIGN KEY ([ArtistId]) REFERENCES [core].[Artist]([ArtistId]),
-    CONSTRAINT [UQ_Engagement_TimeSlot] UNIQUE ([TimeSlotId])  -- One artist per time slot
+    CONSTRAINT [FK_Engagement_Artist] FOREIGN KEY ([ArtistId]) REFERENCES [core].[Artist]([ArtistId])
 );
 
+CREATE INDEX [IX_Engagement_TimeSlot] ON [schedule].[Engagement] ([TimeSlotId]) WHERE [IsDeleted] = 0;
 CREATE INDEX [IX_Engagement_Artist] ON [schedule].[Engagement] ([ArtistId]) WHERE [IsDeleted] = 0;
 ```
 
@@ -484,48 +484,33 @@ Stores user permissions for festivals.
 ```sql
 CREATE TABLE [permissions].[FestivalPermission]
 (
-    [PermissionId]      UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [FestivalId]        UNIQUEIDENTIFIER    NOT NULL,
-    [UserId]            UNIQUEIDENTIFIER    NOT NULL,
-    [Role]              NVARCHAR(20)        NOT NULL,
-    [InvitedByUserId]   UNIQUEIDENTIFIER    NULL,
-    [AcceptedAtUtc]     DATETIME2(7)        NULL,
-    [IsDeleted]         BIT                 NOT NULL    DEFAULT 0,
-    [DeletedAtUtc]      DATETIME2(7)        NULL,
-    [CreatedAtUtc]      DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [CreatedBy]         UNIQUEIDENTIFIER    NOT NULL,
-    [ModifiedAtUtc]     DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [ModifiedBy]        UNIQUEIDENTIFIER    NOT NULL,
+    [FestivalPermissionId]  BIGINT IDENTITY(1,1)    NOT NULL,
+    [FestivalId]            BIGINT              NOT NULL,
+    [UserId]                BIGINT              NOT NULL,
+    [Role]                  TINYINT             NOT NULL,   -- 0 = Viewer, 1 = Manager, 2 = Administrator, 3 = Owner
+    [Scope]                 TINYINT             NOT NULL    DEFAULT 0,  -- 0 = All, 1 = Venues, 2 = Schedule, 3 = Artists, 4 = Editions, 5 = Integrations
+    [InvitedByUserId]       BIGINT              NULL,
+    [AcceptedAtUtc]         DATETIME2(7)        NULL,
+    [IsPending]             BIT                 NOT NULL    DEFAULT 1,
+    [IsRevoked]             BIT                 NOT NULL    DEFAULT 0,
+    [RevokedAtUtc]          DATETIME2(7)        NULL,
+    [CreatedAtUtc]          DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
+    [CreatedBy]             BIGINT              NULL,
+    [ModifiedAtUtc]         DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
+    [ModifiedBy]            BIGINT              NULL,
 
-    CONSTRAINT [PK_FestivalPermission] PRIMARY KEY CLUSTERED ([PermissionId]),
+    CONSTRAINT [PK_FestivalPermission] PRIMARY KEY CLUSTERED ([FestivalPermissionId]),
     CONSTRAINT [FK_FestivalPermission_Festival] FOREIGN KEY ([FestivalId]) REFERENCES [core].[Festival]([FestivalId]),
     CONSTRAINT [FK_FestivalPermission_User] FOREIGN KEY ([UserId]) REFERENCES [identity].[User]([UserId]),
-    CONSTRAINT [UQ_FestivalPermission_User] UNIQUE ([FestivalId], [UserId]),
-    CONSTRAINT [CK_FestivalPermission_Role] CHECK ([Role] IN ('owner', 'administrator', 'manager', 'viewer'))
+    CONSTRAINT [FK_FestivalPermission_InvitedByUser] FOREIGN KEY ([InvitedByUserId]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [CK_FestivalPermission_Role] CHECK ([Role] IN (0, 1, 2, 3)),
+    CONSTRAINT [CK_FestivalPermission_Scope] CHECK ([Scope] IN (0, 1, 2, 3, 4, 5))
 );
 
-CREATE INDEX [IX_FestivalPermission_User] ON [permissions].[FestivalPermission] ([UserId]) WHERE [IsDeleted] = 0;
-```
-
----
-
-#### 5.5.2 PermissionScope
-
-Defines specific scopes for manager/viewer roles.
-
-```sql
-CREATE TABLE [permissions].[PermissionScope]
-(
-    [PermissionScopeId] UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [PermissionId]      UNIQUEIDENTIFIER    NOT NULL,
-    [Scope]             NVARCHAR(50)        NOT NULL,
-
-    CONSTRAINT [PK_PermissionScope] PRIMARY KEY CLUSTERED ([PermissionScopeId]),
-    CONSTRAINT [FK_PermissionScope_Permission] FOREIGN KEY ([PermissionId]) REFERENCES [permissions].[FestivalPermission]([PermissionId]),
-    CONSTRAINT [CK_PermissionScope_Scope] CHECK ([Scope] IN ('venues', 'schedule', 'artists', 'editions', 'integrations', 'all'))
-);
-
-CREATE INDEX [IX_PermissionScope_Permission] ON [permissions].[PermissionScope] ([PermissionId]);
+CREATE INDEX [IX_FestivalPermission_UserId] ON [permissions].[FestivalPermission] ([UserId]) WHERE [IsRevoked] = 0;
+CREATE INDEX [IX_FestivalPermission_FestivalId] ON [permissions].[FestivalPermission] ([FestivalId]) WHERE [IsRevoked] = 0;
+CREATE INDEX [IX_FestivalPermission_InvitedByUserId] ON [permissions].[FestivalPermission] ([InvitedByUserId]) WHERE [InvitedByUserId] IS NOT NULL;
+CREATE INDEX [IX_FestivalPermission_UserId_FestivalId] ON [permissions].[FestivalPermission] ([UserId], [FestivalId]) WHERE [IsRevoked] = 0;
 ```
 
 ---
@@ -539,9 +524,9 @@ Attendee's personal schedule for an edition.
 ```sql
 CREATE TABLE [attendee].[PersonalSchedule]
 (
-    [PersonalScheduleId]    UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [UserId]                UNIQUEIDENTIFIER    NOT NULL,
-    [EditionId]             UNIQUEIDENTIFIER    NOT NULL,
+    [PersonalScheduleId] BIGINT IDENTITY(1,1)    NOT NULL,
+    [UserId] BIGINT              NOT NULL,
+    [EditionId] BIGINT              NOT NULL,
     [CreatedAtUtc]          DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
     [ModifiedAtUtc]         DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
 
@@ -563,9 +548,9 @@ Individual entries in a personal schedule.
 ```sql
 CREATE TABLE [attendee].[PersonalScheduleEntry]
 (
-    [EntryId]               UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [PersonalScheduleId]    UNIQUEIDENTIFIER    NOT NULL,
-    [EngagementId]          UNIQUEIDENTIFIER    NOT NULL,
+    [EntryId] BIGINT IDENTITY(1,1)    NOT NULL,
+    [PersonalScheduleId] BIGINT              NOT NULL,
+    [EngagementId] BIGINT              NOT NULL,
     [AddedAtUtc]            DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
 
     CONSTRAINT [PK_PersonalScheduleEntry] PRIMARY KEY CLUSTERED ([EntryId]),
@@ -586,8 +571,8 @@ Stores FCM device tokens for push notifications.
 ```sql
 CREATE TABLE [notifications].[DeviceToken]
 (
-    [DeviceTokenId]     UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [UserId]            UNIQUEIDENTIFIER    NOT NULL,
+    [DeviceTokenId] BIGINT IDENTITY(1,1)    NOT NULL,
+    [UserId] BIGINT              NOT NULL,
     [Token]             NVARCHAR(500)       NOT NULL,
     [Platform]          NVARCHAR(20)        NOT NULL,
     [IsActive]          BIT                 NOT NULL    DEFAULT 1,
@@ -612,22 +597,35 @@ Audit log for sent notifications.
 ```sql
 CREATE TABLE [notifications].[NotificationLog]
 (
-    [NotificationLogId] UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [UserId]            UNIQUEIDENTIFIER    NOT NULL,
-    [NotificationType]  NVARCHAR(50)        NOT NULL,
-    [Title]             NVARCHAR(200)       NOT NULL,
-    [Body]              NVARCHAR(500)       NOT NULL,
-    [Data]              NVARCHAR(MAX)       NULL,
-    [Status]            NVARCHAR(20)        NOT NULL,
-    [SentAtUtc]         DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [DeliveredAtUtc]    DATETIME2(7)        NULL,
-    [FailureReason]     NVARCHAR(500)       NULL,
+    [NotificationLogId]     BIGINT IDENTITY(1,1)    NOT NULL,
+    [UserId]                BIGINT              NOT NULL,
+    [DeviceTokenId]         BIGINT              NULL,
+    [NotificationType]      NVARCHAR(50)        NOT NULL,   -- 'schedule_change', 'reminder', 'announcement', etc.
+    [Title]                 NVARCHAR(200)       NOT NULL,
+    [Body]                  NVARCHAR(MAX)       NOT NULL,
+    [DataPayload]           NVARCHAR(MAX)       NULL,       -- JSON payload
+    [RelatedEntityType]     NVARCHAR(50)        NULL,       -- 'Edition', 'Engagement', 'TimeSlot', etc.
+    [RelatedEntityId]       BIGINT              NULL,
+    [SentAtUtc]             DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
+    [IsDelivered]           BIT                 NOT NULL    DEFAULT 0,
+    [ErrorMessage]          NVARCHAR(MAX)       NULL,
+    [ReadAtUtc]             DATETIME2(7)        NULL,
+    [IsDeleted]             BIT                 NOT NULL    DEFAULT 0,
+    [DeletedAtUtc]          DATETIME2(7)        NULL,
+    [CreatedAtUtc]          DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
+    [CreatedBy]             BIGINT              NULL,
+    [ModifiedAtUtc]         DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
+    [ModifiedBy]            BIGINT              NULL,
 
     CONSTRAINT [PK_NotificationLog] PRIMARY KEY CLUSTERED ([NotificationLogId]),
-    CONSTRAINT [CK_NotificationLog_Status] CHECK ([Status] IN ('pending', 'sent', 'delivered', 'failed'))
+    CONSTRAINT [FK_NotificationLog_User] FOREIGN KEY ([UserId]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_NotificationLog_DeviceToken] FOREIGN KEY ([DeviceTokenId]) REFERENCES [notifications].[DeviceToken]([DeviceTokenId])
 );
 
-CREATE INDEX [IX_NotificationLog_User] ON [notifications].[NotificationLog] ([UserId], [SentAtUtc]);
+CREATE INDEX [IX_NotificationLog_UserId] ON [notifications].[NotificationLog] ([UserId], [SentAtUtc] DESC);
+CREATE INDEX [IX_NotificationLog_UserId_ReadAtUtc] ON [notifications].[NotificationLog] ([UserId]) WHERE [ReadAtUtc] IS NULL;
+CREATE INDEX [IX_NotificationLog_NotificationType] ON [notifications].[NotificationLog] ([NotificationType], [SentAtUtc] DESC);
+CREATE INDEX [IX_NotificationLog_IsDelivered] ON [notifications].[NotificationLog] ([IsDelivered], [SentAtUtc]) WHERE [IsDelivered] = 0;
 ```
 
 ---
@@ -641,24 +639,35 @@ Stores API keys for external integrations.
 ```sql
 CREATE TABLE [integrations].[ApiKey]
 (
-    [ApiKeyId]          UNIQUEIDENTIFIER    NOT NULL    DEFAULT NEWSEQUENTIALID(),
-    [FestivalId]        UNIQUEIDENTIFIER    NOT NULL,
-    [Name]              NVARCHAR(100)       NOT NULL,
-    [KeyHash]           NVARCHAR(500)       NOT NULL,   -- Hashed key
-    [KeyPrefix]         NVARCHAR(10)        NOT NULL,   -- First 8 chars for identification
-    [ExpiresAtUtc]      DATETIME2(7)        NULL,
-    [IsRevoked]         BIT                 NOT NULL    DEFAULT 0,
-    [RevokedAtUtc]      DATETIME2(7)        NULL,
-    [LastUsedAtUtc]     DATETIME2(7)        NULL,
-    [CreatedAtUtc]      DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
-    [CreatedBy]         UNIQUEIDENTIFIER    NOT NULL,
+    [ApiKeyId]              BIGINT IDENTITY(1,1)    NOT NULL,
+    [FestivalId]            BIGINT              NOT NULL,
+    [Name]                  NVARCHAR(100)       NOT NULL,
+    [KeyHash]               NVARCHAR(500)       NOT NULL,   -- SHA-256 hash of the key
+    [KeyPrefix]             NVARCHAR(10)        NOT NULL,   -- First 8 chars for identification
+    [Scopes]                NVARCHAR(500)       NULL,       -- Comma-separated scopes: 'read:schedule,read:artists'
+    [ExpiresAtUtc]          DATETIME2(7)        NULL,
+    [IsRevoked]             BIT                 NOT NULL    DEFAULT 0,
+    [RevokedAtUtc]          DATETIME2(7)        NULL,
+    [RevokedBy]             BIGINT              NULL,
+    [LastUsedAtUtc]         DATETIME2(7)        NULL,
+    [UsageCount]            BIGINT              NOT NULL    DEFAULT 0,
+    [RateLimitPerMinute]    INT                 NULL,       -- NULL = use default
+    [CreatedAtUtc]          DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
+    [CreatedBy]             BIGINT              NULL,
+    [ModifiedAtUtc]         DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
+    [ModifiedBy]            BIGINT              NULL,
 
     CONSTRAINT [PK_ApiKey] PRIMARY KEY CLUSTERED ([ApiKeyId]),
-    CONSTRAINT [FK_ApiKey_Festival] FOREIGN KEY ([FestivalId]) REFERENCES [core].[Festival]([FestivalId])
+    CONSTRAINT [FK_ApiKey_Festival] FOREIGN KEY ([FestivalId]) REFERENCES [core].[Festival]([FestivalId]),
+    CONSTRAINT [FK_ApiKey_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_ApiKey_RevokedBy] FOREIGN KEY ([RevokedBy]) REFERENCES [identity].[User]([UserId])
 );
 
-CREATE INDEX [IX_ApiKey_Festival] ON [integrations].[ApiKey] ([FestivalId]) WHERE [IsRevoked] = 0;
-CREATE INDEX [IX_ApiKey_Prefix] ON [integrations].[ApiKey] ([KeyPrefix]);
+CREATE INDEX [IX_ApiKey_FestivalId] ON [integrations].[ApiKey] ([FestivalId]) WHERE [IsRevoked] = 0;
+CREATE INDEX [IX_ApiKey_KeyPrefix] ON [integrations].[ApiKey] ([KeyPrefix]) WHERE [IsRevoked] = 0;
+CREATE INDEX [IX_ApiKey_ExpiresAtUtc] ON [integrations].[ApiKey] ([ExpiresAtUtc]) WHERE [IsRevoked] = 0 AND [ExpiresAtUtc] IS NOT NULL;
+CREATE INDEX [IX_ApiKey_CreatedBy] ON [integrations].[ApiKey] ([CreatedBy]);
+CREATE INDEX [IX_ApiKey_RevokedBy] ON [integrations].[ApiKey] ([RevokedBy]) WHERE [RevokedBy] IS NOT NULL;
 ```
 
 ---
@@ -674,11 +683,11 @@ CREATE TABLE [audit].[AuditLog]
 (
     [AuditLogId]        BIGINT IDENTITY(1,1)    NOT NULL,
     [TableName]         NVARCHAR(128)           NOT NULL,
-    [RecordId]          UNIQUEIDENTIFIER        NOT NULL,
+    [RecordId] BIGINT              NOT NULL,
     [Action]            NVARCHAR(10)            NOT NULL,
     [OldValues]         NVARCHAR(MAX)           NULL,
     [NewValues]         NVARCHAR(MAX)           NULL,
-    [UserId]            UNIQUEIDENTIFIER        NULL,
+    [UserId] BIGINT              NULL,
     [IpAddress]         NVARCHAR(45)            NULL,
     [UserAgent]         NVARCHAR(500)           NULL,
     [CreatedAtUtc]      DATETIME2(7)            NOT NULL    DEFAULT SYSUTCDATETIME(),

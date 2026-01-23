@@ -10,7 +10,7 @@ public interface IEmailVerificationTokenRepository
     /// <summary>
     /// Creates a new email verification token.
     /// </summary>
-    Task<Guid> CreateAsync(EmailVerificationToken token, CancellationToken ct = default);
+    Task<long> CreateAsync(EmailVerificationToken token, CancellationToken ct = default);
 
     /// <summary>
     /// Gets a token by its hash value.
@@ -20,17 +20,17 @@ public interface IEmailVerificationTokenRepository
     /// <summary>
     /// Gets the most recent unused token for a user.
     /// </summary>
-    Task<EmailVerificationToken?> GetActiveByUserIdAsync(Guid userId, CancellationToken ct = default);
+    Task<EmailVerificationToken?> GetActiveByUserIdAsync(long userId, CancellationToken ct = default);
 
     /// <summary>
     /// Marks a token as used.
     /// </summary>
-    Task MarkAsUsedAsync(Guid tokenId, CancellationToken ct = default);
+    Task MarkAsUsedAsync(long tokenId, CancellationToken ct = default);
 
     /// <summary>
     /// Invalidates all unused tokens for a user.
     /// </summary>
-    Task InvalidateAllForUserAsync(Guid userId, CancellationToken ct = default);
+    Task InvalidateAllForUserAsync(long userId, CancellationToken ct = default);
 
     /// <summary>
     /// Deletes expired tokens older than the specified date.

@@ -56,8 +56,8 @@ public class PersonalScheduleServiceTests
     public async Task GetByIdAsync_WithValidId_ReturnsSchedule()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var scheduleId = 1L;
+        var userId = 2L;
         var schedule = CreateTestSchedule(scheduleId, userId);
 
         _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
@@ -77,8 +77,8 @@ public class PersonalScheduleServiceTests
     public async Task GetByIdAsync_WithInvalidId_ThrowsPersonalScheduleNotFoundException()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var scheduleId = 3L;
+        var userId = 4L;
 
         _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((PersonalSchedule?)null);
@@ -94,9 +94,9 @@ public class PersonalScheduleServiceTests
     public async Task GetByIdAsync_WithWrongUser_ThrowsForbiddenException()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var ownerId = Guid.NewGuid();
-        var differentUserId = Guid.NewGuid();
+        var scheduleId = 5L;
+        var ownerId = 6L;
+        var differentUserId = 7L;
         var schedule = CreateTestSchedule(scheduleId, ownerId);
 
         _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
@@ -117,9 +117,9 @@ public class PersonalScheduleServiceTests
     public async Task GetMySchedulesAsync_WithSchedules_ReturnsSchedules()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var userId = 8L;
+        var editionId = 9L;
+        var festivalId = 10L;
         var schedules = new List<PersonalSchedule>
         {
             CreateTestSchedule(userId: userId, editionId: editionId),
@@ -131,11 +131,11 @@ public class PersonalScheduleServiceTests
 
         _mockScheduleRepo.Setup(r => r.GetByUserAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(schedules);
-        _mockScheduleRepo.Setup(r => r.GetEntriesByScheduleIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new Dictionary<Guid, IReadOnlyList<PersonalScheduleEntry>>());
-        _mockEditionRepo.Setup(r => r.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+        _mockScheduleRepo.Setup(r => r.GetEntriesByScheduleIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Dictionary<long, IReadOnlyList<PersonalScheduleEntry>>());
+        _mockEditionRepo.Setup(r => r.GetByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<FestivalEdition> { edition });
-        _mockFestivalRepo.Setup(r => r.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+        _mockFestivalRepo.Setup(r => r.GetByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Festival> { festival });
 
         // Act
@@ -149,7 +149,7 @@ public class PersonalScheduleServiceTests
     public async Task GetMySchedulesAsync_WithNoSchedules_ReturnsEmptyList()
     {
         // Arrange
-        var userId = Guid.NewGuid();
+        var userId = 11L;
 
         _mockScheduleRepo.Setup(r => r.GetByUserAsync(userId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<PersonalSchedule>());
@@ -169,8 +169,8 @@ public class PersonalScheduleServiceTests
     public async Task GetByEditionAsync_WithValidEdition_ReturnsSchedules()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
+        var userId = 12L;
+        var editionId = 13L;
         var schedules = new List<PersonalSchedule>
         {
             CreateTestSchedule(userId: userId, editionId: editionId),
@@ -179,8 +179,8 @@ public class PersonalScheduleServiceTests
 
         _mockScheduleRepo.Setup(r => r.GetByUserAndEditionAsync(userId, editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(schedules);
-        _mockScheduleRepo.Setup(r => r.GetEntriesByScheduleIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new Dictionary<Guid, IReadOnlyList<PersonalScheduleEntry>>());
+        _mockScheduleRepo.Setup(r => r.GetEntriesByScheduleIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Dictionary<long, IReadOnlyList<PersonalScheduleEntry>>());
 
         // Act
         var result = await _sut.GetByEditionAsync(userId, editionId);
@@ -194,8 +194,8 @@ public class PersonalScheduleServiceTests
     public async Task GetByEditionAsync_WithNoSchedules_ReturnsEmptyList()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
+        var userId = 14L;
+        var editionId = 15L;
 
         _mockScheduleRepo.Setup(r => r.GetByUserAndEditionAsync(userId, editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<PersonalSchedule>());
@@ -215,10 +215,10 @@ public class PersonalScheduleServiceTests
     public async Task GetDetailAsync_WithValidSchedule_ReturnsDetailWithEntries()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var scheduleId = 16L;
+        var userId = 17L;
+        var editionId = 18L;
+        var festivalId = 19L;
         var schedule = CreateTestSchedule(scheduleId, userId, editionId);
         var edition = new FestivalEdition { EditionId = editionId, FestivalId = festivalId, Name = "2026 Edition" };
         var festival = new Festival { FestivalId = festivalId, Name = "Test Festival" };
@@ -231,7 +231,7 @@ public class PersonalScheduleServiceTests
             .ReturnsAsync(edition);
         _mockFestivalRepo.Setup(r => r.GetByIdAsync(festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(festival);
-        _mockEngagementRepo.Setup(r => r.GetByIdsAsync(It.IsAny<IEnumerable<Guid>>(), It.IsAny<CancellationToken>()))
+        _mockEngagementRepo.Setup(r => r.GetByIdsAsync(It.IsAny<IEnumerable<long>>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<Engagement>());
 
         // Act
@@ -249,8 +249,8 @@ public class PersonalScheduleServiceTests
     public async Task GetDetailAsync_WithNonExistentSchedule_ThrowsPersonalScheduleNotFoundException()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var scheduleId = 20L;
+        var userId = 21L;
 
         _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((PersonalSchedule?)null);
@@ -266,9 +266,9 @@ public class PersonalScheduleServiceTests
     public async Task GetDetailAsync_WithWrongUser_ThrowsForbiddenException()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var ownerId = Guid.NewGuid();
-        var differentUserId = Guid.NewGuid();
+        var scheduleId = 22L;
+        var ownerId = 23L;
+        var differentUserId = 24L;
         var schedule = CreateTestSchedule(scheduleId, ownerId);
 
         _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
@@ -289,8 +289,8 @@ public class PersonalScheduleServiceTests
     public async Task CreateAsync_WithValidRequest_CreatesSchedule()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
+        var userId = 25L;
+        var editionId = 26L;
         var request = new CreatePersonalScheduleRequest(EditionId: editionId, Name: "My Festival Schedule");
 
         _mockEditionRepo.Setup(r => r.ExistsAsync(editionId, It.IsAny<CancellationToken>()))
@@ -298,7 +298,7 @@ public class PersonalScheduleServiceTests
         _mockScheduleRepo.Setup(r => r.GetByUserAndEditionAsync(userId, editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<PersonalSchedule>());
         _mockScheduleRepo.Setup(r => r.CreateAsync(It.IsAny<PersonalSchedule>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(101L);
 
         // Act
         var result = await _sut.CreateAsync(userId, request);
@@ -318,8 +318,8 @@ public class PersonalScheduleServiceTests
     public async Task CreateAsync_WithExistingSchedules_SetsIsDefaultFalse()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
+        var userId = 27L;
+        var editionId = 28L;
         var request = new CreatePersonalScheduleRequest(EditionId: editionId, Name: "Second Schedule");
 
         var existingSchedule = CreateTestSchedule(userId: userId, editionId: editionId);
@@ -329,7 +329,7 @@ public class PersonalScheduleServiceTests
         _mockScheduleRepo.Setup(r => r.GetByUserAndEditionAsync(userId, editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<PersonalSchedule> { existingSchedule });
         _mockScheduleRepo.Setup(r => r.CreateAsync(It.IsAny<PersonalSchedule>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(102L);
 
         // Act
         var result = await _sut.CreateAsync(userId, request);
@@ -343,8 +343,8 @@ public class PersonalScheduleServiceTests
     public async Task CreateAsync_WithNonExistentEdition_ThrowsEditionNotFoundException()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
+        var userId = 29L;
+        var editionId = 30L;
         var request = new CreatePersonalScheduleRequest(EditionId: editionId, Name: null);
 
         _mockEditionRepo.Setup(r => r.ExistsAsync(editionId, It.IsAny<CancellationToken>()))
@@ -365,8 +365,8 @@ public class PersonalScheduleServiceTests
     public async Task UpdateAsync_WithValidRequest_UpdatesSchedule()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var scheduleId = 31L;
+        var userId = 32L;
         var schedule = CreateTestSchedule(scheduleId, userId);
         var request = new UpdatePersonalScheduleRequest(Name: "Updated Name", IsDefault: null);
 
@@ -387,10 +387,10 @@ public class PersonalScheduleServiceTests
     public async Task UpdateAsync_SetAsDefault_ClearsOtherDefaults()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var otherScheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
+        var scheduleId = 33L;
+        var otherScheduleId = 34L;
+        var userId = 35L;
+        var editionId = 36L;
 
         var schedule = CreateTestSchedule(scheduleId, userId, editionId);
         schedule.IsDefault = false;
@@ -422,8 +422,8 @@ public class PersonalScheduleServiceTests
     public async Task UpdateAsync_WithNonExistentSchedule_ThrowsPersonalScheduleNotFoundException()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var scheduleId = 37L;
+        var userId = 38L;
         var request = new UpdatePersonalScheduleRequest(Name: "Updated", IsDefault: null);
 
         _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
@@ -440,9 +440,9 @@ public class PersonalScheduleServiceTests
     public async Task UpdateAsync_WithWrongUser_ThrowsForbiddenException()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var ownerId = Guid.NewGuid();
-        var differentUserId = Guid.NewGuid();
+        var scheduleId = 39L;
+        var ownerId = 40L;
+        var differentUserId = 41L;
         var schedule = CreateTestSchedule(scheduleId, ownerId);
         var request = new UpdatePersonalScheduleRequest(Name: "Updated", IsDefault: null);
 
@@ -464,8 +464,8 @@ public class PersonalScheduleServiceTests
     public async Task DeleteAsync_WithValidPermission_DeletesSchedule()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var scheduleId = 42L;
+        var userId = 43L;
         var schedule = CreateTestSchedule(scheduleId, userId);
 
         _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
@@ -482,8 +482,8 @@ public class PersonalScheduleServiceTests
     public async Task DeleteAsync_WithNonExistentSchedule_ThrowsPersonalScheduleNotFoundException()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var scheduleId = 44L;
+        var userId = 45L;
 
         _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((PersonalSchedule?)null);
@@ -499,9 +499,9 @@ public class PersonalScheduleServiceTests
     public async Task DeleteAsync_WithWrongUser_ThrowsForbiddenException()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var ownerId = Guid.NewGuid();
-        var differentUserId = Guid.NewGuid();
+        var scheduleId = 46L;
+        var ownerId = 47L;
+        var differentUserId = 48L;
         var schedule = CreateTestSchedule(scheduleId, ownerId);
 
         _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
@@ -522,8 +522,8 @@ public class PersonalScheduleServiceTests
     public async Task GetOrCreateDefaultAsync_WithExistingDefault_ReturnsExisting()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
+        var userId = 49L;
+        var editionId = 50L;
         var existingSchedule = CreateTestSchedule(userId: userId, editionId: editionId);
 
         _mockScheduleRepo.Setup(r => r.GetDefaultAsync(userId, editionId, It.IsAny<CancellationToken>()))
@@ -544,8 +544,8 @@ public class PersonalScheduleServiceTests
     public async Task GetOrCreateDefaultAsync_WithNoExisting_CreatesNew()
     {
         // Arrange
-        var userId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
+        var userId = 51L;
+        var editionId = 52L;
 
         _mockScheduleRepo.Setup(r => r.GetDefaultAsync(userId, editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((PersonalSchedule?)null);
@@ -554,7 +554,7 @@ public class PersonalScheduleServiceTests
         _mockScheduleRepo.Setup(r => r.GetByUserAndEditionAsync(userId, editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<PersonalSchedule>());
         _mockScheduleRepo.Setup(r => r.CreateAsync(It.IsAny<PersonalSchedule>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(103L);
 
         // Act
         var result = await _sut.GetOrCreateDefaultAsync(userId, editionId);
@@ -572,12 +572,12 @@ public class PersonalScheduleServiceTests
     public async Task AddEntryAsync_WithValidRequest_AddsEntry()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var engagementId = Guid.NewGuid();
-        var timeSlotId = Guid.NewGuid();
-        var artistId = Guid.NewGuid();
-        var stageId = Guid.NewGuid();
+        var scheduleId = 53L;
+        var userId = 54L;
+        var engagementId = 55L;
+        var timeSlotId = 56L;
+        var artistId = 57L;
+        var stageId = 58L;
 
         var schedule = CreateTestSchedule(scheduleId, userId);
         var engagement = new Engagement { EngagementId = engagementId, TimeSlotId = timeSlotId, ArtistId = artistId };
@@ -593,7 +593,7 @@ public class PersonalScheduleServiceTests
         _mockScheduleRepo.Setup(r => r.HasEngagementAsync(scheduleId, engagementId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
         _mockScheduleRepo.Setup(r => r.AddEntryAsync(It.IsAny<PersonalScheduleEntry>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(104L);
         _mockTimeSlotRepo.Setup(r => r.GetByIdAsync(timeSlotId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(timeSlot);
         _mockArtistRepo.Setup(r => r.GetByIdAsync(artistId, It.IsAny<CancellationToken>()))
@@ -619,9 +619,9 @@ public class PersonalScheduleServiceTests
     public async Task AddEntryAsync_WithNonExistentSchedule_ThrowsPersonalScheduleNotFoundException()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var request = new AddScheduleEntryRequest(Guid.NewGuid(), null, true);
+        var scheduleId = 59L;
+        var userId = 60L;
+        var request = new AddScheduleEntryRequest(100L, null, true);
 
         _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((PersonalSchedule?)null);
@@ -637,9 +637,9 @@ public class PersonalScheduleServiceTests
     public async Task AddEntryAsync_WithNonExistentEngagement_ThrowsEngagementNotFoundException()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var engagementId = Guid.NewGuid();
+        var scheduleId = 61L;
+        var userId = 62L;
+        var engagementId = 63L;
         var schedule = CreateTestSchedule(scheduleId, userId);
         var request = new AddScheduleEntryRequest(engagementId, null, true);
 
@@ -659,9 +659,9 @@ public class PersonalScheduleServiceTests
     public async Task AddEntryAsync_WithDuplicateEngagement_ThrowsConflictException()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var engagementId = Guid.NewGuid();
+        var scheduleId = 64L;
+        var userId = 65L;
+        var engagementId = 66L;
         var schedule = CreateTestSchedule(scheduleId, userId);
         var engagement = new Engagement { EngagementId = engagementId };
         var request = new AddScheduleEntryRequest(engagementId, null, true);
@@ -685,11 +685,11 @@ public class PersonalScheduleServiceTests
     public async Task AddEntryAsync_WithWrongUser_ThrowsForbiddenException()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var ownerId = Guid.NewGuid();
-        var differentUserId = Guid.NewGuid();
+        var scheduleId = 67L;
+        var ownerId = 68L;
+        var differentUserId = 69L;
         var schedule = CreateTestSchedule(scheduleId, ownerId);
-        var request = new AddScheduleEntryRequest(Guid.NewGuid(), null, true);
+        var request = new AddScheduleEntryRequest(101L, null, true);
 
         _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(schedule);
@@ -709,13 +709,13 @@ public class PersonalScheduleServiceTests
     public async Task UpdateEntryAsync_WithValidRequest_UpdatesEntry()
     {
         // Arrange
-        var entryId = Guid.NewGuid();
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var engagementId = Guid.NewGuid();
-        var timeSlotId = Guid.NewGuid();
-        var artistId = Guid.NewGuid();
-        var stageId = Guid.NewGuid();
+        var entryId = 70L;
+        var scheduleId = 71L;
+        var userId = 72L;
+        var engagementId = 73L;
+        var timeSlotId = 74L;
+        var artistId = 75L;
+        var stageId = 76L;
 
         var entry = new PersonalScheduleEntry
         {
@@ -765,8 +765,8 @@ public class PersonalScheduleServiceTests
     public async Task UpdateEntryAsync_WithNonExistentEntry_ThrowsPersonalScheduleEntryNotFoundException()
     {
         // Arrange
-        var entryId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var entryId = 77L;
+        var userId = 78L;
         var request = new UpdateScheduleEntryRequest(Notes: "Updated", NotificationsEnabled: true);
 
         _mockScheduleRepo.Setup(r => r.GetEntryByIdAsync(entryId, It.IsAny<CancellationToken>()))
@@ -783,16 +783,16 @@ public class PersonalScheduleServiceTests
     public async Task UpdateEntryAsync_WithWrongUser_ThrowsForbiddenException()
     {
         // Arrange
-        var entryId = Guid.NewGuid();
-        var scheduleId = Guid.NewGuid();
-        var ownerId = Guid.NewGuid();
-        var differentUserId = Guid.NewGuid();
+        var entryId = 79L;
+        var scheduleId = 80L;
+        var ownerId = 81L;
+        var differentUserId = 82L;
 
         var entry = new PersonalScheduleEntry
         {
             PersonalScheduleEntryId = entryId,
             PersonalScheduleId = scheduleId,
-            EngagementId = Guid.NewGuid()
+            EngagementId = 1L
         };
 
         var schedule = CreateTestSchedule(scheduleId, ownerId);
@@ -818,9 +818,9 @@ public class PersonalScheduleServiceTests
     public async Task RemoveEntryAsync_WithValidPermission_RemovesEntry()
     {
         // Arrange
-        var entryId = Guid.NewGuid();
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var entryId = 83L;
+        var scheduleId = 84L;
+        var userId = 85L;
         var schedule = CreateTestSchedule(scheduleId, userId);
 
         _mockScheduleRepo.Setup(r => r.GetScheduleIdForEntryAsync(entryId, It.IsAny<CancellationToken>()))
@@ -839,11 +839,11 @@ public class PersonalScheduleServiceTests
     public async Task RemoveEntryAsync_WithNonExistentEntry_ThrowsPersonalScheduleEntryNotFoundException()
     {
         // Arrange
-        var entryId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var entryId = 86L;
+        var userId = 87L;
 
         _mockScheduleRepo.Setup(r => r.GetScheduleIdForEntryAsync(entryId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Guid?)null);
+            .ReturnsAsync((long?)null);
 
         // Act
         var act = () => _sut.RemoveEntryAsync(entryId, userId);
@@ -856,10 +856,10 @@ public class PersonalScheduleServiceTests
     public async Task RemoveEntryAsync_WithWrongUser_ThrowsForbiddenException()
     {
         // Arrange
-        var entryId = Guid.NewGuid();
-        var scheduleId = Guid.NewGuid();
-        var ownerId = Guid.NewGuid();
-        var differentUserId = Guid.NewGuid();
+        var entryId = 88L;
+        var scheduleId = 89L;
+        var ownerId = 90L;
+        var differentUserId = 91L;
         var schedule = CreateTestSchedule(scheduleId, ownerId);
 
         _mockScheduleRepo.Setup(r => r.GetScheduleIdForEntryAsync(entryId, It.IsAny<CancellationToken>()))
@@ -882,10 +882,10 @@ public class PersonalScheduleServiceTests
     public async Task SyncAsync_WithValidSchedule_UpdatesLastSyncedAndReturnsDetail()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
+        var scheduleId = 92L;
+        var userId = 93L;
+        var editionId = 94L;
+        var festivalId = 95L;
         var schedule = CreateTestSchedule(scheduleId, userId, editionId);
 
         var edition = new FestivalEdition { EditionId = editionId, FestivalId = festivalId, Name = "2026 Edition" };
@@ -916,8 +916,8 @@ public class PersonalScheduleServiceTests
     public async Task SyncAsync_WithNonExistentSchedule_ThrowsPersonalScheduleNotFoundException()
     {
         // Arrange
-        var scheduleId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var scheduleId = 96L;
+        var userId = 97L;
 
         _mockScheduleRepo.Setup(r => r.GetByIdAsync(scheduleId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((PersonalSchedule?)null);
@@ -934,22 +934,22 @@ public class PersonalScheduleServiceTests
     #region Helper Methods
 
     private PersonalSchedule CreateTestSchedule(
-        Guid? scheduleId = null,
-        Guid? userId = null,
-        Guid? editionId = null)
+        long? scheduleId = null,
+        long? userId = null,
+        long? editionId = null)
     {
         return new PersonalSchedule
         {
-            PersonalScheduleId = scheduleId ?? Guid.NewGuid(),
-            UserId = userId ?? Guid.NewGuid(),
-            EditionId = editionId ?? Guid.NewGuid(),
+            PersonalScheduleId = scheduleId ?? 0L,
+            UserId = userId ?? 0L,
+            EditionId = editionId ?? 0L,
             Name = "My Schedule",
             IsDefault = true,
             IsDeleted = false,
             CreatedAtUtc = _now,
-            CreatedBy = userId ?? Guid.NewGuid(),
+            CreatedBy = userId ?? 0L,
             ModifiedAtUtc = _now,
-            ModifiedBy = userId ?? Guid.NewGuid()
+            ModifiedBy = userId ?? 0L
         };
     }
 

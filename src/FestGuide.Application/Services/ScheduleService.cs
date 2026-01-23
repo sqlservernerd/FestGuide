@@ -50,7 +50,7 @@ public class ScheduleService : IScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<ScheduleDto> GetScheduleAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<ScheduleDto> GetScheduleAsync(long editionId, CancellationToken ct = default)
     {
         if (!await _editionRepository.ExistsAsync(editionId, ct))
         {
@@ -61,14 +61,14 @@ public class ScheduleService : IScheduleService
         if (schedule == null)
         {
             // Return empty schedule representation
-            return new ScheduleDto(Guid.Empty, editionId, 0, null, false);
+            return new ScheduleDto(0, editionId, 0, null, false);
         }
 
         return ScheduleDto.FromEntity(schedule);
     }
 
     /// <inheritdoc />
-    public async Task<ScheduleDetailDto> GetScheduleDetailAsync(Guid editionId, CancellationToken ct = default)
+    public async Task<ScheduleDetailDto> GetScheduleDetailAsync(long editionId, CancellationToken ct = default)
     {
         if (!await _editionRepository.ExistsAsync(editionId, ct))
         {
@@ -117,7 +117,7 @@ public class ScheduleService : IScheduleService
         }).OrderBy(i => i.StartTimeUtc).ThenBy(i => i.StageName).ToList();
 
         return new ScheduleDetailDto(
-            schedule?.ScheduleId ?? Guid.Empty,
+            schedule?.ScheduleId ?? 0,
             editionId,
             schedule?.Version ?? 0,
             schedule?.PublishedAtUtc,
@@ -127,7 +127,7 @@ public class ScheduleService : IScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<ScheduleDto> PublishScheduleAsync(Guid editionId, Guid userId, CancellationToken ct = default)
+    public async Task<ScheduleDto> PublishScheduleAsync(long editionId, long userId, CancellationToken ct = default)
     {
         var festivalId = await _editionRepository.GetFestivalIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -189,7 +189,7 @@ public class ScheduleService : IScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<TimeSlotDto> GetTimeSlotByIdAsync(Guid timeSlotId, CancellationToken ct = default)
+    public async Task<TimeSlotDto> GetTimeSlotByIdAsync(long timeSlotId, CancellationToken ct = default)
     {
         var timeSlot = await _timeSlotRepository.GetByIdAsync(timeSlotId, ct)
             ?? throw new TimeSlotNotFoundException(timeSlotId);
@@ -198,14 +198,14 @@ public class ScheduleService : IScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<TimeSlotDto>> GetTimeSlotsByStageAsync(Guid stageId, Guid editionId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<TimeSlotDto>> GetTimeSlotsByStageAsync(long stageId, long editionId, CancellationToken ct = default)
     {
         var timeSlots = await _timeSlotRepository.GetByStageAndEditionAsync(stageId, editionId, ct);
         return timeSlots.Select(TimeSlotDto.FromEntity).ToList();
     }
 
     /// <inheritdoc />
-    public async Task<TimeSlotDto> CreateTimeSlotAsync(Guid stageId, Guid userId, CreateTimeSlotRequest request, CancellationToken ct = default)
+    public async Task<TimeSlotDto> CreateTimeSlotAsync(long stageId, long userId, CreateTimeSlotRequest request, CancellationToken ct = default)
     {
         var festivalId = await _stageRepository.GetFestivalIdAsync(stageId, ct)
             ?? throw new StageNotFoundException(stageId);
@@ -229,7 +229,6 @@ public class ScheduleService : IScheduleService
         var now = _dateTimeProvider.UtcNow;
         var timeSlot = new TimeSlot
         {
-            TimeSlotId = Guid.NewGuid(),
             StageId = stageId,
             EditionId = request.EditionId,
             StartTimeUtc = request.StartTimeUtc,
@@ -250,7 +249,7 @@ public class ScheduleService : IScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<TimeSlotDto> UpdateTimeSlotAsync(Guid timeSlotId, Guid userId, UpdateTimeSlotRequest request, CancellationToken ct = default)
+    public async Task<TimeSlotDto> UpdateTimeSlotAsync(long timeSlotId, long userId, UpdateTimeSlotRequest request, CancellationToken ct = default)
     {
         var timeSlot = await _timeSlotRepository.GetByIdAsync(timeSlotId, ct)
             ?? throw new TimeSlotNotFoundException(timeSlotId);
@@ -291,7 +290,7 @@ public class ScheduleService : IScheduleService
     }
 
     /// <inheritdoc />
-    public async Task DeleteTimeSlotAsync(Guid timeSlotId, Guid userId, CancellationToken ct = default)
+    public async Task DeleteTimeSlotAsync(long timeSlotId, long userId, CancellationToken ct = default)
     {
         var festivalId = await _timeSlotRepository.GetFestivalIdAsync(timeSlotId, ct)
             ?? throw new TimeSlotNotFoundException(timeSlotId);
@@ -307,7 +306,7 @@ public class ScheduleService : IScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<EngagementDto> GetEngagementByIdAsync(Guid engagementId, CancellationToken ct = default)
+    public async Task<EngagementDto> GetEngagementByIdAsync(long engagementId, CancellationToken ct = default)
     {
         var engagement = await _engagementRepository.GetByIdAsync(engagementId, ct)
             ?? throw new EngagementNotFoundException(engagementId);
@@ -316,7 +315,7 @@ public class ScheduleService : IScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<EngagementDto> CreateEngagementAsync(Guid timeSlotId, Guid userId, CreateEngagementRequest request, CancellationToken ct = default)
+    public async Task<EngagementDto> CreateEngagementAsync(long timeSlotId, long userId, CreateEngagementRequest request, CancellationToken ct = default)
     {
         if (!await _timeSlotRepository.ExistsAsync(timeSlotId, ct))
         {
@@ -343,7 +342,6 @@ public class ScheduleService : IScheduleService
         var now = _dateTimeProvider.UtcNow;
         var engagement = new Engagement
         {
-            EngagementId = Guid.NewGuid(),
             TimeSlotId = timeSlotId,
             ArtistId = request.ArtistId,
             Notes = request.Notes,
@@ -363,7 +361,7 @@ public class ScheduleService : IScheduleService
     }
 
     /// <inheritdoc />
-    public async Task<EngagementDto> UpdateEngagementAsync(Guid engagementId, Guid userId, UpdateEngagementRequest request, CancellationToken ct = default)
+    public async Task<EngagementDto> UpdateEngagementAsync(long engagementId, long userId, UpdateEngagementRequest request, CancellationToken ct = default)
     {
         var engagement = await _engagementRepository.GetByIdAsync(engagementId, ct)
             ?? throw new EngagementNotFoundException(engagementId);
@@ -399,7 +397,7 @@ public class ScheduleService : IScheduleService
     }
 
     /// <inheritdoc />
-    public async Task DeleteEngagementAsync(Guid engagementId, Guid userId, CancellationToken ct = default)
+    public async Task DeleteEngagementAsync(long engagementId, long userId, CancellationToken ct = default)
     {
         var festivalId = await _engagementRepository.GetFestivalIdAsync(engagementId, ct)
             ?? throw new EngagementNotFoundException(engagementId);

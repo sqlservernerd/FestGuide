@@ -29,7 +29,7 @@ public class UserService : IUserService
     }
 
     /// <inheritdoc />
-    public async Task<UserProfileDto> GetProfileAsync(Guid userId, CancellationToken ct = default)
+    public async Task<UserProfileDto> GetProfileAsync(long userId, CancellationToken ct = default)
     {
         var user = await _userRepository.GetByIdAsync(userId, ct)
             ?? throw new UserNotFoundException(userId);
@@ -38,7 +38,7 @@ public class UserService : IUserService
     }
 
     /// <inheritdoc />
-    public async Task<UserProfileDto> UpdateProfileAsync(Guid userId, UpdateProfileRequest request, CancellationToken ct = default)
+    public async Task<UserProfileDto> UpdateProfileAsync(long userId, UpdateProfileRequest request, CancellationToken ct = default)
     {
         var user = await _userRepository.GetByIdAsync(userId, ct)
             ?? throw new UserNotFoundException(userId);
@@ -64,7 +64,7 @@ public class UserService : IUserService
     }
 
     /// <inheritdoc />
-    public async Task DeleteAccountAsync(Guid userId, CancellationToken ct = default)
+    public async Task DeleteAccountAsync(long userId, CancellationToken ct = default)
     {
         var user = await _userRepository.GetByIdAsync(userId, ct)
             ?? throw new UserNotFoundException(userId);
@@ -79,7 +79,7 @@ public class UserService : IUserService
     }
 
     /// <inheritdoc />
-    public async Task<UserDataExportDto> ExportDataAsync(Guid userId, CancellationToken ct = default)
+    public async Task<UserDataExportDto> ExportDataAsync(long userId, CancellationToken ct = default)
     {
         var user = await _userRepository.GetByIdAsync(userId, ct)
             ?? throw new UserNotFoundException(userId);

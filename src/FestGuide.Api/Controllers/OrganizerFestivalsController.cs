@@ -55,10 +55,10 @@ public class OrganizerFestivalsController : ControllerBase
     /// <summary>
     /// Gets a festival by ID.
     /// </summary>
-    [HttpGet("{festivalId:guid}")]
+    [HttpGet("{festivalId:long}")]
     [ProducesResponseType(typeof(ApiResponse<FestivalDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetFestival(Guid festivalId, CancellationToken ct)
+    public async Task<IActionResult> GetFestival(long festivalId, CancellationToken ct)
     {
         try
         {
@@ -95,12 +95,12 @@ public class OrganizerFestivalsController : ControllerBase
     /// <summary>
     /// Updates a festival.
     /// </summary>
-    [HttpPut("{festivalId:guid}")]
+    [HttpPut("{festivalId:long}")]
     [ProducesResponseType(typeof(ApiResponse<FestivalDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateFestival(Guid festivalId, [FromBody] UpdateFestivalRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateFestival(long festivalId, [FromBody] UpdateFestivalRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -129,11 +129,11 @@ public class OrganizerFestivalsController : ControllerBase
     /// <summary>
     /// Deletes a festival.
     /// </summary>
-    [HttpDelete("{festivalId:guid}")]
+    [HttpDelete("{festivalId:long}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteFestival(Guid festivalId, CancellationToken ct)
+    public async Task<IActionResult> DeleteFestival(long festivalId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -156,12 +156,12 @@ public class OrganizerFestivalsController : ControllerBase
     /// <summary>
     /// Transfers festival ownership to another user.
     /// </summary>
-    [HttpPost("{festivalId:guid}/transfer-ownership")]
+    [HttpPost("{festivalId:long}/transfer-ownership")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> TransferOwnership(Guid festivalId, [FromBody] TransferOwnershipRequest request, CancellationToken ct)
+    public async Task<IActionResult> TransferOwnership(long festivalId, [FromBody] TransferOwnershipRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -187,10 +187,10 @@ public class OrganizerFestivalsController : ControllerBase
         }
     }
 
-    private Guid? GetCurrentUserId()
+    private long? GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+        return long.TryParse(userIdClaim, out var userId) ? userId : null;
     }
 
     private static ApiErrorResponse CreateError(string code, string message) =>

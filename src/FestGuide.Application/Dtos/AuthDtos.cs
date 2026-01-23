@@ -28,7 +28,7 @@ public sealed record RefreshTokenRequest(
 /// Response DTO for authentication operations.
 /// </summary>
 public sealed record AuthResponse(
-    Guid UserId,
+    long UserId,
     string Email,
     string DisplayName,
     string UserType,

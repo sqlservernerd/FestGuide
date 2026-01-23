@@ -46,7 +46,7 @@ public class EditionServiceTests
     public async Task GetByIdAsync_WithValidId_ReturnsEdition()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 1L;
         var edition = CreateTestEdition(editionId);
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
@@ -65,7 +65,7 @@ public class EditionServiceTests
     public async Task GetByIdAsync_WithInvalidId_ThrowsEditionNotFoundException()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
+        var editionId = 2L;
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((FestivalEdition?)null);
@@ -85,7 +85,7 @@ public class EditionServiceTests
     public async Task GetByFestivalAsync_WithValidFestivalId_ReturnsEditions()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
+        var festivalId = 3L;
         var editions = new List<FestivalEdition>
         {
             CreateTestEdition(festivalId: festivalId, name: "2025 Edition"),
@@ -106,7 +106,7 @@ public class EditionServiceTests
     public async Task GetByFestivalAsync_WithNoEditions_ReturnsEmptyList()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
+        var festivalId = 4L;
 
         _mockEditionRepo.Setup(r => r.GetByFestivalAsync(festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<FestivalEdition>());
@@ -126,7 +126,7 @@ public class EditionServiceTests
     public async Task GetPublishedByFestivalAsync_ReturnsOnlyPublishedEditions()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
+        var festivalId = 5L;
         var editions = new List<FestivalEdition>
         {
             CreateTestEdition(festivalId: festivalId, status: EditionStatus.Published)
@@ -150,8 +150,8 @@ public class EditionServiceTests
     public async Task CreateAsync_WithValidRequest_CreatesEdition()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 6L;
+        var userId = 7L;
         var request = new CreateEditionRequest(
             Name: "Summer Festival 2026",
             StartDateUtc: _now.AddMonths(6),
@@ -164,7 +164,7 @@ public class EditionServiceTests
         _mockFestivalRepo.Setup(r => r.ExistsAsync(festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         _mockEditionRepo.Setup(r => r.CreateAsync(It.IsAny<FestivalEdition>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Guid.NewGuid());
+            .ReturnsAsync(101L);
 
         // Act
         var result = await _sut.CreateAsync(festivalId, userId, request);
@@ -184,8 +184,8 @@ public class EditionServiceTests
     public async Task CreateAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 8L;
+        var userId = 9L;
         var request = new CreateEditionRequest(
             Name: "Test", StartDateUtc: _now, EndDateUtc: _now.AddDays(1),
             TimezoneId: "UTC", TicketUrl: null);
@@ -204,8 +204,8 @@ public class EditionServiceTests
     public async Task CreateAsync_WithNonExistentFestival_ThrowsFestivalNotFoundException()
     {
         // Arrange
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var festivalId = 10L;
+        var userId = 11L;
         var request = new CreateEditionRequest(
             Name: "Test", StartDateUtc: _now, EndDateUtc: _now.AddDays(1),
             TimezoneId: "UTC", TicketUrl: null);
@@ -230,9 +230,9 @@ public class EditionServiceTests
     public async Task UpdateAsync_WithValidRequest_UpdatesEdition()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var editionId = 12L;
+        var festivalId = 13L;
+        var userId = 14L;
         var edition = CreateTestEdition(editionId, festivalId);
         var request = new UpdateEditionRequest(
             Name: "Updated Edition Name",
@@ -258,8 +258,8 @@ public class EditionServiceTests
     public async Task UpdateAsync_WithNonExistentEdition_ThrowsEditionNotFoundException()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var editionId = 15L;
+        var userId = 16L;
         var request = new UpdateEditionRequest(Name: "Updated", StartDateUtc: null, EndDateUtc: null, TimezoneId: null, TicketUrl: null);
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
@@ -276,9 +276,9 @@ public class EditionServiceTests
     public async Task UpdateAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var editionId = 17L;
+        var festivalId = 18L;
+        var userId = 19L;
         var edition = CreateTestEdition(editionId, festivalId);
         var request = new UpdateEditionRequest(Name: "Updated", StartDateUtc: null, EndDateUtc: null, TimezoneId: null, TicketUrl: null);
 
@@ -302,9 +302,9 @@ public class EditionServiceTests
     public async Task DeleteAsync_WithValidPermission_DeletesEdition()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var editionId = 20L;
+        var festivalId = 21L;
+        var userId = 22L;
         var edition = CreateTestEdition(editionId, festivalId);
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
@@ -323,8 +323,8 @@ public class EditionServiceTests
     public async Task DeleteAsync_WithNonExistentEdition_ThrowsEditionNotFoundException()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var editionId = 23L;
+        var userId = 24L;
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
             .ReturnsAsync((FestivalEdition?)null);
@@ -340,9 +340,9 @@ public class EditionServiceTests
     public async Task DeleteAsync_WithoutPermission_ThrowsForbiddenException()
     {
         // Arrange
-        var editionId = Guid.NewGuid();
-        var festivalId = Guid.NewGuid();
-        var userId = Guid.NewGuid();
+        var editionId = 25L;
+        var festivalId = 26L;
+        var userId = 27L;
         var edition = CreateTestEdition(editionId, festivalId);
 
         _mockEditionRepo.Setup(r => r.GetByIdAsync(editionId, It.IsAny<CancellationToken>()))
@@ -362,15 +362,15 @@ public class EditionServiceTests
     #region Helper Methods
 
     private FestivalEdition CreateTestEdition(
-        Guid? editionId = null,
-        Guid? festivalId = null,
+        long? editionId = null,
+        long? festivalId = null,
         string? name = null,
         EditionStatus status = EditionStatus.Draft)
     {
         return new FestivalEdition
         {
-            EditionId = editionId ?? Guid.NewGuid(),
-            FestivalId = festivalId ?? Guid.NewGuid(),
+            EditionId = editionId ?? 0L,
+            FestivalId = festivalId ?? 0L,
             Name = name ?? "Test Edition 2026",
             StartDateUtc = _now.AddMonths(6),
             EndDateUtc = _now.AddMonths(6).AddDays(3),
@@ -379,9 +379,9 @@ public class EditionServiceTests
             Status = status,
             IsDeleted = false,
             CreatedAtUtc = _now,
-            CreatedBy = Guid.NewGuid(),
+            CreatedBy = 1L,
             ModifiedAtUtc = _now,
-            ModifiedBy = Guid.NewGuid()
+            ModifiedBy = 1L
         };
     }
 

@@ -18,7 +18,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<PersonalSchedule?> GetByIdAsync(Guid personalScheduleId, CancellationToken ct = default)
+    public async Task<PersonalSchedule?> GetByIdAsync(long personalScheduleId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -34,7 +34,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<PersonalSchedule>> GetByUserAsync(Guid userId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<PersonalSchedule>> GetByUserAsync(long userId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -53,7 +53,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<PersonalSchedule>> GetByUserAndEditionAsync(Guid userId, Guid editionId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<PersonalSchedule>> GetByUserAndEditionAsync(long userId, long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -72,7 +72,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<PersonalSchedule?> GetDefaultAsync(Guid userId, Guid editionId, CancellationToken ct = default)
+    public async Task<PersonalSchedule?> GetDefaultAsync(long userId, long editionId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT TOP 1
@@ -89,15 +89,15 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(PersonalSchedule personalSchedule, CancellationToken ct = default)
+    public async Task<long> CreateAsync(PersonalSchedule personalSchedule, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO attendee.PersonalSchedule (
-                PersonalScheduleId, UserId, EditionId, Name, IsDefault,
+                UserId, EditionId, Name, IsDefault,
                 LastSyncedAtUtc, IsDeleted, DeletedAtUtc,
                 CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
             ) VALUES (
-                @PersonalScheduleId, @UserId, @EditionId, @Name, @IsDefault,
+                @UserId, @EditionId, @Name, @IsDefault,
                 @LastSyncedAtUtc, @IsDeleted, @DeletedAtUtc,
                 @CreatedAtUtc, @CreatedBy, @ModifiedAtUtc, @ModifiedBy
             )
@@ -127,7 +127,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task DeleteAsync(Guid personalScheduleId, CancellationToken ct = default)
+    public async Task DeleteAsync(long personalScheduleId, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE attendee.PersonalSchedule SET
@@ -141,7 +141,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<bool> ExistsAsync(Guid personalScheduleId, CancellationToken ct = default)
+    public async Task<bool> ExistsAsync(long personalScheduleId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT CASE WHEN EXISTS (
@@ -155,7 +155,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<PersonalScheduleEntry>> GetEntriesAsync(Guid personalScheduleId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<PersonalScheduleEntry>> GetEntriesAsync(long personalScheduleId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -174,12 +174,12 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyDictionary<Guid, IReadOnlyList<PersonalScheduleEntry>>> GetEntriesByScheduleIdsAsync(IEnumerable<Guid> personalScheduleIds, CancellationToken ct = default)
+    public async Task<IReadOnlyDictionary<long, IReadOnlyList<PersonalScheduleEntry>>> GetEntriesByScheduleIdsAsync(IEnumerable<long> personalScheduleIds, CancellationToken ct = default)
     {
         var scheduleIdsList = personalScheduleIds.ToList();
         if (!scheduleIdsList.Any())
         {
-            return new Dictionary<Guid, IReadOnlyList<PersonalScheduleEntry>>();
+            return new Dictionary<long, IReadOnlyList<PersonalScheduleEntry>>();
         }
 
         const string sql = """
@@ -204,7 +204,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<PersonalScheduleEntry?> GetEntryByIdAsync(Guid entryId, CancellationToken ct = default)
+    public async Task<PersonalScheduleEntry?> GetEntryByIdAsync(long entryId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -220,15 +220,15 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid> AddEntryAsync(PersonalScheduleEntry entry, CancellationToken ct = default)
+    public async Task<long> AddEntryAsync(PersonalScheduleEntry entry, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO attendee.PersonalScheduleEntry (
-                PersonalScheduleEntryId, PersonalScheduleId, EngagementId, Notes,
+                PersonalScheduleId, EngagementId, Notes,
                 NotificationsEnabled, IsDeleted, DeletedAtUtc,
                 CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
             ) VALUES (
-                @PersonalScheduleEntryId, @PersonalScheduleId, @EngagementId, @Notes,
+                @PersonalScheduleId, @EngagementId, @Notes,
                 @NotificationsEnabled, @IsDeleted, @DeletedAtUtc,
                 @CreatedAtUtc, @CreatedBy, @ModifiedAtUtc, @ModifiedBy
             )
@@ -257,7 +257,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task RemoveEntryAsync(Guid entryId, CancellationToken ct = default)
+    public async Task RemoveEntryAsync(long entryId, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE attendee.PersonalScheduleEntry SET
@@ -271,7 +271,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<bool> HasEngagementAsync(Guid personalScheduleId, Guid engagementId, CancellationToken ct = default)
+    public async Task<bool> HasEngagementAsync(long personalScheduleId, long engagementId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT CASE WHEN EXISTS (
@@ -287,7 +287,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<Guid?> GetScheduleIdForEntryAsync(Guid entryId, CancellationToken ct = default)
+    public async Task<long?> GetScheduleIdForEntryAsync(long entryId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT PersonalScheduleId 
@@ -295,12 +295,12 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
             WHERE PersonalScheduleEntryId = @EntryId AND IsDeleted = 0
             """;
 
-        return await _connection.QuerySingleOrDefaultAsync<Guid?>(
+        return await _connection.QuerySingleOrDefaultAsync<long?>(
             new CommandDefinition(sql, new { EntryId = entryId }, cancellationToken: ct)).ConfigureAwait(false);
     }
 
     /// <inheritdoc />
-    public async Task UpdateLastSyncedAsync(Guid personalScheduleId, DateTime syncedAtUtc, CancellationToken ct = default)
+    public async Task UpdateLastSyncedAsync(long personalScheduleId, DateTime syncedAtUtc, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE attendee.PersonalSchedule SET
@@ -313,7 +313,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<PersonalSchedule>> GetByEditionAsync(Guid editionId, int limit = 1000, int offset = 0, CancellationToken ct = default)
+    public async Task<IReadOnlyList<PersonalSchedule>> GetByEditionAsync(long editionId, int limit = 1000, int offset = 0, CancellationToken ct = default)
     {
         const string sql = """
             SELECT 
@@ -333,7 +333,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<Guid>> GetUserIdsWithEngagementAsync(Guid engagementId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<long>> GetUserIdsWithEngagementAsync(long engagementId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT DISTINCT ps.UserId
@@ -345,7 +345,7 @@ public class SqlServerPersonalScheduleRepository : IPersonalScheduleRepository
               AND pse.NotificationsEnabled = 1
             """;
 
-        var result = await _connection.QueryAsync<Guid>(
+        var result = await _connection.QueryAsync<long>(
             new CommandDefinition(sql, new { EngagementId = engagementId }, cancellationToken: ct)).ConfigureAwait(false);
 
         return result.ToList();

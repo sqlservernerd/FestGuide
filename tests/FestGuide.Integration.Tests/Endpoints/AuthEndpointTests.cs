@@ -24,7 +24,7 @@ public class AuthEndpointTests : IClassFixture<FestGuideWebApplicationFactory>
         // Arrange
         var request = new
         {
-            Email = $"test-{Guid.NewGuid()}@example.com",
+            Email = $"test-{100L}@example.com",
             Password = "SecurePassword123!",
             DisplayName = "Test User",
             UserType = "attendee"

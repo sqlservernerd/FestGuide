@@ -6,9 +6,9 @@ namespace FestGuide.Application.Dtos;
 /// Response DTO for time slot.
 /// </summary>
 public sealed record TimeSlotDto(
-    Guid TimeSlotId,
-    Guid StageId,
-    Guid EditionId,
+    long TimeSlotId,
+    long StageId,
+    long EditionId,
     DateTime StartTimeUtc,
     DateTime EndTimeUtc,
     DateTime CreatedAtUtc,
@@ -29,7 +29,7 @@ public sealed record TimeSlotDto(
 /// Request DTO for creating a time slot.
 /// </summary>
 public sealed record CreateTimeSlotRequest(
-    Guid EditionId,
+    long EditionId,
     DateTime StartTimeUtc,
     DateTime EndTimeUtc);
 
@@ -44,9 +44,9 @@ public sealed record UpdateTimeSlotRequest(
 /// Response DTO for engagement.
 /// </summary>
 public sealed record EngagementDto(
-    Guid EngagementId,
-    Guid TimeSlotId,
-    Guid ArtistId,
+    long EngagementId,
+    long TimeSlotId,
+    long ArtistId,
     string? Notes,
     DateTime CreatedAtUtc,
     DateTime ModifiedAtUtc)
@@ -65,22 +65,22 @@ public sealed record EngagementDto(
 /// Request DTO for creating an engagement.
 /// </summary>
 public sealed record CreateEngagementRequest(
-    Guid ArtistId,
+    long ArtistId,
     string? Notes);
 
 /// <summary>
 /// Request DTO for updating an engagement.
 /// </summary>
 public sealed record UpdateEngagementRequest(
-    Guid? ArtistId,
+    long? ArtistId,
     string? Notes);
 
 /// <summary>
 /// Response DTO for schedule.
 /// </summary>
 public sealed record ScheduleDto(
-    Guid ScheduleId,
-    Guid EditionId,
+    long ScheduleId,
+    long EditionId,
     int Version,
     DateTime? PublishedAtUtc,
     bool IsPublished)
@@ -98,8 +98,8 @@ public sealed record ScheduleDto(
 /// Detailed schedule response including all time slots and engagements.
 /// </summary>
 public sealed record ScheduleDetailDto(
-    Guid ScheduleId,
-    Guid EditionId,
+    long ScheduleId,
+    long EditionId,
     int Version,
     DateTime? PublishedAtUtc,
     bool IsPublished,
@@ -109,12 +109,12 @@ public sealed record ScheduleDetailDto(
 /// Combined time slot and engagement info for schedule display.
 /// </summary>
 public sealed record ScheduleItemDto(
-    Guid TimeSlotId,
-    Guid StageId,
+    long TimeSlotId,
+    long StageId,
     string StageName,
     DateTime StartTimeUtc,
     DateTime EndTimeUtc,
-    Guid? EngagementId,
-    Guid? ArtistId,
+    long? EngagementId,
+    long? ArtistId,
     string? ArtistName,
     string? Notes);

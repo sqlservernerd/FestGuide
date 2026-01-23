@@ -9,17 +9,17 @@ public class PersonalSchedule : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the personal schedule.
     /// </summary>
-    public Guid PersonalScheduleId { get; set; }
+    public long PersonalScheduleId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the user who owns this schedule.
     /// </summary>
-    public Guid UserId { get; set; }
+    public long UserId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the edition this schedule is for.
     /// </summary>
-    public Guid EditionId { get; set; }
+    public long EditionId { get; set; }
 
     /// <summary>
     /// Gets or sets the display name for this schedule.

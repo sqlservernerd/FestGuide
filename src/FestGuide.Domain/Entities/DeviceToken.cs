@@ -8,12 +8,12 @@ public class DeviceToken : BaseEntity
     /// <summary>
     /// Gets or sets the unique identifier for the device token record.
     /// </summary>
-    public Guid DeviceTokenId { get; set; }
+    public long DeviceTokenId { get; set; }
 
     /// <summary>
     /// Gets or sets the ID of the user who owns this device.
     /// </summary>
-    public Guid UserId { get; set; }
+    public long UserId { get; set; }
 
     /// <summary>
     /// Gets or sets the push notification token (FCM, APNS, etc.).

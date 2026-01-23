@@ -37,7 +37,7 @@ public class JwtTokenService : IJwtTokenService
     }
 
     /// <inheritdoc />
-    public string GenerateAccessToken(Guid userId, string email, string userType)
+    public string GenerateAccessToken(long userId, string email, string userType)
     {
         var claims = new Dictionary<string, object>
         {
@@ -99,7 +99,7 @@ public class JwtTokenService : IJwtTokenService
                 return new TokenValidationResult(false, Error: result.Exception?.Message ?? "Invalid token");
             }
 
-            var userId = Guid.Parse(result.Claims[ClaimTypes.NameIdentifier]?.ToString() 
+            var userId = long.Parse(result.Claims[ClaimTypes.NameIdentifier]?.ToString() 
                 ?? result.Claims[JwtRegisteredClaimNames.Sub]?.ToString() 
                 ?? string.Empty);
             var email = result.Claims[ClaimTypes.Email]?.ToString() 

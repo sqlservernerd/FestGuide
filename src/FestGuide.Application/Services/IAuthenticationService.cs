@@ -30,7 +30,7 @@ public interface IAuthenticationService
     /// <summary>
     /// Logs out a user from all devices by revoking all refresh tokens.
     /// </summary>
-    Task LogoutAllAsync(Guid userId, CancellationToken ct = default);
+    Task LogoutAllAsync(long userId, CancellationToken ct = default);
 
     /// <summary>
     /// Verifies a user's email address using the verification token.

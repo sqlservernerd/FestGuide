@@ -14,7 +14,7 @@ public interface IFestivalAuthorizationService
     /// <param name="festivalId">The festival ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>True if the user can view the festival.</returns>
-    Task<bool> CanViewFestivalAsync(Guid userId, Guid festivalId, CancellationToken ct = default);
+    Task<bool> CanViewFestivalAsync(long userId, long festivalId, CancellationToken ct = default);
 
     /// <summary>
     /// Checks if a user can edit a festival's details.
@@ -23,7 +23,7 @@ public interface IFestivalAuthorizationService
     /// <param name="festivalId">The festival ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>True if the user can edit the festival.</returns>
-    Task<bool> CanEditFestivalAsync(Guid userId, Guid festivalId, CancellationToken ct = default);
+    Task<bool> CanEditFestivalAsync(long userId, long festivalId, CancellationToken ct = default);
 
     /// <summary>
     /// Checks if a user can delete a festival.
@@ -32,7 +32,7 @@ public interface IFestivalAuthorizationService
     /// <param name="festivalId">The festival ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>True if the user can delete the festival (owner only).</returns>
-    Task<bool> CanDeleteFestivalAsync(Guid userId, Guid festivalId, CancellationToken ct = default);
+    Task<bool> CanDeleteFestivalAsync(long userId, long festivalId, CancellationToken ct = default);
 
     /// <summary>
     /// Checks if a user has a specific permission scope for a festival.
@@ -42,7 +42,7 @@ public interface IFestivalAuthorizationService
     /// <param name="scope">The permission scope to check.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>True if the user has the specified scope.</returns>
-    Task<bool> HasScopeAsync(Guid userId, Guid festivalId, PermissionScope scope, CancellationToken ct = default);
+    Task<bool> HasScopeAsync(long userId, long festivalId, PermissionScope scope, CancellationToken ct = default);
 
     /// <summary>
     /// Gets the user's role for a festival.
@@ -51,7 +51,7 @@ public interface IFestivalAuthorizationService
     /// <param name="festivalId">The festival ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>The role name, or null if no permission exists.</returns>
-    Task<string?> GetRoleAsync(Guid userId, Guid festivalId, CancellationToken ct = default);
+    Task<string?> GetRoleAsync(long userId, long festivalId, CancellationToken ct = default);
 
     /// <summary>
     /// Checks if a user can manage permissions for a festival.
@@ -60,7 +60,7 @@ public interface IFestivalAuthorizationService
     /// <param name="festivalId">The festival ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>True if the user can manage permissions (owner or admin).</returns>
-    Task<bool> CanManagePermissionsAsync(Guid userId, Guid festivalId, CancellationToken ct = default);
+    Task<bool> CanManagePermissionsAsync(long userId, long festivalId, CancellationToken ct = default);
 
     /// <summary>
     /// Checks if a user can transfer ownership of a festival.
@@ -69,7 +69,7 @@ public interface IFestivalAuthorizationService
     /// <param name="festivalId">The festival ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>True if the user can transfer ownership (owner only).</returns>
-    Task<bool> CanTransferOwnershipAsync(Guid userId, Guid festivalId, CancellationToken ct = default);
+    Task<bool> CanTransferOwnershipAsync(long userId, long festivalId, CancellationToken ct = default);
 
     /// <summary>
     /// Checks if a user can publish the schedule for an edition.
@@ -78,7 +78,7 @@ public interface IFestivalAuthorizationService
     /// <param name="festivalId">The festival ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>True if the user can publish schedules.</returns>
-    Task<bool> CanPublishScheduleAsync(Guid userId, Guid festivalId, CancellationToken ct = default);
+    Task<bool> CanPublishScheduleAsync(long userId, long festivalId, CancellationToken ct = default);
 
     /// <summary>
     /// Checks if a user can view analytics for a festival.
@@ -87,5 +87,5 @@ public interface IFestivalAuthorizationService
     /// <param name="festivalId">The festival ID.</param>
     /// <param name="ct">Cancellation token.</param>
     /// <returns>True if the user can view analytics.</returns>
-    Task<bool> CanViewAnalyticsAsync(Guid userId, Guid festivalId, CancellationToken ct = default);
+    Task<bool> CanViewAnalyticsAsync(long userId, long festivalId, CancellationToken ct = default);
 }

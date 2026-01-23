@@ -58,9 +58,9 @@ public class PersonalScheduleController : ControllerBase
     /// <summary>
     /// Gets personal schedules for a specific edition.
     /// </summary>
-    [HttpGet("editions/{editionId:guid}")]
+    [HttpGet("editions/{editionId:long}")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<PersonalScheduleDto>>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetByEdition(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> GetByEdition(long editionId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -72,11 +72,11 @@ public class PersonalScheduleController : ControllerBase
     /// <summary>
     /// Gets a personal schedule by ID.
     /// </summary>
-    [HttpGet("{scheduleId:guid}")]
+    [HttpGet("{scheduleId:long}")]
     [ProducesResponseType(typeof(ApiResponse<PersonalScheduleDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetSchedule(Guid scheduleId, CancellationToken ct)
+    public async Task<IActionResult> GetSchedule(long scheduleId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -99,11 +99,11 @@ public class PersonalScheduleController : ControllerBase
     /// <summary>
     /// Gets detailed schedule with all entries.
     /// </summary>
-    [HttpGet("{scheduleId:guid}/detail")]
+    [HttpGet("{scheduleId:long}/detail")]
     [ProducesResponseType(typeof(ApiResponse<PersonalScheduleDetailDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetScheduleDetail(Guid scheduleId, CancellationToken ct)
+    public async Task<IActionResult> GetScheduleDetail(long scheduleId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -158,12 +158,12 @@ public class PersonalScheduleController : ControllerBase
     /// <summary>
     /// Updates a personal schedule.
     /// </summary>
-    [HttpPut("{scheduleId:guid}")]
+    [HttpPut("{scheduleId:long}")]
     [ProducesResponseType(typeof(ApiResponse<PersonalScheduleDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateSchedule(Guid scheduleId, [FromBody] UpdatePersonalScheduleRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateSchedule(long scheduleId, [FromBody] UpdatePersonalScheduleRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -192,11 +192,11 @@ public class PersonalScheduleController : ControllerBase
     /// <summary>
     /// Deletes a personal schedule.
     /// </summary>
-    [HttpDelete("{scheduleId:guid}")]
+    [HttpDelete("{scheduleId:long}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteSchedule(Guid scheduleId, CancellationToken ct)
+    public async Task<IActionResult> DeleteSchedule(long scheduleId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -219,10 +219,10 @@ public class PersonalScheduleController : ControllerBase
     /// <summary>
     /// Gets or creates a default schedule for an edition.
     /// </summary>
-    [HttpPost("editions/{editionId:guid}/default")]
+    [HttpPost("editions/{editionId:long}/default")]
     [ProducesResponseType(typeof(ApiResponse<PersonalScheduleDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetOrCreateDefault(Guid editionId, CancellationToken ct)
+    public async Task<IActionResult> GetOrCreateDefault(long editionId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -241,13 +241,13 @@ public class PersonalScheduleController : ControllerBase
     /// <summary>
     /// Adds an entry (performance) to a schedule.
     /// </summary>
-    [HttpPost("{scheduleId:guid}/entries")]
+    [HttpPost("{scheduleId:long}/entries")]
     [ProducesResponseType(typeof(ApiResponse<PersonalScheduleEntryDto>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status409Conflict)]
-    public async Task<IActionResult> AddEntry(Guid scheduleId, [FromBody] AddScheduleEntryRequest request, CancellationToken ct)
+    public async Task<IActionResult> AddEntry(long scheduleId, [FromBody] AddScheduleEntryRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -287,12 +287,12 @@ public class PersonalScheduleController : ControllerBase
     /// <summary>
     /// Updates an entry in a schedule.
     /// </summary>
-    [HttpPut("entries/{entryId:guid}")]
+    [HttpPut("entries/{entryId:long}")]
     [ProducesResponseType(typeof(ApiResponse<PersonalScheduleEntryDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> UpdateEntry(Guid entryId, [FromBody] UpdateScheduleEntryRequest request, CancellationToken ct)
+    public async Task<IActionResult> UpdateEntry(long entryId, [FromBody] UpdateScheduleEntryRequest request, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -325,11 +325,11 @@ public class PersonalScheduleController : ControllerBase
     /// <summary>
     /// Removes an entry from a schedule.
     /// </summary>
-    [HttpDelete("entries/{entryId:guid}")]
+    [HttpDelete("entries/{entryId:long}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> RemoveEntry(Guid entryId, CancellationToken ct)
+    public async Task<IActionResult> RemoveEntry(long entryId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -356,11 +356,11 @@ public class PersonalScheduleController : ControllerBase
     /// <summary>
     /// Syncs the schedule for offline support.
     /// </summary>
-    [HttpPost("{scheduleId:guid}/sync")]
+    [HttpPost("{scheduleId:long}/sync")]
     [ProducesResponseType(typeof(ApiResponse<PersonalScheduleDetailDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(ApiErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> SyncSchedule(Guid scheduleId, CancellationToken ct)
+    public async Task<IActionResult> SyncSchedule(long scheduleId, CancellationToken ct)
     {
         var userId = GetCurrentUserId();
         if (userId == null) return Unauthorized();
@@ -380,10 +380,10 @@ public class PersonalScheduleController : ControllerBase
         }
     }
 
-    private Guid? GetCurrentUserId()
+    private long? GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        return Guid.TryParse(userIdClaim, out var userId) ? userId : null;
+        return long.TryParse(userIdClaim, out var userId) ? userId : null;
     }
 
     private static ApiErrorResponse CreateError(string code, string message) =>

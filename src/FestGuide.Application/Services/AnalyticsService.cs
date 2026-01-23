@@ -50,12 +50,12 @@ public class AnalyticsService : IAnalyticsService
     }
 
     /// <inheritdoc />
-    public async Task TrackEventAsync(Guid? userId, TrackEventRequest request, CancellationToken ct = default)
+    public async Task TrackEventAsync(long? userId, TrackEventRequest request, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(request);
         var now = _dateTimeProvider.UtcNow;
         
-        Guid? festivalId = null;
+        long? festivalId = null;
         if (request.EditionId.HasValue)
         {
             var edition = await _editionRepository.GetByIdAsync(request.EditionId.Value, ct);
@@ -64,7 +64,6 @@ public class AnalyticsService : IAnalyticsService
 
         var analyticsEvent = new AnalyticsEvent
         {
-            AnalyticsEventId = Guid.NewGuid(),
             UserId = userId,
             FestivalId = festivalId,
             EditionId = request.EditionId,
@@ -85,7 +84,7 @@ public class AnalyticsService : IAnalyticsService
     }
 
     /// <inheritdoc />
-    public async Task TrackScheduleViewAsync(Guid? userId, Guid editionId, string? platform, string? sessionId, CancellationToken ct = default)
+    public async Task TrackScheduleViewAsync(long? userId, long editionId, string? platform, string? sessionId, CancellationToken ct = default)
     {
         var request = new TrackEventRequest(
             EventType: "schedule_view",
@@ -100,7 +99,7 @@ public class AnalyticsService : IAnalyticsService
     }
 
     /// <inheritdoc />
-    public async Task TrackEngagementSaveAsync(Guid userId, Guid editionId, Guid engagementId, CancellationToken ct = default)
+    public async Task TrackEngagementSaveAsync(long userId, long editionId, long engagementId, CancellationToken ct = default)
     {
         var request = new TrackEventRequest(
             EventType: "engagement_save",
@@ -115,7 +114,7 @@ public class AnalyticsService : IAnalyticsService
     }
 
     /// <inheritdoc />
-    public async Task<EditionDashboardDto> GetEditionDashboardAsync(Guid editionId, Guid organizerId, CancellationToken ct = default)
+    public async Task<EditionDashboardDto> GetEditionDashboardAsync(long editionId, long organizerId, CancellationToken ct = default)
     {
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -156,7 +155,7 @@ public class AnalyticsService : IAnalyticsService
     }
 
     /// <inheritdoc />
-    public async Task<FestivalAnalyticsSummaryDto> GetFestivalSummaryAsync(Guid festivalId, Guid organizerId, CancellationToken ct = default)
+    public async Task<FestivalAnalyticsSummaryDto> GetFestivalSummaryAsync(long festivalId, long organizerId, CancellationToken ct = default)
     {
         await EnsureOrganizerAccessAsync(festivalId, organizerId, ct);
 
@@ -198,7 +197,7 @@ public class AnalyticsService : IAnalyticsService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<ArtistAnalyticsDto>> GetTopArtistsAsync(Guid editionId, Guid organizerId, int limit = 10, CancellationToken ct = default)
+    public async Task<IReadOnlyList<ArtistAnalyticsDto>> GetTopArtistsAsync(long editionId, long organizerId, int limit = 10, CancellationToken ct = default)
     {
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -213,8 +212,8 @@ public class AnalyticsService : IAnalyticsService
         var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();
         var artists = await Task.WhenAll(artistTasks);
         
-        var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
-        var missingArtistIds = new List<Guid>();
+        var artistDictionary = new Dictionary<long, Domain.Entities.Artist>();
+        var missingArtistIds = new List<long>();
 
         for (int i = 0; i < artists.Length; i++)
         {
@@ -259,7 +258,7 @@ public class AnalyticsService : IAnalyticsService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<EngagementAnalyticsDto>> GetTopEngagementsAsync(Guid editionId, Guid organizerId, int limit = 10, CancellationToken ct = default)
+    public async Task<IReadOnlyList<EngagementAnalyticsDto>> GetTopEngagementsAsync(long editionId, long organizerId, int limit = 10, CancellationToken ct = default)
     {
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -273,7 +272,7 @@ public class AnalyticsService : IAnalyticsService
         var engagementTasks = engagementIds.Select(id => _engagementRepository.GetByIdAsync(id, ct)).ToArray();
         var engagements = await Task.WhenAll(engagementTasks);
         
-        var engagementDictionary = new Dictionary<Guid, Domain.Entities.Engagement>();
+        var engagementDictionary = new Dictionary<long, Domain.Entities.Engagement>();
         foreach (var engagement in engagements.Where(e => e != null))
         {
             engagementDictionary[engagement!.EngagementId] = engagement;
@@ -289,7 +288,7 @@ public class AnalyticsService : IAnalyticsService
         var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();
         var artists = await Task.WhenAll(artistTasks);
         
-        var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
+        var artistDictionary = new Dictionary<long, Domain.Entities.Artist>();
         foreach (var artist in artists.Where(a => a != null))
         {
             artistDictionary[artist!.ArtistId] = artist;
@@ -300,7 +299,7 @@ public class AnalyticsService : IAnalyticsService
         var timeSlotTasks = timeSlotIds.Select(id => _timeSlotRepository.GetByIdAsync(id, ct)).ToArray();
         var timeSlots = await Task.WhenAll(timeSlotTasks);
         
-        var timeSlotDictionary = new Dictionary<Guid, Domain.Entities.TimeSlot>();
+        var timeSlotDictionary = new Dictionary<long, Domain.Entities.TimeSlot>();
         foreach (var timeSlot in timeSlots.Where(t => t != null))
         {
             timeSlotDictionary[timeSlot!.TimeSlotId] = timeSlot;
@@ -315,7 +314,7 @@ public class AnalyticsService : IAnalyticsService
         var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
         var stages = await Task.WhenAll(stageTasks);
         
-        var stageDictionary = new Dictionary<Guid, Domain.Entities.Stage>();
+        var stageDictionary = new Dictionary<long, Domain.Entities.Stage>();
         foreach (var stage in stages.Where(s => s != null))
         {
             stageDictionary[stage!.StageId] = stage;
@@ -344,7 +343,7 @@ public class AnalyticsService : IAnalyticsService
                 engagementId,
                 engagement.ArtistId,
                 artist?.Name ?? "Unknown",
-                timeSlot?.StageId ?? Guid.Empty,
+                timeSlot?.StageId ?? 0,
                 stage?.Name ?? "Unknown",
                 timeSlot?.StartTimeUtc ?? DateTime.MinValue,
                 timeSlot?.EndTimeUtc ?? DateTime.MinValue,
@@ -356,7 +355,7 @@ public class AnalyticsService : IAnalyticsService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<TimelineDataPointDto>> GetEventTimelineAsync(Guid editionId, Guid organizerId, TimelineRequest request, CancellationToken ct = default)
+    public async Task<IReadOnlyList<TimelineDataPointDto>> GetEventTimelineAsync(long editionId, long organizerId, TimelineRequest request, CancellationToken ct = default)
     {
         ArgumentNullException.ThrowIfNull(request);
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
@@ -375,7 +374,7 @@ public class AnalyticsService : IAnalyticsService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<DailyActiveUsersDto>> GetDailyActiveUsersAsync(Guid editionId, Guid organizerId, DateTime fromUtc, DateTime toUtc, CancellationToken ct = default)
+    public async Task<IReadOnlyList<DailyActiveUsersDto>> GetDailyActiveUsersAsync(long editionId, long organizerId, DateTime fromUtc, DateTime toUtc, CancellationToken ct = default)
     {
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -387,7 +386,7 @@ public class AnalyticsService : IAnalyticsService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<PlatformDistributionDto>> GetPlatformDistributionAsync(Guid editionId, Guid organizerId, CancellationToken ct = default)
+    public async Task<IReadOnlyList<PlatformDistributionDto>> GetPlatformDistributionAsync(long editionId, long organizerId, CancellationToken ct = default)
     {
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -405,7 +404,7 @@ public class AnalyticsService : IAnalyticsService
     }
 
     /// <inheritdoc />
-    public async Task<IReadOnlyList<EventTypeDistributionDto>> GetEventTypeDistributionAsync(Guid editionId, Guid organizerId, DateTime? fromUtc, DateTime? toUtc, CancellationToken ct = default)
+    public async Task<IReadOnlyList<EventTypeDistributionDto>> GetEventTypeDistributionAsync(long editionId, long organizerId, DateTime? fromUtc, DateTime? toUtc, CancellationToken ct = default)
     {
         var edition = await _editionRepository.GetByIdAsync(editionId, ct)
             ?? throw new EditionNotFoundException(editionId);
@@ -422,7 +421,7 @@ public class AnalyticsService : IAnalyticsService
         )).ToList();
     }
 
-    private async Task EnsureOrganizerAccessAsync(Guid festivalId, Guid organizerId, CancellationToken ct)
+    private async Task EnsureOrganizerAccessAsync(long festivalId, long organizerId, CancellationToken ct)
     {
         if (!await _authService.CanViewAnalyticsAsync(organizerId, festivalId, ct))
         {
@@ -431,7 +430,7 @@ public class AnalyticsService : IAnalyticsService
     }
 
     private async Task<IReadOnlyList<TopEngagementDto>> BuildTopEngagementDtosAsync(
-        IReadOnlyList<(Guid EngagementId, int SaveCount)> engagements,
+        IReadOnlyList<(long EngagementId, int SaveCount)> engagements,
         CancellationToken ct)
     {
         if (engagements.Count == 0)
@@ -444,7 +443,7 @@ public class AnalyticsService : IAnalyticsService
         var engagementTasks = engagementIds.Select(id => _engagementRepository.GetByIdAsync(id, ct)).ToArray();
         var engagementsData = await Task.WhenAll(engagementTasks);
         
-        var engagementDictionary = new Dictionary<Guid, Domain.Entities.Engagement>();
+        var engagementDictionary = new Dictionary<long, Domain.Entities.Engagement>();
         foreach (var engagement in engagementsData.OfType<Domain.Entities.Engagement>())
         {
             engagementDictionary[engagement.EngagementId] = engagement;
@@ -460,7 +459,7 @@ public class AnalyticsService : IAnalyticsService
         var artistTasks = artistIds.Select(id => _artistRepository.GetByIdAsync(id, ct)).ToArray();
         var artists = await Task.WhenAll(artistTasks);
         
-        var artistDictionary = new Dictionary<Guid, Domain.Entities.Artist>();
+        var artistDictionary = new Dictionary<long, Domain.Entities.Artist>();
         foreach (var artist in artists.Where(a => a != null))
         {
             artistDictionary[artist!.ArtistId] = artist;
@@ -471,7 +470,7 @@ public class AnalyticsService : IAnalyticsService
         var timeSlotTasks = timeSlotIds.Select(id => _timeSlotRepository.GetByIdAsync(id, ct)).ToArray();
         var timeSlots = await Task.WhenAll(timeSlotTasks);
         
-        var timeSlotDictionary = new Dictionary<Guid, Domain.Entities.TimeSlot>();
+        var timeSlotDictionary = new Dictionary<long, Domain.Entities.TimeSlot>();
         foreach (var timeSlot in timeSlots.Where(t => t != null))
         {
             timeSlotDictionary[timeSlot!.TimeSlotId] = timeSlot;
@@ -486,7 +485,7 @@ public class AnalyticsService : IAnalyticsService
         var stageTasks = stageIds.Select(id => _stageRepository.GetByIdAsync(id, ct)).ToArray();
         var stages = await Task.WhenAll(stageTasks);
         
-        var stageDictionary = new Dictionary<Guid, Domain.Entities.Stage>();
+        var stageDictionary = new Dictionary<long, Domain.Entities.Stage>();
         foreach (var stage in stages.Where(s => s != null))
         {
             stageDictionary[stage!.StageId] = stage;

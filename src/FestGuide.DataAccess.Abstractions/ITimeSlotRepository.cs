@@ -10,27 +10,27 @@ public interface ITimeSlotRepository
     /// <summary>
     /// Gets a time slot by its unique identifier.
     /// </summary>
-    Task<TimeSlot?> GetByIdAsync(Guid timeSlotId, CancellationToken ct = default);
+    Task<TimeSlot?> GetByIdAsync(long timeSlotId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets multiple time slots by their unique identifiers.
     /// </summary>
-    Task<IReadOnlyList<TimeSlot>> GetByIdsAsync(IEnumerable<Guid> timeSlotIds, CancellationToken ct = default);
+    Task<IReadOnlyList<TimeSlot>> GetByIdsAsync(IEnumerable<long> timeSlotIds, CancellationToken ct = default);
 
     /// <summary>
     /// Gets all time slots for a stage within an edition.
     /// </summary>
-    Task<IReadOnlyList<TimeSlot>> GetByStageAndEditionAsync(Guid stageId, Guid editionId, CancellationToken ct = default);
+    Task<IReadOnlyList<TimeSlot>> GetByStageAndEditionAsync(long stageId, long editionId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets all time slots for an edition.
     /// </summary>
-    Task<IReadOnlyList<TimeSlot>> GetByEditionAsync(Guid editionId, CancellationToken ct = default);
+    Task<IReadOnlyList<TimeSlot>> GetByEditionAsync(long editionId, CancellationToken ct = default);
 
     /// <summary>
     /// Creates a new time slot.
     /// </summary>
-    Task<Guid> CreateAsync(TimeSlot timeSlot, CancellationToken ct = default);
+    Task<long> CreateAsync(TimeSlot timeSlot, CancellationToken ct = default);
 
     /// <summary>
     /// Updates an existing time slot.
@@ -40,25 +40,25 @@ public interface ITimeSlotRepository
     /// <summary>
     /// Soft-deletes a time slot.
     /// </summary>
-    Task DeleteAsync(Guid timeSlotId, Guid deletedBy, CancellationToken ct = default);
+    Task DeleteAsync(long timeSlotId, long deletedBy, CancellationToken ct = default);
 
     /// <summary>
     /// Checks if a time slot exists.
     /// </summary>
-    Task<bool> ExistsAsync(Guid timeSlotId, CancellationToken ct = default);
+    Task<bool> ExistsAsync(long timeSlotId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets the edition ID for a time slot.
     /// </summary>
-    Task<Guid?> GetEditionIdAsync(Guid timeSlotId, CancellationToken ct = default);
+    Task<long?> GetEditionIdAsync(long timeSlotId, CancellationToken ct = default);
 
     /// <summary>
     /// Gets the festival ID for a time slot (through stage/venue chain).
     /// </summary>
-    Task<Guid?> GetFestivalIdAsync(Guid timeSlotId, CancellationToken ct = default);
+    Task<long?> GetFestivalIdAsync(long timeSlotId, CancellationToken ct = default);
 
     /// <summary>
     /// Checks for overlapping time slots on a stage.
     /// </summary>
-    Task<bool> HasOverlapAsync(Guid stageId, Guid editionId, DateTime startTimeUtc, DateTime endTimeUtc, Guid? excludeTimeSlotId = null, CancellationToken ct = default);
+    Task<bool> HasOverlapAsync(long stageId, long editionId, DateTime startTimeUtc, DateTime endTimeUtc, long? excludeTimeSlotId = null, CancellationToken ct = default);
 }

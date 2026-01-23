@@ -18,14 +18,14 @@ public class SqlServerPasswordResetTokenRepository : IPasswordResetTokenReposito
     }
 
     /// <inheritdoc />
-    public async Task<Guid> CreateAsync(PasswordResetToken token, CancellationToken ct = default)
+    public async Task<long> CreateAsync(PasswordResetToken token, CancellationToken ct = default)
     {
         const string sql = """
             INSERT INTO identity.PasswordResetToken (
-                TokenId, UserId, TokenHash, ExpiresAtUtc, IsUsed,
+                UserId, TokenHash, ExpiresAtUtc, IsUsed,
                 CreatedAtUtc, CreatedBy, ModifiedAtUtc, ModifiedBy
             ) VALUES (
-                @TokenId, @UserId, @TokenHash, @ExpiresAtUtc, @IsUsed,
+                @UserId, @TokenHash, @ExpiresAtUtc, @IsUsed,
                 @CreatedAtUtc, @CreatedBy, @ModifiedAtUtc, @ModifiedBy
             )
             """;
@@ -51,7 +51,7 @@ public class SqlServerPasswordResetTokenRepository : IPasswordResetTokenReposito
     }
 
     /// <inheritdoc />
-    public async Task<PasswordResetToken?> GetActiveByUserIdAsync(Guid userId, CancellationToken ct = default)
+    public async Task<PasswordResetToken?> GetActiveByUserIdAsync(long userId, CancellationToken ct = default)
     {
         const string sql = """
             SELECT TOP 1
@@ -69,7 +69,7 @@ public class SqlServerPasswordResetTokenRepository : IPasswordResetTokenReposito
     }
 
     /// <inheritdoc />
-    public async Task MarkAsUsedAsync(Guid tokenId, CancellationToken ct = default)
+    public async Task MarkAsUsedAsync(long tokenId, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE identity.PasswordResetToken
@@ -87,7 +87,7 @@ public class SqlServerPasswordResetTokenRepository : IPasswordResetTokenReposito
     }
 
     /// <inheritdoc />
-    public async Task InvalidateAllForUserAsync(Guid userId, CancellationToken ct = default)
+    public async Task InvalidateAllForUserAsync(long userId, CancellationToken ct = default)
     {
         const string sql = """
             UPDATE identity.PasswordResetToken
