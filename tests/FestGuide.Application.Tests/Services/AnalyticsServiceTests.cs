@@ -343,7 +343,7 @@ public class AnalyticsServiceTests
         _mockAuthService.Setup(a => a.CanViewAnalyticsAsync(organizerId, festivalId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
         _mockAnalyticsRepo.Setup(r => r.GetTopArtistsAsync(editionId, 10, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new List<(long, string, int)> { (1L, "Top Artist", 150) });
+            .ReturnsAsync(new List<(long, string, int)> { (artistId, "Top Artist", 150) });
         _mockArtistRepo.Setup(r => r.GetByIdAsync(artistId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(artist);
 

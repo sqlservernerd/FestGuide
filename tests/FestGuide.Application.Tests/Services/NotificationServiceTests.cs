@@ -436,7 +436,7 @@ public class NotificationServiceTests
             .ReturnsAsync(105L);
 
         // Act
-        await _sut.SendToUserAsync(1L, "schedule_change", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
         // Assert
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -462,7 +462,7 @@ public class NotificationServiceTests
             .ReturnsAsync(prefs);
 
         // Act
-        await _sut.SendToUserAsync(1L, "schedule_change", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
         // Assert
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -484,7 +484,7 @@ public class NotificationServiceTests
             .ReturnsAsync(prefs);
 
         // Act
-        await _sut.SendToUserAsync(1L, "schedule_change", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
         // Assert
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -506,7 +506,7 @@ public class NotificationServiceTests
             .ReturnsAsync(new List<DeviceToken>());
 
         // Act
-        await _sut.SendToUserAsync(1L, "schedule_change", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
         // Assert
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -560,7 +560,7 @@ public class NotificationServiceTests
             .ReturnsAsync(107L);
 
         // Act - should not throw
-        await _sut.SendToUserAsync(1L, "schedule_change", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
         // Assert - notification log should still be created with error
         _mockNotificationLogRepo.Verify(r => r.CreateAsync(
@@ -739,7 +739,7 @@ public class NotificationServiceTests
             .ReturnsAsync(prefs);
 
         // Act
-        await _sut.SendToUserAsync(1L, "reminder", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "reminder", "Title", "Body");
 
         // Assert
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -766,7 +766,7 @@ public class NotificationServiceTests
             .ReturnsAsync(111L);
 
         // Act
-        await _sut.SendToUserAsync(1L, "reminder", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "reminder", "Title", "Body");
 
         // Assert
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -788,7 +788,7 @@ public class NotificationServiceTests
             .ReturnsAsync(prefs);
 
         // Act
-        await _sut.SendToUserAsync(1L, "announcement", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "announcement", "Title", "Body");
 
         // Assert
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -815,7 +815,7 @@ public class NotificationServiceTests
             .ReturnsAsync(112L);
 
         // Act
-        await _sut.SendToUserAsync(1L, "announcement", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "announcement", "Title", "Body");
 
         // Assert
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -843,7 +843,7 @@ public class NotificationServiceTests
             .ReturnsAsync(prefs);
 
         // Act
-        await _sut.SendToUserAsync(1L, "schedule_change", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
         // Assert
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -877,7 +877,7 @@ public class NotificationServiceTests
             .ReturnsAsync(113L);
 
         // Act
-        await _sut.SendToUserAsync(1L, "schedule_change", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
         // Assert
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -905,7 +905,7 @@ public class NotificationServiceTests
             .ReturnsAsync(prefs);
 
         // Act
-        await _sut.SendToUserAsync(1L, "schedule_change", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
         // Assert
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -939,7 +939,7 @@ public class NotificationServiceTests
             .ReturnsAsync(114L);
 
         // Act
-        await _sut.SendToUserAsync(1L, "schedule_change", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
         // Assert
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -967,7 +967,7 @@ public class NotificationServiceTests
             .ReturnsAsync(prefs);
 
         // Act
-        await _sut.SendToUserAsync(1L, "schedule_change", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
         // Assert
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -995,7 +995,7 @@ public class NotificationServiceTests
             .ReturnsAsync(prefs);
 
         // Act
-        await _sut.SendToUserAsync(1L, "schedule_change", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
         // Assert - Notifications should be blocked at the quiet hours start boundary
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -1029,7 +1029,7 @@ public class NotificationServiceTests
             .ReturnsAsync(115L);
 
         // Act
-        await _sut.SendToUserAsync(1L, "schedule_change", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
         // Assert - Notifications should be allowed at the quiet hours end boundary (exclusive)
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -1057,7 +1057,7 @@ public class NotificationServiceTests
             .ReturnsAsync(prefs);
 
         // Act
-        await _sut.SendToUserAsync(1L, "schedule_change", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
         // Assert - Notifications should be blocked at the quiet hours start boundary
         _mockPushProvider.Verify(p => p.SendAsync(
@@ -1091,7 +1091,7 @@ public class NotificationServiceTests
             .ReturnsAsync(116L);
 
         // Act
-        await _sut.SendToUserAsync(1L, "schedule_change", "Title", "Body");
+        await _sut.SendToUserAsync(userId, "schedule_change", "Title", "Body");
 
         // Assert - Notifications should be allowed at the quiet hours end boundary (exclusive)
         _mockPushProvider.Verify(p => p.SendAsync(
