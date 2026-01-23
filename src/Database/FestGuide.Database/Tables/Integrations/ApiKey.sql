@@ -25,6 +25,7 @@ CREATE TABLE [integrations].[ApiKey]
     CONSTRAINT [PK_ApiKey] PRIMARY KEY CLUSTERED ([ApiKeyId]),
     CONSTRAINT [FK_ApiKey_Festival] FOREIGN KEY ([FestivalId]) REFERENCES [core].[Festival]([FestivalId]),
     CONSTRAINT [FK_ApiKey_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_ApiKey_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [identity].[User]([UserId]),
     CONSTRAINT [FK_ApiKey_RevokedBy] FOREIGN KEY ([RevokedBy]) REFERENCES [identity].[User]([UserId])
 );
 GO

@@ -20,7 +20,9 @@ CREATE TABLE [core].[Artist]
     [ModifiedBy]            BIGINT                  NULL,
 
     CONSTRAINT [PK_Artist] PRIMARY KEY CLUSTERED ([ArtistId]),
-    CONSTRAINT [FK_Artist_Festival] FOREIGN KEY ([FestivalId]) REFERENCES [core].[Festival]([FestivalId])
+    CONSTRAINT [FK_Artist_Festival] FOREIGN KEY ([FestivalId]) REFERENCES [core].[Festival]([FestivalId]),
+    CONSTRAINT [FK_Artist_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_Artist_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [identity].[User]([UserId])
 );
 GO
 

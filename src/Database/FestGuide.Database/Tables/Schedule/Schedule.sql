@@ -18,7 +18,9 @@ CREATE TABLE [schedule].[Schedule]
 
     CONSTRAINT [PK_Schedule] PRIMARY KEY CLUSTERED ([ScheduleId]),
     CONSTRAINT [FK_Schedule_Edition] FOREIGN KEY ([EditionId]) REFERENCES [core].[FestivalEdition]([EditionId]),
-    CONSTRAINT [FK_Schedule_PublishedBy] FOREIGN KEY ([PublishedBy]) REFERENCES [identity].[User]([UserId])
+    CONSTRAINT [FK_Schedule_PublishedBy] FOREIGN KEY ([PublishedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_Schedule_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_Schedule_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [identity].[User]([UserId])
 );
 GO
 

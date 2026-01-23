@@ -23,7 +23,8 @@ CREATE TABLE [integrations].[WebhookSubscription]
 
     CONSTRAINT [PK_WebhookSubscription] PRIMARY KEY CLUSTERED ([WebhookSubscriptionId]),
     CONSTRAINT [FK_WebhookSubscription_Festival] FOREIGN KEY ([FestivalId]) REFERENCES [core].[Festival]([FestivalId]),
-    CONSTRAINT [FK_WebhookSubscription_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId])
+    CONSTRAINT [FK_WebhookSubscription_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_WebhookSubscription_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [identity].[User]([UserId])
 );
 GO
 

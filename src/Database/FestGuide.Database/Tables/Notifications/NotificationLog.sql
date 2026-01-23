@@ -26,7 +26,9 @@ CREATE TABLE [notifications].[NotificationLog]
 
     CONSTRAINT [PK_NotificationLog] PRIMARY KEY CLUSTERED ([NotificationLogId]),
     CONSTRAINT [FK_NotificationLog_User] FOREIGN KEY ([UserId]) REFERENCES [identity].[User]([UserId]),
-    CONSTRAINT [FK_NotificationLog_DeviceToken] FOREIGN KEY ([DeviceTokenId]) REFERENCES [notifications].[DeviceToken]([DeviceTokenId])
+    CONSTRAINT [FK_NotificationLog_DeviceToken] FOREIGN KEY ([DeviceTokenId]) REFERENCES [notifications].[DeviceToken]([DeviceTokenId]),
+    CONSTRAINT [FK_NotificationLog_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_NotificationLog_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [identity].[User]([UserId])
 );
 GO
 

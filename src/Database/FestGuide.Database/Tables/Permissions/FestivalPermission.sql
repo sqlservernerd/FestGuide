@@ -11,9 +11,11 @@ CREATE TABLE [permissions].[FestivalPermission]
     [Scope]                 TINYINT                 NOT NULL    CONSTRAINT [DF_FestivalPermission_Scope] DEFAULT (0), -- 0 = All, 1 = Venues, 2 = Schedule, 3 = Artists, 4 = Editions, 5 = Integrations
     [InvitedByUserId]       BIGINT                  NULL,
     [AcceptedAtUtc]         DATETIME2(7)            NULL,
+    [AcceptedBy]            BIGINT                  NULL,
     [IsPending]             BIT                     NOT NULL    CONSTRAINT [DF_FestivalPermission_IsPending] DEFAULT (1),
     [IsRevoked]             BIT                     NOT NULL    CONSTRAINT [DF_FestivalPermission_IsRevoked] DEFAULT (0),
     [RevokedAtUtc]          DATETIME2(7)            NULL,
+    [RevokedBy]             BIGINT                  NULL,
     [CreatedAtUtc]          DATETIME2(7)            NOT NULL    CONSTRAINT [DF_FestivalPermission_CreatedAtUtc] DEFAULT (SYSUTCDATETIME()),
     [CreatedBy]             BIGINT                  NULL,
     [ModifiedAtUtc]         DATETIME2(7)            NOT NULL    CONSTRAINT [DF_FestivalPermission_ModifiedAtUtc] DEFAULT (SYSUTCDATETIME()),
@@ -23,6 +25,10 @@ CREATE TABLE [permissions].[FestivalPermission]
     CONSTRAINT [FK_FestivalPermission_Festival] FOREIGN KEY ([FestivalId]) REFERENCES [core].[Festival]([FestivalId]),
     CONSTRAINT [FK_FestivalPermission_User] FOREIGN KEY ([UserId]) REFERENCES [identity].[User]([UserId]),
     CONSTRAINT [FK_FestivalPermission_InvitedByUser] FOREIGN KEY ([InvitedByUserId]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_FestivalPermission_AcceptedBy] FOREIGN KEY ([AcceptedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_FestivalPermission_RevokedBy] FOREIGN KEY ([RevokedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_FestivalPermission_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_FestivalPermission_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [identity].[User]([UserId]),
     CONSTRAINT [CK_FestivalPermission_Role] CHECK ([Role] IN (0, 1, 2, 3)),
     CONSTRAINT [CK_FestivalPermission_Scope] CHECK ([Scope] IN (0, 1, 2, 3, 4, 5))
 );

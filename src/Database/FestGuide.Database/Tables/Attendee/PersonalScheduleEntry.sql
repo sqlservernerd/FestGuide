@@ -18,7 +18,9 @@ CREATE TABLE [attendee].[PersonalScheduleEntry]
 
     CONSTRAINT [PK_PersonalScheduleEntry] PRIMARY KEY CLUSTERED ([PersonalScheduleEntryId]),
     CONSTRAINT [FK_PersonalScheduleEntry_PersonalSchedule] FOREIGN KEY ([PersonalScheduleId]) REFERENCES [attendee].[PersonalSchedule]([PersonalScheduleId]),
-    CONSTRAINT [FK_PersonalScheduleEntry_Engagement] FOREIGN KEY ([EngagementId]) REFERENCES [schedule].[Engagement]([EngagementId])
+    CONSTRAINT [FK_PersonalScheduleEntry_Engagement] FOREIGN KEY ([EngagementId]) REFERENCES [schedule].[Engagement]([EngagementId]),
+    CONSTRAINT [FK_PersonalScheduleEntry_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_PersonalScheduleEntry_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [identity].[User]([UserId])
 );
 GO
 

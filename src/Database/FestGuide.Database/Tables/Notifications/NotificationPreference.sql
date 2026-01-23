@@ -22,6 +22,8 @@ CREATE TABLE [notifications].[NotificationPreference]
 
     CONSTRAINT [PK_NotificationPreference] PRIMARY KEY CLUSTERED ([NotificationPreferenceId]),
     CONSTRAINT [FK_NotificationPreference_User] FOREIGN KEY ([UserId]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_NotificationPreference_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_NotificationPreference_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [identity].[User]([UserId]),
     CONSTRAINT [CK_NotificationPreference_ReminderMinutesBefore] CHECK ([ReminderMinutesBefore] >= 5 AND [ReminderMinutesBefore] <= 1440),
     CONSTRAINT [CK_NotificationPreference_QuietHours] CHECK (
         ([QuietHoursStart] IS NULL AND [QuietHoursEnd] IS NULL) OR 

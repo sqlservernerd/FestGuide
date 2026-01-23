@@ -21,6 +21,8 @@ CREATE TABLE [core].[FestivalEdition]
 
     CONSTRAINT [PK_FestivalEdition] PRIMARY KEY CLUSTERED ([EditionId]),
     CONSTRAINT [FK_FestivalEdition_Festival] FOREIGN KEY ([FestivalId]) REFERENCES [core].[Festival]([FestivalId]),
+    CONSTRAINT [FK_FestivalEdition_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_FestivalEdition_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [identity].[User]([UserId]),
     CONSTRAINT [CK_FestivalEdition_Status] CHECK ([Status] IN (0, 1, 2)),
     CONSTRAINT [CK_FestivalEdition_Dates] CHECK ([EndDateUtc] > [StartDateUtc])
 );

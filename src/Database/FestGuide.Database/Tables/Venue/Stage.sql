@@ -17,7 +17,9 @@ CREATE TABLE [venue].[Stage]
     [ModifiedBy]            BIGINT                  NULL,
 
     CONSTRAINT [PK_Stage] PRIMARY KEY CLUSTERED ([StageId]),
-    CONSTRAINT [FK_Stage_Venue] FOREIGN KEY ([VenueId]) REFERENCES [venue].[Venue]([VenueId])
+    CONSTRAINT [FK_Stage_Venue] FOREIGN KEY ([VenueId]) REFERENCES [venue].[Venue]([VenueId]),
+    CONSTRAINT [FK_Stage_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_Stage_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [identity].[User]([UserId])
 );
 GO
 

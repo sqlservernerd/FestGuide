@@ -11,9 +11,6 @@ CREATE TABLE [identity].[EmailVerificationToken]
     [IsUsed]                BIT                     NOT NULL    CONSTRAINT [DF_EmailVerificationToken_IsUsed] DEFAULT (0),
     [UsedAtUtc]             DATETIME2(7)            NULL,
     [CreatedAtUtc]          DATETIME2(7)            NOT NULL    CONSTRAINT [DF_EmailVerificationToken_CreatedAtUtc] DEFAULT (SYSUTCDATETIME()),
-    [CreatedBy]             BIGINT                  NULL,
-    [ModifiedAtUtc]         DATETIME2(7)            NOT NULL    CONSTRAINT [DF_EmailVerificationToken_ModifiedAtUtc] DEFAULT (SYSUTCDATETIME()),
-    [ModifiedBy]            BIGINT                  NULL,
 
     CONSTRAINT [PK_EmailVerificationToken] PRIMARY KEY CLUSTERED ([TokenId]),
     CONSTRAINT [FK_EmailVerificationToken_User] FOREIGN KEY ([UserId]) REFERENCES [identity].[User]([UserId])

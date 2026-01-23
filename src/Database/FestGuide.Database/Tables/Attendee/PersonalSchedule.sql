@@ -19,7 +19,9 @@ CREATE TABLE [attendee].[PersonalSchedule]
 
     CONSTRAINT [PK_PersonalSchedule] PRIMARY KEY CLUSTERED ([PersonalScheduleId]),
     CONSTRAINT [FK_PersonalSchedule_User] FOREIGN KEY ([UserId]) REFERENCES [identity].[User]([UserId]),
-    CONSTRAINT [FK_PersonalSchedule_Edition] FOREIGN KEY ([EditionId]) REFERENCES [core].[FestivalEdition]([EditionId])
+    CONSTRAINT [FK_PersonalSchedule_Edition] FOREIGN KEY ([EditionId]) REFERENCES [core].[FestivalEdition]([EditionId]),
+    CONSTRAINT [FK_PersonalSchedule_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_PersonalSchedule_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [identity].[User]([UserId])
 );
 GO
 

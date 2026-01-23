@@ -20,6 +20,8 @@ CREATE TABLE [venue].[TimeSlot]
     CONSTRAINT [PK_TimeSlot] PRIMARY KEY CLUSTERED ([TimeSlotId]),
     CONSTRAINT [FK_TimeSlot_Stage] FOREIGN KEY ([StageId]) REFERENCES [venue].[Stage]([StageId]),
     CONSTRAINT [FK_TimeSlot_Edition] FOREIGN KEY ([EditionId]) REFERENCES [core].[FestivalEdition]([EditionId]),
+    CONSTRAINT [FK_TimeSlot_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_TimeSlot_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [identity].[User]([UserId]),
     CONSTRAINT [CK_TimeSlot_Times] CHECK ([EndTimeUtc] > [StartTimeUtc]),
     CONSTRAINT [CK_TimeSlot_SlotType] CHECK ([SlotType] IN ('performance', 'changeover'))
 );

@@ -32,7 +32,7 @@
 | UTC Timestamps | All datetime columns store UTC values |
 | IANA Timezones | Timezone identifiers stored as IANA strings |
 | Soft Deletes | Where applicable, use `IsDeleted` flag |
-| Audit Columns | All tables include `CreatedAtUtc`, `CreatedBy`, `ModifiedAtUtc`, `ModifiedBy` |
+| Audit Columns | All tables include `CreatedAtUtc`, `CreatedBy`, `ModifiedAtUtc`, `ModifiedBy`, except system-generated token tables (PasswordResetToken, EmailVerificationToken) which only include `CreatedAtUtc` |
 | BIGINT IDENTITY Primary Keys | Use `BIGINT IDENTITY(1,1)` for auto-incrementing primary keys with better performance |
 
 ---
@@ -147,6 +147,8 @@ CREATE TABLE [identity].[User]
     [DisplayName]           NVARCHAR(100)       NOT NULL,
     [UserType]              TINYINT             NOT NULL,   -- 0 = Attendee, 1 = Organizer
     [PreferredTimezoneId]   NVARCHAR(100)       NULL,       -- IANA timezone
+    [FailedLoginAttempts]   INT                 NOT NULL    DEFAULT 0,
+    [LockoutEndUtc]         DATETIME2(7)        NULL,
     [IsDeleted]             BIT                 NOT NULL    DEFAULT 0,
     [DeletedAtUtc]          DATETIME2(7)        NULL,
     [CreatedAtUtc]          DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
@@ -173,6 +175,8 @@ CREATE INDEX [IX_User_UserType] ON [identity].[User] ([UserType]) WHERE [IsDelet
 | DisplayName | NVARCHAR(100) | User's display name |
 | UserType | TINYINT | Account type: 0 = Attendee, 1 = Organizer |
 | PreferredTimezoneId | NVARCHAR(100) | IANA timezone identifier |
+| FailedLoginAttempts | INT | Number of consecutive failed login attempts |
+| LockoutEndUtc | DATETIME2(7) | UTC timestamp when account lockout expires |
 
 ---
 
@@ -315,8 +319,8 @@ CREATE TABLE [venue].[Venue]
     [Name]              NVARCHAR(200)       NOT NULL,
     [Description]       NVARCHAR(MAX)       NULL,
     [Address]           NVARCHAR(500)       NULL,
-    [Latitude]          DECIMAL(11,7)        NULL,
-    [Longitude]         DECIMAL(11,7)        NULL,
+    [Latitude]          DECIMAL(9,6)         NULL,
+    [Longitude]         DECIMAL(9,6)         NULL,
     [IsDeleted]         BIT                 NOT NULL    DEFAULT 0,
     [DeletedAtUtc]      DATETIME2(7)        NULL,
     [CreatedAtUtc]      DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
@@ -427,19 +431,16 @@ CREATE TABLE [schedule].[Schedule]
 (
     [ScheduleId] BIGINT IDENTITY(1,1)    NOT NULL,
     [EditionId] BIGINT              NOT NULL,
-    [Status]                NVARCHAR(20)        NOT NULL    DEFAULT 'draft',
+    [Version]               INT                 NOT NULL    DEFAULT 1,
     [PublishedAtUtc]        DATETIME2(7)        NULL,
     [PublishedBy] BIGINT              NULL,
-    [Version]               INT                 NOT NULL    DEFAULT 1,
     [CreatedAtUtc]          DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
     [CreatedBy] BIGINT              NULL,
     [ModifiedAtUtc]         DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
     [ModifiedBy] BIGINT              NULL,
 
     CONSTRAINT [PK_Schedule] PRIMARY KEY CLUSTERED ([ScheduleId]),
-    CONSTRAINT [FK_Schedule_Edition] FOREIGN KEY ([EditionId]) REFERENCES [core].[FestivalEdition]([EditionId]),
-    CONSTRAINT [UQ_Schedule_Edition] UNIQUE ([EditionId]),
-    CONSTRAINT [CK_Schedule_Status] CHECK ([Status] IN ('draft', 'published'))
+    CONSTRAINT [FK_Schedule_Edition] FOREIGN KEY ([EditionId]) REFERENCES [core].[FestivalEdition]([EditionId])
 );
 ```
 
@@ -455,8 +456,7 @@ CREATE TABLE [schedule].[Engagement]
     [EngagementId] BIGINT IDENTITY(1,1)    NOT NULL,
     [TimeSlotId] BIGINT              NOT NULL,
     [ArtistId] BIGINT              NOT NULL,
-    [IsHeadliner]       BIT                 NOT NULL    DEFAULT 0,
-    [Notes]             NVARCHAR(500)       NULL,
+    [Notes]             NVARCHAR(MAX)       NULL,
     [IsDeleted]         BIT                 NOT NULL    DEFAULT 0,
     [DeletedAtUtc]      DATETIME2(7)        NULL,
     [CreatedAtUtc]      DATETIME2(7)        NOT NULL    DEFAULT SYSUTCDATETIME(),
@@ -466,10 +466,10 @@ CREATE TABLE [schedule].[Engagement]
 
     CONSTRAINT [PK_Engagement] PRIMARY KEY CLUSTERED ([EngagementId]),
     CONSTRAINT [FK_Engagement_TimeSlot] FOREIGN KEY ([TimeSlotId]) REFERENCES [venue].[TimeSlot]([TimeSlotId]),
-    CONSTRAINT [FK_Engagement_Artist] FOREIGN KEY ([ArtistId]) REFERENCES [core].[Artist]([ArtistId]),
-    CONSTRAINT [UQ_Engagement_TimeSlot] UNIQUE ([TimeSlotId])  -- One artist per time slot
+    CONSTRAINT [FK_Engagement_Artist] FOREIGN KEY ([ArtistId]) REFERENCES [core].[Artist]([ArtistId])
 );
 
+CREATE INDEX [IX_Engagement_TimeSlot] ON [schedule].[Engagement] ([TimeSlotId]) WHERE [IsDeleted] = 0;
 CREATE INDEX [IX_Engagement_Artist] ON [schedule].[Engagement] ([ArtistId]) WHERE [IsDeleted] = 0;
 ```
 

@@ -9,8 +9,8 @@ CREATE TABLE [venue].[Venue]
     [Name]                  NVARCHAR(200)           NOT NULL,
     [Description]           NVARCHAR(MAX)           NULL,
     [Address]               NVARCHAR(500)           NULL,
-    [Latitude]              DECIMAL(11, 7)          NULL,
-    [Longitude]             DECIMAL(11, 7)          NULL,
+    [Latitude]              DECIMAL(9, 6)           NULL,
+    [Longitude]             DECIMAL(9, 6)           NULL,
     [IsDeleted]             BIT                     NOT NULL    CONSTRAINT [DF_Venue_IsDeleted] DEFAULT (0),
     [DeletedAtUtc]          DATETIME2(7)            NULL,
     [CreatedAtUtc]          DATETIME2(7)            NOT NULL    CONSTRAINT [DF_Venue_CreatedAtUtc] DEFAULT (SYSUTCDATETIME()),
@@ -20,6 +20,8 @@ CREATE TABLE [venue].[Venue]
 
     CONSTRAINT [PK_Venue] PRIMARY KEY CLUSTERED ([VenueId]),
     CONSTRAINT [FK_Venue_Festival] FOREIGN KEY ([FestivalId]) REFERENCES [core].[Festival]([FestivalId]),
+    CONSTRAINT [FK_Venue_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_Venue_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [identity].[User]([UserId]),
     CONSTRAINT [CK_Venue_Latitude] CHECK ([Latitude] IS NULL OR ([Latitude] >= -90 AND [Latitude] <= 90)),
     CONSTRAINT [CK_Venue_Longitude] CHECK ([Longitude] IS NULL OR ([Longitude] >= -180 AND [Longitude] <= 180))
 );

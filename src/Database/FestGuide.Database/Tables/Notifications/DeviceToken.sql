@@ -19,6 +19,8 @@ CREATE TABLE [notifications].[DeviceToken]
 
     CONSTRAINT [PK_DeviceToken] PRIMARY KEY CLUSTERED ([DeviceTokenId]),
     CONSTRAINT [FK_DeviceToken_User] FOREIGN KEY ([UserId]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_DeviceToken_CreatedBy] FOREIGN KEY ([CreatedBy]) REFERENCES [identity].[User]([UserId]),
+    CONSTRAINT [FK_DeviceToken_ModifiedBy] FOREIGN KEY ([ModifiedBy]) REFERENCES [identity].[User]([UserId]),
     CONSTRAINT [CK_DeviceToken_Platform] CHECK ([Platform] IN ('ios', 'android', 'web'))
 );
 GO

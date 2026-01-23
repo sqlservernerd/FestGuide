@@ -37,3 +37,9 @@ CREATE NONCLUSTERED INDEX [IX_RefreshToken_ExpiresAtUtc]
     ON [identity].[RefreshToken]([ExpiresAtUtc])
     WHERE [IsRevoked] = 0;
 GO
+
+-- Index for token replacement chain lookups
+CREATE NONCLUSTERED INDEX [IX_RefreshToken_ReplacedByTokenId]
+    ON [identity].[RefreshToken]([ReplacedByTokenId])
+    WHERE [ReplacedByTokenId] IS NOT NULL;
+GO
