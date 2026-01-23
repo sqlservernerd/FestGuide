@@ -7,8 +7,6 @@ CREATE TABLE [schedule].[Engagement]
     [EngagementId]          UNIQUEIDENTIFIER    NOT NULL,
     [TimeSlotId]            UNIQUEIDENTIFIER    NOT NULL,
     [ArtistId]              UNIQUEIDENTIFIER    NOT NULL,
-    [IsHeadliner]           BIT                 NOT NULL    CONSTRAINT [DF_Engagement_IsHeadliner] DEFAULT (0),
-    [BillingOrder]          INT                 NULL,       -- Display order for multiple artists
     [Notes]                 NVARCHAR(MAX)       NULL,
     [IsDeleted]             BIT                 NOT NULL    CONSTRAINT [DF_Engagement_IsDeleted] DEFAULT (0),
     [DeletedAtUtc]          DATETIME2(7)        NULL,
