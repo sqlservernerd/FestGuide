@@ -16,7 +16,7 @@ CREATE TABLE [identity].[RefreshToken]
 
     CONSTRAINT [PK_RefreshToken] PRIMARY KEY CLUSTERED ([RefreshTokenId]),
     CONSTRAINT [FK_RefreshToken_User] FOREIGN KEY ([UserId]) REFERENCES [identity].[User]([UserId]),
-    CONSTRAINT [FK_RefreshToken_ReplacedByToken] FOREIGN KEY ([ReplacedByTokenId]) REFERENCES [identity].[RefreshToken]([RefreshTokenId])
+    CONSTRAINT [FK_RefreshToken_ReplacedByToken] FOREIGN KEY ([ReplacedByTokenId]) REFERENCES [identity].[RefreshToken]([RefreshTokenId]) ON DELETE SET NULL
 );
 GO
 

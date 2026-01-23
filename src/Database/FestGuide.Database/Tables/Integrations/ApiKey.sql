@@ -46,3 +46,14 @@ CREATE NONCLUSTERED INDEX [IX_ApiKey_ExpiresAtUtc]
     ON [integrations].[ApiKey]([ExpiresAtUtc])
     WHERE [IsRevoked] = 0 AND [ExpiresAtUtc] IS NOT NULL;
 GO
+
+-- Index for API keys created by user
+CREATE NONCLUSTERED INDEX [IX_ApiKey_CreatedBy]
+    ON [integrations].[ApiKey]([CreatedBy]);
+GO
+
+-- Index for API keys revoked by user
+CREATE NONCLUSTERED INDEX [IX_ApiKey_RevokedBy]
+    ON [integrations].[ApiKey]([RevokedBy])
+    WHERE [RevokedBy] IS NOT NULL;
+GO

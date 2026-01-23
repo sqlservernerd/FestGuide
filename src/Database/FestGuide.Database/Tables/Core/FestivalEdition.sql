@@ -22,7 +22,7 @@ CREATE TABLE [core].[FestivalEdition]
     CONSTRAINT [PK_FestivalEdition] PRIMARY KEY CLUSTERED ([EditionId]),
     CONSTRAINT [FK_FestivalEdition_Festival] FOREIGN KEY ([FestivalId]) REFERENCES [core].[Festival]([FestivalId]),
     CONSTRAINT [CK_FestivalEdition_Status] CHECK ([Status] IN (0, 1, 2)),
-    CONSTRAINT [CK_FestivalEdition_Dates] CHECK ([EndDateUtc] >= [StartDateUtc])
+    CONSTRAINT [CK_FestivalEdition_Dates] CHECK ([EndDateUtc] > [StartDateUtc])
 );
 GO
 

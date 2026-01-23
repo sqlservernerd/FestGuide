@@ -21,9 +21,14 @@ CREATE TABLE [identity].[User]
     [ModifiedAtUtc]         DATETIME2(7)        NOT NULL    CONSTRAINT [DF_User_ModifiedAtUtc] DEFAULT (SYSUTCDATETIME()),
     [ModifiedBy]            UNIQUEIDENTIFIER    NULL,
 
-    CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED ([UserId]),
-    CONSTRAINT [UQ_User_EmailNormalized] UNIQUE ([EmailNormalized])
+    CONSTRAINT [PK_User] PRIMARY KEY CLUSTERED ([UserId])
 );
+GO
+
+-- Unique constraint: one active email per user (allows reuse of deleted user emails)
+CREATE UNIQUE NONCLUSTERED INDEX [UQ_User_EmailNormalized]
+    ON [identity].[User]([EmailNormalized])
+    WHERE [IsDeleted] = 0;
 GO
 
 -- Index for login lookups

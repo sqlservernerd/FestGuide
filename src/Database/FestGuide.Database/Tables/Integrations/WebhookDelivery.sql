@@ -5,7 +5,7 @@
 CREATE TABLE [integrations].[WebhookDelivery]
 (
     [WebhookDeliveryId]     UNIQUEIDENTIFIER    NOT NULL,
-    [WebhookSubscriptionId] UNIQUEIDENTIFIER    NOT NULL,
+    [WebhookSubscriptionId] UNIQUEIDENTIFIER    NULL,
     [EventType]             NVARCHAR(100)       NOT NULL,   -- 'schedule.published', 'artist.updated', etc.
     [Payload]               NVARCHAR(MAX)       NOT NULL,   -- JSON payload sent
     [ResponseStatusCode]    INT                 NULL,
@@ -17,7 +17,7 @@ CREATE TABLE [integrations].[WebhookDelivery]
     [CreatedAtUtc]          DATETIME2(7)        NOT NULL    CONSTRAINT [DF_WebhookDelivery_CreatedAtUtc] DEFAULT (SYSUTCDATETIME()),
 
     CONSTRAINT [PK_WebhookDelivery] PRIMARY KEY CLUSTERED ([WebhookDeliveryId]),
-    CONSTRAINT [FK_WebhookDelivery_WebhookSubscription] FOREIGN KEY ([WebhookSubscriptionId]) REFERENCES [integrations].[WebhookSubscription]([WebhookSubscriptionId])
+    CONSTRAINT [FK_WebhookDelivery_WebhookSubscription] FOREIGN KEY ([WebhookSubscriptionId]) REFERENCES [integrations].[WebhookSubscription]([WebhookSubscriptionId]) ON DELETE SET NULL
 );
 GO
 

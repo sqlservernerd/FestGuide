@@ -40,8 +40,8 @@ CREATE NONCLUSTERED INDEX [IX_FestivalPermission_FestivalId]
     WHERE [IsRevoked] = 0;
 GO
 
--- Unique constraint: one permission per user per festival
-CREATE UNIQUE NONCLUSTERED INDEX [UQ_FestivalPermission_FestivalId_UserId]
-    ON [permissions].[FestivalPermission]([FestivalId], [UserId])
-    WHERE [IsRevoked] = 0;
+-- Index for invited by user lookups
+CREATE NONCLUSTERED INDEX [IX_FestivalPermission_InvitedByUserId]
+    ON [permissions].[FestivalPermission]([InvitedByUserId])
+    WHERE [InvitedByUserId] IS NOT NULL;
 GO
