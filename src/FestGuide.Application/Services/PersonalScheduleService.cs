@@ -175,7 +175,6 @@ public class PersonalScheduleService : IPersonalScheduleService
         var now = _dateTimeProvider.UtcNow;
         var schedule = new PersonalSchedule
         {
-            PersonalScheduleId = 0,
             UserId = userId,
             EditionId = request.EditionId,
             Name = request.Name ?? (isFirstSchedule ? "My Schedule" : $"Schedule {existingSchedules.Count + 1}"),
@@ -287,7 +286,6 @@ public class PersonalScheduleService : IPersonalScheduleService
         var now = _dateTimeProvider.UtcNow;
         var entry = new PersonalScheduleEntry
         {
-            PersonalScheduleEntryId = 0,
             PersonalScheduleId = personalScheduleId,
             EngagementId = request.EngagementId,
             Notes = request.Notes,

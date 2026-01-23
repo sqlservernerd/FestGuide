@@ -73,7 +73,6 @@ public class ArtistService : IArtistService
         var now = _dateTimeProvider.UtcNow;
         var artist = new Artist
         {
-            ArtistId = 0,
             FestivalId = festivalId,
             Name = request.Name,
             Genre = request.Genre,

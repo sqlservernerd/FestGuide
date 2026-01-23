@@ -64,7 +64,6 @@ public class AnalyticsService : IAnalyticsService
 
         var analyticsEvent = new AnalyticsEvent
         {
-            AnalyticsEventId = 0,
             UserId = userId,
             FestivalId = festivalId,
             EditionId = request.EditionId,

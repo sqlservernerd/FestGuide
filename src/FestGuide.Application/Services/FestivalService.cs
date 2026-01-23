@@ -63,7 +63,6 @@ public class FestivalService : IFestivalService
         var now = _dateTimeProvider.UtcNow;
         var festival = new Festival
         {
-            FestivalId = 0,
             Name = request.Name,
             Description = request.Description,
             ImageUrl = request.ImageUrl,
@@ -81,7 +80,6 @@ public class FestivalService : IFestivalService
         // Create owner permission
         var permission = new FestivalPermission
         {
-            FestivalPermissionId = 0,
             FestivalId = festival.FestivalId,
             UserId = userId,
             Role = FestivalRole.Owner,

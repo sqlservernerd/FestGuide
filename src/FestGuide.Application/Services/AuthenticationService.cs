@@ -63,7 +63,6 @@ public class AuthenticationService : IAuthenticationService
         var now = _dateTimeProvider.UtcNow;
         var user = new User
         {
-            UserId = 0,
             Email = request.Email,
             EmailNormalized = request.Email.ToLowerInvariant(),
             EmailVerified = false,
@@ -142,7 +141,6 @@ public class AuthenticationService : IAuthenticationService
         var newRefreshToken = _jwtTokenService.GenerateRefreshToken();
         var newTokenEntity = new RefreshToken
         {
-            RefreshTokenId = 0,
             UserId = user.UserId,
             TokenHash = _jwtTokenService.HashRefreshToken(newRefreshToken),
             ExpiresAtUtc = _jwtTokenService.GetRefreshTokenExpiration(),
@@ -254,7 +252,6 @@ public class AuthenticationService : IAuthenticationService
         var rawToken = _jwtTokenService.GenerateRefreshToken();
         var tokenEntity = new PasswordResetToken
         {
-            TokenId = 0,
             UserId = user.UserId,
             TokenHash = _jwtTokenService.HashRefreshToken(rawToken),
             ExpiresAtUtc = now.AddHours(PasswordResetTokenExpirationHours),
@@ -313,7 +310,6 @@ public class AuthenticationService : IAuthenticationService
         var rawToken = _jwtTokenService.GenerateRefreshToken();
         var tokenEntity = new EmailVerificationToken
         {
-            TokenId = 0,
             UserId = user.UserId,
             TokenHash = _jwtTokenService.HashRefreshToken(rawToken),
             ExpiresAtUtc = now.AddHours(EmailVerificationTokenExpirationHours),
@@ -333,7 +329,6 @@ public class AuthenticationService : IAuthenticationService
 
         var tokenEntity = new RefreshToken
         {
-            RefreshTokenId = 0,
             UserId = user.UserId,
             TokenHash = _jwtTokenService.HashRefreshToken(refreshToken),
             ExpiresAtUtc = refreshTokenExpiry,

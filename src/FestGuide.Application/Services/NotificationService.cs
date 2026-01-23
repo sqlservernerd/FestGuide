@@ -49,7 +49,6 @@ public class NotificationService : INotificationService
         var now = _dateTimeProvider.UtcNow;
         var deviceToken = new DeviceToken
         {
-            DeviceTokenId = 0,
             UserId = userId,
             Token = request.Token,
             Platform = request.Platform.ToLowerInvariant(),
@@ -121,7 +120,6 @@ public class NotificationService : INotificationService
 
         var prefs = existing ?? new NotificationPreference
         {
-            NotificationPreferenceId = 0,
             UserId = userId,
             CreatedAtUtc = now,
             CreatedBy = userId
@@ -232,7 +230,6 @@ public class NotificationService : INotificationService
         {
             var log = new NotificationLog
             {
-                NotificationLogId = 0,
                 UserId = userId,
                 DeviceTokenId = device.DeviceTokenId,
                 NotificationType = notificationType,

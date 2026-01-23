@@ -79,7 +79,6 @@ public class VenueService : IVenueService
         var now = _dateTimeProvider.UtcNow;
         var venue = new Venue
         {
-            VenueId = 0,
             FestivalId = festivalId,
             Name = request.Name,
             Description = request.Description,
@@ -232,7 +231,6 @@ public class VenueService : IVenueService
         var now = _dateTimeProvider.UtcNow;
         var stage = new Stage
         {
-            StageId = 0,
             VenueId = venueId,
             Name = request.Name,
             Description = request.Description,

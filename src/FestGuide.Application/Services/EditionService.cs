@@ -73,7 +73,6 @@ public class EditionService : IEditionService
         var now = _dateTimeProvider.UtcNow;
         var edition = new FestivalEdition
         {
-            EditionId = 0,
             FestivalId = festivalId,
             Name = request.Name,
             StartDateUtc = request.StartDateUtc,

@@ -229,7 +229,6 @@ public class ScheduleService : IScheduleService
         var now = _dateTimeProvider.UtcNow;
         var timeSlot = new TimeSlot
         {
-            TimeSlotId = 0,
             StageId = stageId,
             EditionId = request.EditionId,
             StartTimeUtc = request.StartTimeUtc,
@@ -343,7 +342,6 @@ public class ScheduleService : IScheduleService
         var now = _dateTimeProvider.UtcNow;
         var engagement = new Engagement
         {
-            EngagementId = 0,
             TimeSlotId = timeSlotId,
             ArtistId = request.ArtistId,
             Notes = request.Notes,

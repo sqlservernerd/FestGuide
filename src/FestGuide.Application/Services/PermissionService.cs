@@ -152,7 +152,6 @@ public class PermissionService : IPermissionService
             // Create the permission first
             var permission = new FestivalPermission
             {
-                FestivalPermissionId = 0,
                 FestivalId = festivalId,
                 UserId = invitedUserId,
                 Role = request.Role,
