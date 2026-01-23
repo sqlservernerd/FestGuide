@@ -1,10 +1,10 @@
-# 🎵 FestGuide - Coding Standards
+# 🎵 FestConnect - Coding Standards
 
 ---
 
 ## Document Control
 
-| **Document Title** | FestGuide - Coding Standards |
+| **Document Title** | FestConnect - Coding Standards |
 |---|---|
 | **Version** | 1.0 |
 | **Date** | 2026-01-20 |
@@ -18,11 +18,11 @@
 
 ### 1.1 Purpose
 
-This document establishes coding standards and conventions for the FestGuide project to ensure consistency, maintainability, and quality across the codebase.
+This document establishes coding standards and conventions for the FestConnect project to ensure consistency, maintainability, and quality across the codebase.
 
 ### 1.2 Scope
 
-These standards apply to all code in the FestGuide solution:
+These standards apply to all code in the FestConnect solution:
 - C# (.NET 10)
 - SQL Server (T-SQL)
 - XAML (.NET MAUI)
@@ -46,7 +46,7 @@ These standards apply to all code in the FestGuide solution:
 
 | **Element** | **Convention** | **Example** |
 |---|---|---|
-| Namespaces | PascalCase | `FestGuide.Application.Services` |
+| Namespaces | PascalCase | `FestConnect.Application.Services` |
 | Classes | PascalCase | `FestivalService` |
 | Interfaces | IPascalCase | `IFestivalRepository` |
 | Methods | PascalCase | `GetFestivalByIdAsync` |
@@ -88,7 +88,7 @@ Each file should contain a single public type:
 
 ```csharp
 // FestivalService.cs
-namespace FestGuide.Application.Services;
+namespace FestConnect.Application.Services;
 
 public class FestivalService : IFestivalService
 {
@@ -147,8 +147,8 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 
-using FestGuide.Domain.Entities;
-using FestGuide.Domain.Exceptions;
+using FestConnect.Domain.Entities;
+using FestConnect.Domain.Exceptions;
 ```
 
 ### 2.6 Null Handling
@@ -672,16 +672,16 @@ public async Task GetFestivalAsync_WithInvalidId_ThrowsNotFoundException()
 
 ```
 tests/
-├── FestGuide.Application.Tests/
+├── FestConnect.Application.Tests/
 │   ├── Services/
 │   │   ├── FestivalServiceTests.cs
 │   │   └── ScheduleServiceTests.cs
 │   └── Validators/
 │       └── CreateFestivalRequestValidatorTests.cs
-├── FestGuide.Api.Tests/
+├── FestConnect.Api.Tests/
 │   └── Controllers/
 │       └── FestivalsControllerTests.cs
-└── FestGuide.Integration.Tests/
+└── FestConnect.Integration.Tests/
     └── Endpoints/
         └── FestivalEndpointTests.cs
 ```
@@ -821,7 +821,7 @@ if (!await _authService.CanEditFestivalAsync(userId, festivalId, ct))
 var connectionString = _configuration.GetConnectionString("DefaultConnection");
 
 // ✗ Bad: Hardcoded secrets
-var connectionString = "Server=prod;Database=FestGuide;User=admin;Password=secret123";
+var connectionString = "Server=prod;Database=FestConnect;User=admin;Password=secret123";
 ```
 
 ---

@@ -10,7 +10,7 @@
 
 ## Context
 
-FestGuide is a mobile-first platform designed to deliver an exceptional experience for music festival attendees. The platform must:
+FestConnect is a mobile-first platform designed to deliver an exceptional experience for music festival attendees. The platform must:
 
 - Support **initial launch** with 1 festival (2,000-5,000 attendees)
 - Scale to **400,000 concurrent users** within a 2-year horizon

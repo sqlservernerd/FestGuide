@@ -1,10 +1,10 @@
-# 🎵 FestGuide - Requirements Document
+# 🎵 FestConnect - Requirements Document
 
 ---
 
 ## Document Control
 
-| **Document Title** | FestGuide - Requirements Document |
+| **Document Title** | FestConnect - Requirements Document |
 |---|---|
 | **Version** | 1.0 |
 | **Date** | 2026-01-20 |
@@ -18,11 +18,11 @@
 
 ### 1.1 Purpose
 
-This document defines the functional and non-functional requirements for FestGuide, a mobile-first platform designed to deliver an exceptional experience for music festival attendees. It serves as the authoritative source for what the system must do and how it must perform.
+This document defines the functional and non-functional requirements for FestConnect, a mobile-first platform designed to deliver an exceptional experience for music festival attendees. It serves as the authoritative source for what the system must do and how it must perform.
 
 ### 1.2 Scope
 
-FestGuide enables:
+FestConnect enables:
 - **Attendees** to discover festivals, build personalized schedules, and receive real-time notifications
 - **Organizers** to publish festival data and integrate with their websites and social media
 

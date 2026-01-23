@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\FestConnect.Domain\FestConnect.Domain.csproj" />
+    <ProjectReference Include="..\FestConnect.DataAccess.Abstractions\FestConnect.DataAccess.Abstractions.csproj" />
+    <ProjectReference Include="..\FestConnect.Security\FestConnect.Security.csproj" />
+    <ProjectReference Include="..\FestConnect.Infrastructure\FestConnect.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

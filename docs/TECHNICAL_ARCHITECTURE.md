@@ -1,10 +1,10 @@
-# 🎵 FestGuide - Technical Architecture Document
+# 🎵 FestConnect - Technical Architecture Document
 
 ---
 
 ## Document Control
 
-| **Document Title** | FestGuide - Technical Architecture Document |
+| **Document Title** | FestConnect - Technical Architecture Document |
 |---|---|
 | **Version** | 1.1 |
 | **Date** | 2026-01-20 |
@@ -23,7 +23,7 @@
 
 ### 1.1 Purpose
 
-This document describes the technical architecture for FestGuide, a mobile-first platform for music festival attendees. It provides a comprehensive view of the system's structure, components, and technical decisions.
+This document describes the technical architecture for FestConnect, a mobile-first platform for music festival attendees. It provides a comprehensive view of the system's structure, components, and technical decisions.
 
 ### 1.2 Scope
 
@@ -139,26 +139,26 @@ This architecture supports:
 ### 4.1 Project Organization
 
 ```
-FestGuide.sln
+FestConnect.sln
 │
 ├── src/
-│   ├── FestGuide.Presentation.Maui/        # .NET MAUI (iOS, Android, Web)
-│   ├── FestGuide.Api/                      # ASP.NET Web API (Interface Layer)
-│   ├── FestGuide.Application/              # Business Logic (Application Layer)
-│   ├── FestGuide.DataAccess/               # Dapper Repositories (Data Access Layer)
-│   ├── FestGuide.DataAccess.Abstractions/  # Interfaces for DB portability
-│   ├── FestGuide.Domain/                   # Domain Entities, Enums, Exceptions
-│   ├── FestGuide.Infrastructure/           # Cross-cutting: Caching, Logging, Firebase
-│   ├── FestGuide.Security/                 # Cross-cutting: Security utilities
-│   ├── FestGuide.Integrations/             # Webhooks, widgets, social sharing
-│   └── FestGuide.Database/                 # SQL Server Database Project (SSDT)
+│   ├── FestConnect.Presentation.Maui/        # .NET MAUI (iOS, Android, Web)
+│   ├── FestConnect.Api/                      # ASP.NET Web API (Interface Layer)
+│   ├── FestConnect.Application/              # Business Logic (Application Layer)
+│   ├── FestConnect.DataAccess/               # Dapper Repositories (Data Access Layer)
+│   ├── FestConnect.DataAccess.Abstractions/  # Interfaces for DB portability
+│   ├── FestConnect.Domain/                   # Domain Entities, Enums, Exceptions
+│   ├── FestConnect.Infrastructure/           # Cross-cutting: Caching, Logging, Firebase
+│   ├── FestConnect.Security/                 # Cross-cutting: Security utilities
+│   ├── FestConnect.Integrations/             # Webhooks, widgets, social sharing
+│   └── FestConnect.Database/                 # SQL Server Database Project (SSDT)
 │
 ├── tests/
-│   ├── FestGuide.Api.Tests/                # API endpoint unit tests
-│   ├── FestGuide.Application.Tests/        # Business logic unit tests
-│   ├── FestGuide.DataAccess.Tests/         # Repository integration tests
-│   ├── FestGuide.Integrations.Tests/       # Integration feature tests
-│   └── FestGuide.Integration.Tests/        # End-to-end integration tests
+│   ├── FestConnect.Api.Tests/                # API endpoint unit tests
+│   ├── FestConnect.Application.Tests/        # Business logic unit tests
+│   ├── FestConnect.DataAccess.Tests/         # Repository integration tests
+│   ├── FestConnect.Integrations.Tests/       # Integration feature tests
+│   └── FestConnect.Integration.Tests/        # End-to-end integration tests
 │
 └── docs/
     ├── PROJECT_CHARTER.md
@@ -170,27 +170,27 @@ FestGuide.sln
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    FestGuide.Presentation.Maui                   │
+│                    FestConnect.Presentation.Maui                   │
 │                              │                                   │
 │                              ▼                                   │
-│                       FestGuide.Api ◄──────────────────────────┐│
+│                       FestConnect.Api ◄──────────────────────────┐│
 │                              │                                  ││
 │                              ▼                                  ││
-│                    FestGuide.Application                        ││
+│                    FestConnect.Application                        ││
 │                         │         │                             ││
 │            ┌────────────┘         └────────────┐                ││
 │            ▼                                   ▼                ││
-│   FestGuide.DataAccess              FestGuide.Infrastructure    ││
+│   FestConnect.DataAccess              FestConnect.Infrastructure    ││
 │            │                                   │                ││
 │            ▼                                   │                ││
-│   FestGuide.DataAccess.Abstractions           │                ││
+│   FestConnect.DataAccess.Abstractions           │                ││
 │            │                                   │                ││
 │            └───────────────┬───────────────────┘                ││
 │                            ▼                                    ││
-│                     FestGuide.Domain                            ││
+│                     FestConnect.Domain                            ││
 │                            │                                    ││
 │                            ▼                                    ││
-│                    FestGuide.Security ──────────────────────────┘│
+│                    FestConnect.Security ──────────────────────────┘│
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -539,7 +539,7 @@ public interface ITimezoneService
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   Organizer     │     │   FestGuide     │     │   Organizer     │
+│   Organizer     │     │   FestConnect     │     │   Organizer     │
 │   Website       │────►│   Public API    │◄────│   Mobile App    │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
                                │
@@ -554,15 +554,15 @@ public interface ITimezoneService
 ┌─────────────────────────────────────────────────────────────────┐
 │                    Organizer Website                             │
 │  ┌───────────────────────────────────────────────────────────┐  │
-│  │  <script src="https://festguide.app/widget.js"></script>  │  │
-│  │  <div data-festguide-widget="schedule"                    │  │
+│  │  <script src="https://FestConnect.app/widget.js"></script>  │  │
+│  │  <div data-FestConnect-widget="schedule"                    │  │
 │  │       data-edition-id="abc123"></div>                     │  │
 │  └───────────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
                                │
                                ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    FestGuide Widget Service                      │
+│                    FestConnect Widget Service                      │
 │  • Lightweight JavaScript                                        │
 │  • Fetches data from Public API                                 │
 │  • Renders schedule in iframe or shadow DOM                     │
@@ -575,7 +575,7 @@ public interface ITimezoneService
 
 ```
 ┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│   FestGuide     │     │    Firebase     │     │   Mobile        │
+│   FestConnect     │     │    Firebase     │     │   Mobile        │
 │   API           │────►│    FCM          │────►│   Device        │
 └─────────────────┘     └─────────────────┘     └─────────────────┘
         │

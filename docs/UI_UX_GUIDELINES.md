@@ -1,10 +1,10 @@
-# 🎵 FestGuide - UI/UX Guidelines
+# 🎵 FestConnect - UI/UX Guidelines
 
 ---
 
 ## Document Control
 
-| **Document Title** | FestGuide - UI/UX Guidelines |
+| **Document Title** | FestConnect - UI/UX Guidelines |
 |---|---|
 | **Version** | 1.0 |
 | **Date** | 2026-01-20 |
@@ -18,7 +18,7 @@
 
 ### 1.1 Purpose
 
-This document establishes UI/UX guidelines for FestGuide to ensure a consistent, accessible, and user-friendly experience across all platforms (iOS, Android, Web).
+This document establishes UI/UX guidelines for FestConnect to ensure a consistent, accessible, and user-friendly experience across all platforms (iOS, Android, Web).
 
 ### 1.2 Design Principles
 
@@ -526,7 +526,7 @@ SemanticScreenReader.Announce("Artist added to your schedule");
 
 ```
 ┌────────────────────────────────────────────────────┐
-│ 📱 FestGuide                                       │
+│ 📱 FestConnect                                       │
 │                                                    │
 │ Schedule Change Alert                              │
 │ The Headliners moved to Main Stage, 9 PM          │

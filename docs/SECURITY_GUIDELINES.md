@@ -1,10 +1,10 @@
-# 🎵 FestGuide - Security Guidelines
+# 🎵 FestConnect - Security Guidelines
 
 ---
 
 ## Document Control
 
-| **Document Title** | FestGuide - Security Guidelines |
+| **Document Title** | FestConnect - Security Guidelines |
 |---|---|
 | **Version** | 1.0 |
 | **Date** | 2026-01-20 |
@@ -18,7 +18,7 @@
 
 ### 1.1 Purpose
 
-This document establishes security requirements, guidelines, and best practices for the FestGuide platform. Security is a critical cross-cutting concern that applies to all layers of the application.
+This document establishes security requirements, guidelines, and best practices for the FestConnect platform. Security is a critical cross-cutting concern that applies to all layers of the application.
 
 ### 1.2 Security Principles
 
@@ -110,8 +110,8 @@ public class PasswordHasher : IPasswordHasher
 public class JwtSettings
 {
     public string SecretKey { get; set; }      // 256-bit minimum
-    public string Issuer { get; set; }          // https://api.festguide.com
-    public string Audience { get; set; }        // https://festguide.com
+    public string Issuer { get; set; }          // https://api.FestConnect.com
+    public string Audience { get; set; }        // https://FestConnect.com
     public int AccessTokenExpiryMinutes { get; set; } = 15;
     public int RefreshTokenExpiryDays { get; set; } = 7;
 }
@@ -321,9 +321,9 @@ services.AddCors(options =>
     options.AddPolicy("Production", policy =>
     {
         policy.WithOrigins(
-                "https://festguide.com",
-                "https://www.festguide.com",
-                "https://app.festguide.com")
+                "https://FestConnect.com",
+                "https://www.FestConnect.com",
+                "https://app.FestConnect.com")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();

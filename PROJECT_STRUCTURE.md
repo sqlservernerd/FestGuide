@@ -1,6 +1,6 @@
-# FestGuide Project Structure
+# FestConnect Project Structure
 
-This document describes the layered architecture of the FestGuide solution.
+This document describes the layered architecture of the FestConnect solution.
 
 ## Overview
 
@@ -9,8 +9,8 @@ The solution follows a clean architecture pattern with clear separation of conce
 ## Directory Structure
 
 ```
-FestGuide/
-├── FestGuide.sln              # Solution file at root
+FestConnect/
+├── FestConnect.sln              # Solution file at root
 ├── .gitignore                 # Git ignore rules
 ├── .editorconfig              # Code style configuration
 ├── Directory.Build.props      # Common MSBuild properties
@@ -20,37 +20,37 @@ FestGuide/
 │
 ├── src/                       # Source code
 │   ├── Presentation/         # UI Layer
-│   │   └── FestGuide.Presentation.Maui/   # .NET MAUI app
+│   │   └── FestConnect.Presentation.Maui/   # .NET MAUI app
 │   │
 │   ├── Interface/            # API Layer
-│   │   └── FestGuide.Api/                 # ASP.NET Web API
+│   │   └── FestConnect.Api/                 # ASP.NET Web API
 │   │
 │   ├── Application/          # Business Logic Layer
-│   │   └── FestGuide.Application/         # Application services
+│   │   └── FestConnect.Application/         # Application services
 │   │
 │   ├── DataAccess/          # Data Access Layer
-│   │   ├── FestGuide.DataAccess/          # Dapper repositories
-│   │   └── FestGuide.DataAccess.Abstractions/  # DB interfaces
+│   │   ├── FestConnect.DataAccess/          # Dapper repositories
+│   │   └── FestConnect.DataAccess.Abstractions/  # DB interfaces
 │   │
 │   ├── Domain/              # Domain Layer
-│   │   └── FestGuide.Domain/              # Entities, enums, exceptions
+│   │   └── FestConnect.Domain/              # Entities, enums, exceptions
 │   │
 │   ├── Infrastructure/      # Cross-cutting Concerns
-│   │   ├── FestGuide.Infrastructure/      # Caching, logging, Firebase
-│   │   └── FestGuide.Security/            # Security utilities
+│   │   ├── FestConnect.Infrastructure/      # Caching, logging, Firebase
+│   │   └── FestConnect.Security/            # Security utilities
 │   │
 │   ├── Integrations/        # External Integrations
-│   │   └── FestGuide.Integrations/        # Webhooks, widgets, social
+│   │   └── FestConnect.Integrations/        # Webhooks, widgets, social
 │   │
 │   └── Database/            # Database
-│       └── FestGuide.Database/            # SQL Server SSDT project
+│       └── FestConnect.Database/            # SQL Server SSDT project
 │
 ├── tests/                    # Test projects (flat structure)
-│   ├── FestGuide.Api.Tests/
-│   ├── FestGuide.Application.Tests/
-│   ├── FestGuide.DataAccess.Tests/
-│   ├── FestGuide.Integrations.Tests/
-│   └── FestGuide.Integration.Tests/
+│   ├── FestConnect.Api.Tests/
+│   ├── FestConnect.Application.Tests/
+│   ├── FestConnect.DataAccess.Tests/
+│   ├── FestConnect.Integrations.Tests/
+│   └── FestConnect.Integration.Tests/
 │
 └── docs/                     # Documentation
     ├── PROJECT_CHARTER.md
@@ -63,72 +63,72 @@ FestGuide/
 ### Presentation Layer
 - **Technology**: .NET MAUI (Blazor Hybrid)
 - **Purpose**: UI/UX, offline storage, sync engine, local caching, timezone display
-- **Projects**: FestGuide.Presentation.Maui
+- **Projects**: FestConnect.Presentation.Maui
 
 ### Interface Layer
 - **Technology**: ASP.NET Web API
 - **Purpose**: REST endpoints, JWT validation, CORS, DTOs, validation, rate limiting
-- **Projects**: FestGuide.Api
+- **Projects**: FestConnect.Api
 
 ### Application Layer
 - **Technology**: .NET Class Library
 - **Purpose**: Business logic, orchestration, authorization, timezone conversion
-- **Projects**: FestGuide.Application
+- **Projects**: FestConnect.Application
 
 ### Data Access Layer
 - **Technology**: Dapper + Repository Pattern
 - **Purpose**: Database operations, caching, data abstraction
-- **Projects**: FestGuide.DataAccess, FestGuide.DataAccess.Abstractions
+- **Projects**: FestConnect.DataAccess, FestConnect.DataAccess.Abstractions
 
 ### Domain Layer
 - **Technology**: .NET Class Library
 - **Purpose**: Core domain entities, enums, exceptions, business rules
-- **Projects**: FestGuide.Domain
+- **Projects**: FestConnect.Domain
 
 ### Infrastructure Layer
 - **Technology**: .NET Class Libraries
 - **Purpose**: Cross-cutting concerns (logging, caching, security)
-- **Projects**: FestGuide.Infrastructure, FestGuide.Security
+- **Projects**: FestConnect.Infrastructure, FestConnect.Security
 
 ### Integrations Layer
 - **Technology**: .NET Class Library
 - **Purpose**: External integrations, webhooks, widgets, social sharing
-- **Projects**: FestGuide.Integrations
+- **Projects**: FestConnect.Integrations
 
 ### Database Layer
 - **Technology**: SQL Server Database Project (SSDT)
 - **Purpose**: Database schema, stored procedures, migrations
-- **Projects**: FestGuide.Database
+- **Projects**: FestConnect.Database
 
 ## Project Dependencies
 
 ```
-FestGuide.Presentation.Maui
-  └── FestGuide.Application
+FestConnect.Presentation.Maui
+  └── FestConnect.Application
 
-FestGuide.Api
-  ├── FestGuide.Application
-  ├── FestGuide.Infrastructure
-  └── FestGuide.Security
+FestConnect.Api
+  ├── FestConnect.Application
+  ├── FestConnect.Infrastructure
+  └── FestConnect.Security
 
-FestGuide.Application
-  ├── FestGuide.Domain
-  └── FestGuide.DataAccess.Abstractions
+FestConnect.Application
+  ├── FestConnect.Domain
+  └── FestConnect.DataAccess.Abstractions
 
-FestGuide.DataAccess
-  ├── FestGuide.Domain
-  └── FestGuide.DataAccess.Abstractions
+FestConnect.DataAccess
+  ├── FestConnect.Domain
+  └── FestConnect.DataAccess.Abstractions
 
-FestGuide.Infrastructure
+FestConnect.Infrastructure
   (no dependencies)
 
-FestGuide.Security
+FestConnect.Security
   (no dependencies)
 
-FestGuide.Integrations
+FestConnect.Integrations
   (no dependencies)
 
-FestGuide.Domain
+FestConnect.Domain
   (no dependencies)
 ```
 
@@ -143,16 +143,16 @@ FestGuide.Domain
 
 ```bash
 # Restore packages
-dotnet restore FestGuide.sln
+dotnet restore FestConnect.sln
 
 # Build all projects (except MAUI and Database without workloads)
-dotnet build FestGuide.sln
+dotnet build FestConnect.sln
 
 # Build specific project
-dotnet build src/Interface/FestGuide.Api/FestGuide.Api.csproj
+dotnet build src/Interface/FestConnect.Api/FestConnect.Api.csproj
 
 # Run tests
-dotnet test FestGuide.sln
+dotnet test FestConnect.sln
 ```
 
 ## Central Package Management

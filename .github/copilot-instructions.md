@@ -1,10 +1,10 @@
-# GitHub Copilot Instructions for FestGuide
+# GitHub Copilot Instructions for FestConnect
 
-This file provides context and guidelines for GitHub Copilot when working with the FestGuide codebase.
+This file provides context and guidelines for GitHub Copilot when working with the FestConnect codebase.
 
 ## Project Overview
 
-FestGuide is a festival and events guide application built with .NET 10, featuring:
+FestConnect is a festival and events guide application built with .NET 10, featuring:
 - **Backend**: ASP.NET Web API with JWT authentication
 - **Frontend**: .NET MAUI (Blazor Hybrid) for cross-platform mobile
 - **Database**: SQL Server with Dapper ORM
@@ -17,23 +17,23 @@ The solution follows a clean architecture pattern with clear layer separation:
 ```
 src/
 ├── Presentation/              # .NET MAUI Blazor Hybrid UI
-│   └── FestGuide.Presentation.Maui/
+│   └── FestConnect.Presentation.Maui/
 ├── Interface/                 # REST API endpoints
-│   └── FestGuide.Api/
+│   └── FestConnect.Api/
 ├── Application/               # Business logic, services
-│   └── FestGuide.Application/
+│   └── FestConnect.Application/
 ├── DataAccess/               # Dapper repositories
-│   ├── FestGuide.DataAccess/
-│   └── FestGuide.DataAccess.Abstractions/
+│   ├── FestConnect.DataAccess/
+│   └── FestConnect.DataAccess.Abstractions/
 ├── Domain/                   # Core entities, enums, exceptions
-│   └── FestGuide.Domain/
+│   └── FestConnect.Domain/
 ├── Infrastructure/           # Cross-cutting concerns
-│   ├── FestGuide.Infrastructure/
-│   └── FestGuide.Security/
+│   ├── FestConnect.Infrastructure/
+│   └── FestConnect.Security/
 ├── Integrations/             # External integrations
-│   └── FestGuide.Integrations/
+│   └── FestConnect.Integrations/
 └── Database/                 # SQL Server SSDT project
-    └── FestGuide.Database/
+    └── FestConnect.Database/
 ```
 
 ### Layer Dependencies
@@ -49,7 +49,7 @@ src/
 
 | Element | Convention | Example |
 |---------|-----------|---------|
-| Namespaces | PascalCase | `FestGuide.Application.Services` |
+| Namespaces | PascalCase | `FestConnect.Application.Services` |
 | Classes | PascalCase | `FestivalService` |
 | Interfaces | IPascalCase | `IFestivalRepository` |
 | Methods | PascalCase | `GetFestivalByIdAsync` |
@@ -316,19 +316,19 @@ _logger.LogInformation($"Festival {festival.FestivalId} created");
 
 ```bash
 # Restore packages
-dotnet restore FestGuide.sln
+dotnet restore FestConnect.sln
 
 # Build all projects
-dotnet build FestGuide.sln
+dotnet build FestConnect.sln
 
 # Build specific project
-dotnet build src/Interface/FestGuide.Api/FestGuide.Api.csproj
+dotnet build src/Interface/FestConnect.Api/FestConnect.Api.csproj
 
 # Run tests
-dotnet test FestGuide.sln
+dotnet test FestConnect.sln
 
 # Run API locally
-dotnet run --project src/Interface/FestGuide.Api/FestGuide.Api.csproj
+dotnet run --project src/Interface/FestConnect.Api/FestConnect.Api.csproj
 ```
 
 ### Central Package Management

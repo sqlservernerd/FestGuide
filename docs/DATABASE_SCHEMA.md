@@ -1,10 +1,10 @@
-# 🎵 FestGuide - Database Schema
+# 🎵 FestConnect - Database Schema
 
 ---
 
 ## Document Control
 
-| **Document Title** | FestGuide - Database Schema |
+| **Document Title** | FestConnect - Database Schema |
 |---|---|
 | **Version** | 1.0 |
 | **Date** | 2026-01-20 |

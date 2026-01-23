@@ -1,10 +1,10 @@
-# 🎵 FestGuide - Deployment Guide
+# 🎵 FestConnect - Deployment Guide
 
 ---
 
 ## Document Control
 
-| **Document Title** | FestGuide - Deployment Guide |
+| **Document Title** | FestConnect - Deployment Guide |
 |---|---|
 | **Version** | 1.0 |
 | **Date** | 2026-01-20 |
@@ -100,13 +100,13 @@ appsettings.json                    # Base configuration (checked into source)
 | `ASPNETCORE_ENVIRONMENT` | Runtime environment | `Production` |
 | `ConnectionStrings__DefaultConnection` | Database connection string | `Server=...` |
 | `Jwt__SecretKey` | JWT signing key (256-bit) | `<base64-key>` |
-| `Jwt__Issuer` | JWT issuer | `https://api.festguide.com` |
-| `Jwt__Audience` | JWT audience | `https://festguide.com` |
-| `Firebase__ProjectId` | Firebase project ID | `festguide-prod` |
+| `Jwt__Issuer` | JWT issuer | `https://api.FestConnect.com` |
+| `Jwt__Audience` | JWT audience | `https://FestConnect.com` |
+| `Firebase__ProjectId` | Firebase project ID | `FestConnect-prod` |
 | `Firebase__CredentialsPath` | Path to Firebase credentials | `/secrets/firebase.json` |
 | `Email__SmtpHost` | SMTP server host | `smtp.example.com` |
 | `Email__SmtpPort` | SMTP server port | `587` |
-| `Email__SmtpUsername` | SMTP username | `noreply@festguide.com` |
+| `Email__SmtpUsername` | SMTP username | `noreply@FestConnect.com` |
 | `Email__SmtpPassword` | SMTP password | `<password>` |
 | `Redis__ConnectionString` | Redis connection | `localhost:6379` |
 
@@ -162,15 +162,15 @@ jobs:
       run: dotnet test --no-build --configuration Release --verbosity normal
     
     - name: Publish
-      run: dotnet publish src/FestGuide.Api/FestGuide.Api.csproj -c Release -o ./publish
+      run: dotnet publish src/FestConnect.Api/FestConnect.Api.csproj -c Release -o ./publish
     
     - name: Build Docker image
-      run: docker build -t festguide-api:${{ github.sha }} .
+      run: docker build -t FestConnect-api:${{ github.sha }} .
     
     - name: Push to registry
       run: |
-        docker tag festguide-api:${{ github.sha }} registry.festguide.com/api:${{ github.sha }}
-        docker push registry.festguide.com/api:${{ github.sha }}
+        docker tag FestConnect-api:${{ github.sha }} registry.FestConnect.com/api:${{ github.sha }}
+        docker push registry.FestConnect.com/api:${{ github.sha }}
 ```
 
 ### 4.2 Dockerfile
@@ -184,18 +184,18 @@ EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
-COPY ["src/FestGuide.Api/FestGuide.Api.csproj", "FestGuide.Api/"]
-COPY ["src/FestGuide.Application/FestGuide.Application.csproj", "FestGuide.Application/"]
-COPY ["src/FestGuide.DataAccess/FestGuide.DataAccess.csproj", "FestGuide.DataAccess/"]
-COPY ["src/FestGuide.Domain/FestGuide.Domain.csproj", "FestGuide.Domain/"]
-COPY ["src/FestGuide.Infrastructure/FestGuide.Infrastructure.csproj", "FestGuide.Infrastructure/"]
-COPY ["src/FestGuide.Security/FestGuide.Security.csproj", "FestGuide.Security/"]
-RUN dotnet restore "FestGuide.Api/FestGuide.Api.csproj"
+COPY ["src/FestConnect.Api/FestConnect.Api.csproj", "FestConnect.Api/"]
+COPY ["src/FestConnect.Application/FestConnect.Application.csproj", "FestConnect.Application/"]
+COPY ["src/FestConnect.DataAccess/FestConnect.DataAccess.csproj", "FestConnect.DataAccess/"]
+COPY ["src/FestConnect.Domain/FestConnect.Domain.csproj", "FestConnect.Domain/"]
+COPY ["src/FestConnect.Infrastructure/FestConnect.Infrastructure.csproj", "FestConnect.Infrastructure/"]
+COPY ["src/FestConnect.Security/FestConnect.Security.csproj", "FestConnect.Security/"]
+RUN dotnet restore "FestConnect.Api/FestConnect.Api.csproj"
 COPY src/ .
-RUN dotnet build "FestGuide.Api/FestGuide.Api.csproj" -c Release -o /app/build
+RUN dotnet build "FestConnect.Api/FestConnect.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "FestGuide.Api/FestGuide.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "FestConnect.Api/FestConnect.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
@@ -205,28 +205,28 @@ COPY --from=publish /app/publish .
 RUN adduser --disabled-password --gecos '' appuser && chown -R appuser /app
 USER appuser
 
-ENTRYPOINT ["dotnet", "FestGuide.Api.dll"]
+ENTRYPOINT ["dotnet", "FestConnect.Api.dll"]
 ```
 
 ### 4.3 Build Commands
 
 ```bash
 # Restore packages
-dotnet restore FestGuide.sln
+dotnet restore FestConnect.sln
 
 # Build solution
-dotnet build FestGuide.sln --configuration Release
+dotnet build FestConnect.sln --configuration Release
 
 # Run tests
-dotnet test FestGuide.sln --configuration Release --no-build
+dotnet test FestConnect.sln --configuration Release --no-build
 
 # Publish API
-dotnet publish src/FestGuide.Api/FestGuide.Api.csproj \
+dotnet publish src/FestConnect.Api/FestConnect.Api.csproj \
     --configuration Release \
     --output ./artifacts/api
 
 # Build Docker image
-docker build -t festguide-api:latest .
+docker build -t FestConnect-api:latest .
 ```
 
 ---
@@ -239,17 +239,17 @@ Database schema is managed using SQL Server Data Tools (SSDT).
 
 ```bash
 # Build database project
-dotnet build src/FestGuide.Database/FestGuide.Database.sqlproj
+dotnet build src/FestConnect.Database/FestConnect.Database.sqlproj
 
 # Generate deployment script
 sqlpackage /Action:Script \
-    /SourceFile:./src/FestGuide.Database/bin/Release/FestGuide.Database.dacpac \
+    /SourceFile:./src/FestConnect.Database/bin/Release/FestConnect.Database.dacpac \
     /TargetConnectionString:"<connection-string>" \
     /OutputPath:./deploy-script.sql
 
 # Deploy to database
 sqlpackage /Action:Publish \
-    /SourceFile:./src/FestGuide.Database/bin/Release/FestGuide.Database.dacpac \
+    /SourceFile:./src/FestConnect.Database/bin/Release/FestConnect.Database.dacpac \
     /TargetConnectionString:"<connection-string>" \
     /p:BlockOnPossibleDataLoss=true
 ```
@@ -312,7 +312,7 @@ version: '3.8'
 
 services:
   api:
-    image: registry.festguide.com/api:${IMAGE_TAG}
+    image: registry.FestConnect.com/api:${IMAGE_TAG}
     ports:
       - "8080:8080"
     environment:
@@ -376,13 +376,13 @@ upstream api_servers {
 
 server {
     listen 80;
-    server_name api.festguide.com;
+    server_name api.FestConnect.com;
     return 301 https://$server_name$request_uri;
 }
 
 server {
     listen 443 ssl http2;
-    server_name api.festguide.com;
+    server_name api.FestConnect.com;
 
     ssl_certificate /etc/nginx/certs/fullchain.pem;
     ssl_certificate_key /etc/nginx/certs/privkey.pem;
@@ -419,13 +419,13 @@ server {
 
 ```bash
 # Pull latest image
-docker pull registry.festguide.com/api:${VERSION}
+docker pull registry.FestConnect.com/api:${VERSION}
 
 # Deploy with rolling update
 docker-compose -f docker-compose.staging.yml up -d --no-deps api
 
 # Verify health
-curl -f https://api.festguide.com/health
+curl -f https://api.FestConnect.com/health
 
 # View logs
 docker-compose -f docker-compose.staging.yml logs -f api
@@ -489,8 +489,8 @@ docker-compose -f docker-compose.staging.yml up -d --no-deps api \
 # Generate certificate with Let's Encrypt
 certbot certonly --webroot \
     -w /var/www/certbot \
-    -d api.festguide.com \
-    --email admin@festguide.com \
+    -d api.FestConnect.com \
+    --email admin@FestConnect.com \
     --agree-tos
 
 # Auto-renewal (cron)
@@ -523,7 +523,7 @@ certbot certonly --webroot \
       {
         "Name": "File",
         "Args": {
-          "path": "/var/log/festguide/app-.log",
+          "path": "/var/log/FestConnect/app-.log",
           "rollingInterval": "Day",
           "retainedFileCountLimit": 30
         }
@@ -563,11 +563,11 @@ certbot certonly --webroot \
 ```bash
 # Full database backup
 sqlcmd -S localhost -U sa -P ${DB_PASSWORD} -Q \
-    "BACKUP DATABASE FestGuide TO DISK='/backups/festguide_$(date +%Y%m%d).bak' WITH COMPRESSION"
+    "BACKUP DATABASE FestConnect TO DISK='/backups/FestConnect_$(date +%Y%m%d).bak' WITH COMPRESSION"
 
 # Verify backup
 sqlcmd -S localhost -U sa -P ${DB_PASSWORD} -Q \
-    "RESTORE VERIFYONLY FROM DISK='/backups/festguide_$(date +%Y%m%d).bak'"
+    "RESTORE VERIFYONLY FROM DISK='/backups/FestConnect_$(date +%Y%m%d).bak'"
 ```
 
 ### 10.3 Recovery Procedure
@@ -590,14 +590,14 @@ sqlcmd -S localhost -U sa -P ${DB_PASSWORD} -Q \
 
 ```bash
 # Identify previous version
-docker images registry.festguide.com/api --format "{{.Tag}}"
+docker images registry.FestConnect.com/api --format "{{.Tag}}"
 
 # Rollback to previous version
 export IMAGE_TAG=<previous-version>
 docker-compose -f docker-compose.staging.yml up -d --no-deps api
 
 # Verify rollback
-curl -f https://api.festguide.com/health
+curl -f https://api.FestConnect.com/health
 ```
 
 ### 11.2 Database Rollback
@@ -605,7 +605,7 @@ curl -f https://api.festguide.com/health
 ```bash
 # Restore from backup
 sqlcmd -S localhost -U sa -P ${DB_PASSWORD} -Q \
-    "RESTORE DATABASE FestGuide FROM DISK='/backups/festguide_YYYYMMDD.bak' WITH REPLACE"
+    "RESTORE DATABASE FestConnect FROM DISK='/backups/FestConnect_YYYYMMDD.bak' WITH REPLACE"
 ```
 
 ---
@@ -650,13 +650,13 @@ sqlcmd -S localhost -U sa -P ${DB_PASSWORD} -Q \
 
 ```bash
 # View container logs
-docker logs festguide-api --tail 100 -f
+docker logs FestConnect-api --tail 100 -f
 
 # Check container resources
-docker stats festguide-api
+docker stats FestConnect-api
 
 # Test database connectivity
-docker exec festguide-api dotnet FestGuide.Api.dll --test-db
+docker exec FestConnect-api dotnet FestConnect.Api.dll --test-db
 
 # Check nginx configuration
 nginx -t

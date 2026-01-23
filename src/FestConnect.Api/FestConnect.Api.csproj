@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <ItemGroup>
+    <ProjectReference Include="..\FestConnect.Application\FestConnect.Application.csproj" />
+    <ProjectReference Include="..\FestConnect.DataAccess\FestConnect.DataAccess.csproj" />
+    <ProjectReference Include="..\FestConnect.Integrations\FestConnect.Integrations.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation.AspNetCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!--
+      UserSecretsId identifies the local user secrets store for the FestConnect.Api project.
+      Configure API secrets for local development using the .NET user-secrets tooling, e.g.:
+        dotnet user-secrets set "Jwt:SigningKey" "your-local-dev-key" -p src/FestConnect.Api/FestConnect.Api.csproj
+        dotnet user-secrets set "Smtp:Username" "your-smtp-username" -p src/FestConnect.Api/FestConnect.Api.csproj
+        dotnet user-secrets set "Smtp:Password" "your-smtp-password" -p src/FestConnect.Api/FestConnect.Api.csproj
+      See the developer documentation/README for the full list of expected secret keys and structure.
+    -->
+    <UserSecretsId>43220b37-66d0-40e0-b8d4-0e835ff2a421</UserSecretsId>
+  </PropertyGroup>
+
+</Project>

@@ -1,10 +1,10 @@
-# 🎵 FestGuide - Testing Strategy
+# 🎵 FestConnect - Testing Strategy
 
 ---
 
 ## Document Control
 
-| **Document Title** | FestGuide - Testing Strategy |
+| **Document Title** | FestConnect - Testing Strategy |
 |---|---|
 | **Version** | 1.0 |
 | **Date** | 2026-01-20 |
@@ -18,7 +18,7 @@
 
 ### 1.1 Purpose
 
-This document defines the testing strategy for FestGuide, establishing testing types, coverage requirements, tools, and processes to ensure software quality.
+This document defines the testing strategy for FestConnect, establishing testing types, coverage requirements, tools, and processes to ensure software quality.
 
 ### 1.2 Testing Objectives
 
@@ -149,44 +149,44 @@ This document defines the testing strategy for FestGuide, establishing testing t
 
 ```
 tests/
-├── FestGuide.Application.Tests/           # Application layer unit tests
+├── FestConnect.Application.Tests/           # Application layer unit tests
 │   ├── Services/
 │   │   ├── FestivalServiceTests.cs
 │   │   ├── ScheduleServiceTests.cs
 │   │   └── AuthenticationServiceTests.cs
 │   ├── Validators/
 │   │   └── CreateFestivalRequestValidatorTests.cs
-│   └── FestGuide.Application.Tests.csproj
+│   └── FestConnect.Application.Tests.csproj
 │
-├── FestGuide.Api.Tests/                   # API controller unit tests
+├── FestConnect.Api.Tests/                   # API controller unit tests
 │   ├── Controllers/
 │   │   ├── FestivalsControllerTests.cs
 │   │   └── AuthControllerTests.cs
-│   └── FestGuide.Api.Tests.csproj
+│   └── FestConnect.Api.Tests.csproj
 │
-├── FestGuide.Domain.Tests/                # Domain logic unit tests
+├── FestConnect.Domain.Tests/                # Domain logic unit tests
 │   ├── Entities/
 │   │   └── FestivalTests.cs
-│   └── FestGuide.Domain.Tests.csproj
+│   └── FestConnect.Domain.Tests.csproj
 │
-├── FestGuide.DataAccess.Tests/            # Repository integration tests
+├── FestConnect.DataAccess.Tests/            # Repository integration tests
 │   ├── Repositories/
 │   │   ├── FestivalRepositoryTests.cs
 │   │   └── UserRepositoryTests.cs
 │   ├── TestDatabaseFixture.cs
-│   └── FestGuide.DataAccess.Tests.csproj
+│   └── FestConnect.DataAccess.Tests.csproj
 │
-├── FestGuide.Integration.Tests/           # Full integration tests
+├── FestConnect.Integration.Tests/           # Full integration tests
 │   ├── Endpoints/
 │   │   ├── FestivalEndpointTests.cs
 │   │   └── AuthEndpointTests.cs
 │   ├── WebApplicationFactory.cs
-│   └── FestGuide.Integration.Tests.csproj
+│   └── FestConnect.Integration.Tests.csproj
 │
-└── FestGuide.Performance.Tests/           # Performance/load tests
+└── FestConnect.Performance.Tests/           # Performance/load tests
     ├── LoadTests/
     │   └── ScheduleLoadTests.cs
-    └── FestGuide.Performance.Tests.csproj
+    └── FestConnect.Performance.Tests.csproj
 ```
 
 ### 3.2 Test Naming Convention
@@ -550,7 +550,7 @@ export const options = {
     },
 };
 
-const BASE_URL = __ENV.BASE_URL || 'https://api.festguide.com';
+const BASE_URL = __ENV.BASE_URL || 'https://api.FestConnect.com';
 
 export default function () {
     // Get festival schedule (most common operation)
@@ -695,7 +695,7 @@ jobs:
         run: dotnet build --no-restore
       
       - name: Unit Tests
-        run: dotnet test tests/FestGuide.Application.Tests --no-build --verbosity normal --collect:"XPlat Code Coverage"
+        run: dotnet test tests/FestConnect.Application.Tests --no-build --verbosity normal --collect:"XPlat Code Coverage"
       
       - name: Upload Coverage
         uses: codecov/codecov-action@v4
@@ -728,22 +728,22 @@ jobs:
         run: dotnet build --no-restore
       
       - name: Integration Tests
-        run: dotnet test tests/FestGuide.Integration.Tests --no-build --verbosity normal
+        run: dotnet test tests/FestConnect.Integration.Tests --no-build --verbosity normal
         env:
-          ConnectionStrings__TestDatabase: "Server=localhost;Database=FestGuide_Test;User Id=sa;Password=TestPassword123!;TrustServerCertificate=true"
+          ConnectionStrings__TestDatabase: "Server=localhost;Database=FestConnect_Test;User Id=sa;Password=TestPassword123!;TrustServerCertificate=true"
 ```
 
 ### 8.2 Test Execution Order
 
 ```
 1. Unit Tests (parallel)
-   ├── FestGuide.Application.Tests
-   ├── FestGuide.Api.Tests
-   └── FestGuide.Domain.Tests
+   ├── FestConnect.Application.Tests
+   ├── FestConnect.Api.Tests
+   └── FestConnect.Domain.Tests
 
 2. Integration Tests (sequential)
-   ├── FestGuide.DataAccess.Tests
-   └── FestGuide.Integration.Tests
+   ├── FestConnect.DataAccess.Tests
+   └── FestConnect.Integration.Tests
 
 3. Security Scans
    ├── CodeQL Analysis
@@ -758,10 +758,10 @@ jobs:
 
 | **Project** | **Target** | **Minimum** |
 |---|---|---|
-| FestGuide.Application | 85% | 80% |
-| FestGuide.Domain | 80% | 70% |
-| FestGuide.Api | 75% | 70% |
-| FestGuide.DataAccess | Integration tests | N/A |
+| FestConnect.Application | 85% | 80% |
+| FestConnect.Domain | 80% | 70% |
+| FestConnect.Api | 75% | 70% |
+| FestConnect.DataAccess | Integration tests | N/A |
 
 ### 9.2 Quality Gates
 
@@ -778,7 +778,7 @@ jobs:
 ```xml
 <!-- test-results.xml (JUnit format) -->
 <testsuites>
-  <testsuite name="FestGuide.Application.Tests" tests="150" failures="0" time="5.234">
+  <testsuite name="FestConnect.Application.Tests" tests="150" failures="0" time="5.234">
     <testcase classname="FestivalServiceTests" name="GetFestivalAsync_WithValidId_ReturnsFestival" time="0.123"/>
     <!-- ... -->
   </testsuite>

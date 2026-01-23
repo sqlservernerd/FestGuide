@@ -1,10 +1,10 @@
-# 🎵 FestGuide - API Specification
+# 🎵 FestConnect - API Specification
 
 ---
 
 ## Document Control
 
-| **Document Title** | FestGuide - API Specification |
+| **Document Title** | FestConnect - API Specification |
 |---|---|
 | **Version** | 1.0 |
 | **Date** | 2026-01-20 |
@@ -18,15 +18,15 @@
 
 ### 1.1 Purpose
 
-This document provides the complete API specification for FestGuide, defining all endpoints, request/response formats, authentication mechanisms, and error handling patterns.
+This document provides the complete API specification for FestConnect, defining all endpoints, request/response formats, authentication mechanisms, and error handling patterns.
 
 ### 1.2 Base URL
 
 | **Environment** | **Base URL** |
 |---|---|
 | Development | `https://localhost:5001/api` |
-| Staging | `https://staging-api.festguide.com/api` |
-| Production | `https://api.festguide.com/api` |
+| Staging | `https://staging-api.FestConnect.com/api` |
+| Production | `https://api.FestConnect.com/api` |
 
 ### 1.3 API Versioning
 
@@ -441,7 +441,7 @@ Search and list festivals.
       "festivalId": "550e8400-e29b-41d4-a716-446655440000",
       "name": "Summer Music Festival",
       "description": "Annual summer music festival...",
-      "imageUrl": "https://cdn.festguide.com/festivals/smf.jpg",
+      "imageUrl": "https://cdn.FestConnect.com/festivals/smf.jpg",
       "nextEditionDate": "2026-07-15"
     }
   ],
@@ -471,7 +471,7 @@ Returns festival details.
     "festivalId": "550e8400-e29b-41d4-a716-446655440000",
     "name": "Summer Music Festival",
     "description": "Annual summer music festival featuring top artists...",
-    "imageUrl": "https://cdn.festguide.com/festivals/smf.jpg",
+    "imageUrl": "https://cdn.FestConnect.com/festivals/smf.jpg",
     "websiteUrl": "https://summermusicfest.com",
     "editions": [
       {
@@ -520,7 +520,7 @@ Returns published schedule for an edition.
                   "artistId": "aa0e8400-e29b-41d4-a716-446655440005",
                   "name": "The Headliners",
                   "genre": "Rock",
-                  "imageUrl": "https://cdn.festguide.com/artists/headliners.jpg"
+                  "imageUrl": "https://cdn.FestConnect.com/artists/headliners.jpg"
                 },
                 "startTimeUtc": "2026-07-15T20:00:00Z",
                 "endTimeUtc": "2026-07-15T22:00:00Z"

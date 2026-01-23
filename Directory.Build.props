@@ -8,9 +8,9 @@
     <NoWarn>$(NoWarn);1591</NoWarn>
 
     <!-- Assembly information -->
-    <Company>FestGuide</Company>
-    <Copyright>Copyright © FestGuide 2026</Copyright>
-    <Product>FestGuide</Product>
+    <Company>FestConnect</Company>
+    <Copyright>Copyright © FestConnect 2026</Copyright>
+    <Product>FestConnect</Product>
     <Version>1.0.0</Version>
 
     <!-- Deterministic builds -->

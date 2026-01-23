@@ -1,10 +1,10 @@
-# 🎵 FestGuide - Project Charter
+# 🎵 FestConnect - Project Charter
 
 ---
 
 ## Document Control
 
-| **Document Title** | FestGuide - Project Charter |
+| **Document Title** | FestConnect - Project Charter |
 |---|---|
 | **Version** | 1.0 |
 | **Date** | 2026-01-20 |
@@ -20,7 +20,7 @@
 
 ## 1. Executive Summary
 
-**FestGuide** is a mobile-first platform designed to deliver an exceptional experience for music festival attendees worldwide. The platform is architected to support up to **400,000 simultaneous users** at full scale, but will launch with a **single partner festival of 2,000-5,000 attendees** to validate the concept and iterate based on real-world feedback.
+**FestConnect** is a mobile-first platform designed to deliver an exceptional experience for music festival attendees worldwide. The platform is architected to support up to **400,000 simultaneous users** at full scale, but will launch with a **single partner festival of 2,000-5,000 attendees** to validate the concept and iterate based on real-world feedback.
 
 The platform enables attendees to discover festivals, build personalized schedules, and receive real-time notifications about schedule changes. Festival organizers use the platform to publish event data—lineups, schedules, venues, and artists—that attendees consume. The platform also enables organizers to integrate this information into their own websites and social media channels. **This is not a festival operations management system**; it is the attendee-facing information layer.
 
@@ -74,7 +74,7 @@ For organizers, distributing accurate, timely schedule information to attendees 
 
 ### 2.2 Proposed Solution
 
-FestGuide addresses these challenges by providing:
+FestConnect addresses these challenges by providing:
 
 1. **Unified Platform**: Single source of truth for festival schedules, accessible across devices
 2. **Personalization**: Attendees build custom schedules featuring only their chosen artists
@@ -96,9 +96,9 @@ Rather than building for 400,000 users immediately, the project will launch with
 
 ### 2.4 Competitive Analysis
 
-The festival app market includes several established players. FestGuide differentiates through its focus on **organizer data publishing with attendee-first experience** and **offline reliability**.
+The festival app market includes several established players. FestConnect differentiates through its focus on **organizer data publishing with attendee-first experience** and **offline reliability**.
 
-| **Competitor** | **Strengths** | **Weaknesses** | **FestGuide Differentiation** |
+| **Competitor** | **Strengths** | **Weaknesses** | **FestConnect Differentiation** |
 |---|---|---|---|
 | **Clashfinder** | Free, community-driven, printable schedules | Web-only, no mobile app, no push notifications | Native mobile apps, organizer-controlled data, real-time push notifications |
 | **Frontstage** | Strong offline maps, friend-finding, 100+ festivals | Social features add complexity, limited organizer tools | Focus on schedule reliability over social, robust organizer publishing tools |
